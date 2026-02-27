@@ -2,6 +2,10 @@
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
+  <Project Path="QuestFlag.Infrastructure.Client/QuestFlag.Infrastructure.Client.csproj" Id="2b81de17-e12a-46aa-ab16-0f87cafaa29c" />
   <Project Path="QuestFlag.Infrastructure.Core/QuestFlag.Infrastructure.Core.csproj" />
+  <Project Path="QuestFlag.Infrastructure.Domain/QuestFlag.Infrastructure.Domain.csproj" Id="4b582fee-9cf6-4d98-8ead-a86e1bcb634e" />
   <Project Path="QuestFlag.Infrastructure.Services/QuestFlag.Infrastructure.Services.csproj" Id="a811e5a2-0a11-4106-9ec7-b1fb78ee466c" />
+  <Project Path="QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp.Client/QuestFlag.Infrastructure.WebApp.Client.csproj" Id="1c83305a-d4b0-4d28-9e5a-72effd96492e" />
+  <Project Path="QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp.csproj" Id="5c8c7ec9-0cc6-470a-a148-0bd76c34eb0e" />
 </Solution>

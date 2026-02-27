@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
+  </ItemGroup>
+
 </Project>
