@@ -1,0 +1,6 @@
+@QuestFlag.Infrastructure.Services_HostAddress = http://localhost:5139
+
+GET {{QuestFlag.Infrastructure.Services_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
