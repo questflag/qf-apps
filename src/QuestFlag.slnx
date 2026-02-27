@@ -2,6 +2,7 @@
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
+  <Project Path="QuestFlag.Infrastructure.Application/QuestFlag.Infrastructure.Application.csproj" Id="ca15bdbe-0e35-4ec3-af3c-307b6acc624e" />
   <Project Path="QuestFlag.Infrastructure.Client/QuestFlag.Infrastructure.Client.csproj" Id="2b81de17-e12a-46aa-ab16-0f87cafaa29c" />
   <Project Path="QuestFlag.Infrastructure.Core/QuestFlag.Infrastructure.Core.csproj" />
   <Project Path="QuestFlag.Infrastructure.Domain/QuestFlag.Infrastructure.Domain.csproj" Id="4b582fee-9cf6-4d98-8ead-a86e1bcb634e" />
