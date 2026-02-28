@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using QuestFlag.Passport.UserClient;
 
@@ -8,6 +9,8 @@ public partial class LoginPage
 {
     [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
     [SupplyParameterFromQuery] public string? ClientId { get; set; }
+
+    [Inject] private IConfiguration Config { get; set; } = default!;
 
     private IReadOnlyList<TenantDto>? _tenants;
     private ResolvedTenantDto? _resolvedTenant;
@@ -57,14 +60,17 @@ public partial class LoginPage
         try
         {
             // Build the authorize URL — redirect to Passport.Services /connect/authorize
-            // The Passport.Services will handle PKCE code challenge verification.
-            // For the SSO WebApp's own session we'd use form-based login + server cookie here.
-            // For now, redirect to the OAuth authorize endpoint which will use this form.
-            var authorizeUrl = $"https://localhost:7002/connect/authorize" +
+            // URLs are configured via Passport:PassportServicesBaseUrl and Passport:InfraWebAppBaseUrl in appsettings.json
+            var passportServicesBaseUrl = Config["Passport:PassportServicesBaseUrl"]
+                ?? throw new InvalidOperationException("Passport:PassportServicesBaseUrl is required in configuration.");
+            var infraWebAppBaseUrl = Config["Passport:InfraWebAppBaseUrl"]
+                ?? throw new InvalidOperationException("Passport:InfraWebAppBaseUrl is required in configuration.");
+
+            var authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize" +
                                $"?response_type=code" +
                                $"&client_id={Uri.EscapeDataString(ClientId ?? "passport-webapp")}" +
                                $"&scope=openid profile roles offline_access" +
-                               $"&redirect_uri={Uri.EscapeDataString(ReturnUrl ?? "https://localhost:7000/signin-oidc")}" +
+                               $"&redirect_uri={Uri.EscapeDataString(ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc")}" +
                                $"&tenant={Uri.EscapeDataString(_tenantSlug)}" +
                                $"&login_hint={Uri.EscapeDataString(_username)}";
 

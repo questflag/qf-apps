@@ -7,12 +7,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QuestFlag.Infrastructure.Application.Common.DTOs;
+using QuestFlag.Infrastructure.ApiCore.Extensions;
+using QuestFlag.Infrastructure.ApiCore.Models;
 using QuestFlag.Infrastructure.Application.Common.Models;
+using QuestFlag.Infrastructure.Application.Common.DTOs;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Commands;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
-using QuestFlag.Infrastructure.Services.Extensions;
-using QuestFlag.Infrastructure.Services.Models;
 
 namespace QuestFlag.Infrastructure.Services.Controllers;
 

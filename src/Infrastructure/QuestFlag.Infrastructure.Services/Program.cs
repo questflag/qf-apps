@@ -1,11 +1,8 @@
-using System;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using OpenIddict.Validation.AspNetCore;
+using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Infrastructure.Application.DependencyInjection;
 using QuestFlag.Infrastructure.Core.Data;
 using QuestFlag.Infrastructure.Core.DependencyInjection;
@@ -19,57 +16,56 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // 1. Add layers DI
+        // 1. Layer DI
         builder.Services.AddInfrastructureApplication();
         builder.Services.AddInfrastructureCore(builder.Configuration);
 
-        // Add HttpClient for the Kafka consumer downstream call
+        // HttpClient for Kafka consumer downstream calls
         builder.Services.AddHttpClient();
 
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
+        // 2. Common API services (controllers, endpoint explorer, Swagger)
+        builder.Services.AddQuestFlagApiServices();
 
-        // 2. Swagger Configuration
-        builder.Services.AddSwaggerGen();
-
-        // 3. Authentication & Authorization (Consuming Passport JWT via Introspection)
+        // 3. Authentication & Authorization (consuming Passport JWT via Introspection)
         builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+
+        var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
+            ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
 
         builder.Services.AddOpenIddict()
             .AddValidation(options =>
             {
-                // The Passport Server's address
-                options.SetIssuer("https://localhost:7002");
+                // Passport Server's address — configured via ServiceUrls:PassportServices
+                options.SetIssuer(passportServicesUrl);
                 options.AddAudiences("infra-api");
 
-                // We want to validate against the Passport Introspection endpoint
+                // Validate against the Passport Introspection endpoint
                 options.UseIntrospection()
                        .SetClientId("infra-api")
                        .SetClientSecret("infra-api-secret"); // Should come from config in production
 
-                // Register the System.Net.Http integration.
                 options.UseSystemNetHttp();
-
-                // Register the ASP.NET Core host.
                 options.UseAspNetCore();
             });
 
         builder.Services.AddAuthorization(options =>
         {
-            // TenantAdmin Policy
             options.AddPolicy("TenantAdmin", policy =>
                 policy.RequireClaim("role", "tenant_admin"));
         });
 
-        // 4. CORS
+        // 4. CORS — origins configured via ServiceUrls:* in appsettings.json
+        var infraWebApp     = builder.Configuration["ServiceUrls:InfraWebApp"]     ?? throw new InvalidOperationException("ServiceUrls:InfraWebApp is required.");
+        var infraWebAppHttp = builder.Configuration["ServiceUrls:InfraWebAppHttp"] ?? throw new InvalidOperationException("ServiceUrls:InfraWebAppHttp is required.");
+
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.WithOrigins("https://localhost:7000", "http://localhost:5000", "https://localhost:7002") // Allow Blazor WebApp
+                policy.WithOrigins(infraWebApp, infraWebAppHttp, passportServicesUrl)
                       .AllowAnyHeader()
                       .AllowAnyMethod()
-                      .AllowCredentials(); // needed for some JS clients if they pack cookies
+                      .AllowCredentials();
             });
         });
 
@@ -82,17 +78,11 @@ public class Program
             db.Database.Migrate();
         }
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseHttpsRedirection();
+        // 6. CORS must come before auth middleware
         app.UseCors();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.MapControllers();
+
+        // 7. Standard API pipeline (Swagger, HTTPS, Auth, Controllers)
+        app.UseQuestFlagApiPipeline();
 
         app.Run();
     }

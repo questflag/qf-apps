@@ -1,24 +1,22 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using OpenIddict.Abstractions;
+using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Passport.Application.DependencyInjection;
 using QuestFlag.Passport.Core.DependencyInjection;
 using QuestFlag.Passport.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add layers
+// 1. Layer DI
 builder.Services.AddPassportApplication();
 builder.Services.AddPassportCore(builder.Configuration);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// 2. Common API services (controllers, endpoint explorer, Swagger)
+builder.Services.AddQuestFlagApiServices();
 
-// OpenIddict Server Configuration — Full SSO Provider
+// 3. OpenIddict Server — Full SSO Provider
 builder.Services.AddOpenIddict()
     .AddServer(options =>
     {
@@ -49,7 +47,7 @@ builder.Services.AddOpenIddict()
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 
-        // Configure JWT output (disable encryption for external validation compat)
+        // Disable access token encryption for external validation compatibility
         options.DisableAccessTokenEncryption();
 
         // ASP.NET Core integration + passthrough so controllers handle the endpoints
@@ -61,11 +59,11 @@ builder.Services.AddOpenIddict()
     })
     .AddValidation(options =>
     {
-        // Validate tokens issued by this server + support remote introspection
         options.UseLocalServer();
         options.UseAspNetCore();
     });
 
+// 4. Authentication & Authorization
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
@@ -78,15 +76,20 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim(OpenIddictConstants.Claims.Role, "passport_admin"));
 });
 
-// Configure CORS for all web app origins
+// 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json
+var infraWebApp          = builder.Configuration["ServiceUrls:InfraWebApp"]         ?? throw new InvalidOperationException("ServiceUrls:InfraWebApp is required.");
+var infraWebAppHttp      = builder.Configuration["ServiceUrls:InfraWebAppHttp"]     ?? throw new InvalidOperationException("ServiceUrls:InfraWebAppHttp is required.");
+var passportWebApp       = builder.Configuration["ServiceUrls:PassportWebApp"]      ?? throw new InvalidOperationException("ServiceUrls:PassportWebApp is required.");
+var passportAdminWebApp  = builder.Configuration["ServiceUrls:PassportAdminWebApp"] ?? throw new InvalidOperationException("ServiceUrls:PassportAdminWebApp is required.");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PassportClients",
         b => b.WithOrigins(
-                "https://localhost:7000",  // Infrastructure.WebApp
-                "http://localhost:5000",
-                "https://localhost:7003",  // Passport.WebApp (SSO portal)
-                "https://localhost:7004"   // Passport.AdminWebApp
+                infraWebApp,          // Infrastructure.WebApp
+                infraWebAppHttp,
+                passportWebApp,       // Passport.WebApp (SSO portal)
+                passportAdminWebApp   // Passport.AdminWebApp
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
@@ -100,15 +103,10 @@ app.UseCors("PassportClients");
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     await app.InitializeDatabaseAsync();
 }
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+// 6. Standard API pipeline (Swagger, HTTPS, Auth, Controllers)
+app.UseQuestFlagApiPipeline();
 
 app.Run();
-

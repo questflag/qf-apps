@@ -88,7 +88,8 @@ public class TenantsController : ControllerBase
     [Authorize(Policy = "PassportAdmin")]
     public async Task<IActionResult> InviteUser(System.Guid tenantId, [FromBody] InviteUserRequest request)
     {
-        var baseUrl = _config["Passport:WebAppBaseUrl"] ?? "https://localhost:7003";
+        var baseUrl = _config["Passport:WebAppBaseUrl"]
+            ?? throw new InvalidOperationException("Passport:WebAppBaseUrl is required in configuration.");
         var id = await _mediator.Send(new InviteUserCommand(
             tenantId,
             request.Username,

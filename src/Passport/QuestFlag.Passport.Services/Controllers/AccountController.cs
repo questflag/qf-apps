@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using QuestFlag.Passport.ApiCore.Extensions;
 using QuestFlag.Passport.Application.Features.Users.Commands;
 
 namespace QuestFlag.Passport.Services.Controllers;
@@ -34,7 +36,8 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-        var baseUrl = _config["Passport:WebAppBaseUrl"] ?? "https://localhost:7003";
+        var baseUrl = _config["Passport:WebAppBaseUrl"]
+            ?? throw new InvalidOperationException("Passport:WebAppBaseUrl is required in configuration.");
         await _mediator.Send(new SendPasswordResetEmailCommand(request.Email, baseUrl));
         // Always return OK — never reveal whether the email exists
         return Ok(new { message = "If that email is registered, a reset link has been sent." });
@@ -109,15 +112,10 @@ public class AccountController : ControllerBase
     }
 
     // ─────────────────────────────────────────────────────────
-    // Helpers
+    // Helpers via QuestFlag.Passport.ApiCore.Extensions
     // ─────────────────────────────────────────────────────────
 
-    private Guid? GetCurrentUserId()
-    {
-        var sub = User.FindFirst(OpenIddict.Abstractions.OpenIddictConstants.Claims.Subject)?.Value
-               ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(sub, out var id) ? id : null;
-    }
+    private Guid? GetCurrentUserId() => User.GetCurrentUserId();
 }
 
 // ── Request DTOs ──────────────────────────────────────────────────────────────

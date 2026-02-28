@@ -18,6 +18,9 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
 builder.Services.AddHttpContextAccessor();
 
+var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
+    ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -26,7 +29,7 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = "https://localhost:7002"; // Passport.Services
+    options.Authority = passportServicesUrl; // Passport.Services — configured via ServiceUrls:PassportServices
     options.ClientId = "infra-webapp";
     options.ResponseType = OpenIdConnectResponseType.Code;
     options.SaveTokens = true;

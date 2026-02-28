@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Abstractions;
+using QuestFlag.Passport.ApiCore.Extensions;
 using QuestFlag.Passport.Application.Features.Users.Commands;
 using QuestFlag.Passport.Application.Features.Users.Queries;
 
@@ -55,10 +55,5 @@ public class DevicesController : ControllerBase
         return Ok(new { message = "All devices revoked." });
     }
 
-    private Guid? GetCurrentUserId()
-    {
-        var sub = User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value
-               ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(sub, out var id) ? id : null;
-    }
+    private Guid? GetCurrentUserId() => User.GetCurrentUserId();
 }
