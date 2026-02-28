@@ -4,3 +4,13 @@ services:
     build:
       context: ..
       dockerfile: Infrastructure/QuestFlag.Infrastructure.Services/Dockerfile
+  questflag.passport.webapp:
+    image: ${DOCKER_REGISTRY-}questflagpassportwebapp
+    build:
+      context: ..
+      dockerfile: Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/Dockerfile
+  questflag.passport.adminwebapp:
+    image: ${DOCKER_REGISTRY-}questflagpassportadminwebapp
+    build:
+      context: ..
+      dockerfile: Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp/Dockerfile
