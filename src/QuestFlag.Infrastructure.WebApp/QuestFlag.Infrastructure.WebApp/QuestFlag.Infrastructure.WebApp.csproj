@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npx tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css" />
+    <Exec Command="npx -y tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css" />
   </Target>
 
 </Project>
