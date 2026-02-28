@@ -1,0 +1,213 @@
+@page "/upload"
+@using QuestFlag.Infrastructure.Client
+@inject UploadApiService UploadApi
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<PageTitle>Upload Files - QuestFlag</PageTitle>
+
+<div class="max-w-4xl mx-auto p-4 space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Secure Upload</h1>
+        
+        <div class="flex items-center space-x-2 bg-green-50 text-green-700 px-3 py-1 rounded border border-green-200 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Authenticated</span>
+        </div>
+    </div>
+
+    @if (_error != null)
+    {
+        <div class="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200">
+            @_error
+        </div>
+    }
+
+    <div class="card p-6">
+        <h2 class="text-lg font-semibold mb-4">Metadata</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Task / App Name</label>
+                <input @bind="_taskName" class="input-field" placeholder="e.g. quarterly-report" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select @bind="_category" class="input-field cursor-pointer">
+                    <option value="backup">Backup</option>
+                    <option value="core">Core System</option>
+                    <option value="agents">Agents</option>
+                    <option value="users">Users</option>
+                    <option value="default">Default</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tags (Comma-separated)</label>
+                <input @bind="_tagsInput" class="input-field" placeholder="finance, urgent" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Extra Data (JSON format)</label>
+                <input @bind="_extraData" class="input-field shadow-sm" placeholder="{ \"region\": \"us-east\" }" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-6">
+        <h2 class="text-lg font-semibold mb-4">Select Files</h2>
+        
+        <div class="flex items-center justify-center w-full">
+            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                    </svg>
+                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                    <p class="text-xs text-gray-500">Auto-starts upload queue</p>
+                </div>
+                <InputFile id="dropzone-file" class="hidden" OnChange="@OnInputFileChange" multiple />
+            </label>
+        </div>
+    </div>
+
+    @if (_uploadQueue.Count > 0)
+    {
+        <div class="card">
+            <div class="table-header flex items-center justify-between">
+                <span>Upload Queue</span>
+                <span class="text-gray-500 text-xs font-normal">@(_uploadQueue.Count(q => q.IsDone)) / @_uploadQueue.Count completed</span>
+            </div>
+            <div class="w-full">
+                @foreach (var item in _uploadQueue)
+                {
+                    <div class="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-3 w-1/2">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <span class="text-sm font-medium text-gray-700 truncate" title="@item.File.Name">@item.File.Name</span>
+                        </div>
+                        <div class="w-1/4">
+                            @if (item.IsUploading)
+                            {
+                                <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 hidden md:block">
+                                    <div class="bg-blue-600 h-1.5 rounded-full w-full animate-pulse"></div>
+                                </div>
+                                <span class="text-xs text-blue-600 font-medium">Uploading...</span>
+                            }
+                            else if (item.IsDone)
+                            {
+                                <span class="text-xs text-green-600 font-medium">Completed</span>
+                            }
+                            else if (item.HasError)
+                            {
+                                <span class="text-xs text-red-600 font-medium truncate inline-block w-full">@item.ErrorMessage</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs text-gray-500 font-medium">Pending</span>
+                            }
+                        </div>
+                        <div class="w-1/4 text-right">
+                            <span class="text-sm text-gray-500">@(item.File.Size / 1024) KB</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <div class="flex justify-end gap-2">
+            <button class="btn btn-secondary" @onclick="ClearDone">Clear Completed</button>
+            <button class="btn btn-primary" @onclick='() => Nav.NavigateTo("/uploads")'>View All Uploads</button>
+        </div>
+    }
+</div>
+
+@code {
+    private string _taskName = "bulk-data";
+    private string _category = "default";
+    private string _tagsInput = "";
+    private string _extraData = "";
+    private string? _error;
+    private string? _token;
+
+    private List<UploadItem> _uploadQueue = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
+        if (string.IsNullOrEmpty(_token))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        // Initialize the Typed Client with Bearer token
+        UploadApi.SetBearerToken(_token);
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_taskName))
+        {
+            _error = "Task Name is required to formulate the storage path.";
+            return;
+        }
+
+        _error = null;
+        var tags = _tagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles: 20))
+        {
+            var item = new UploadItem { File = file };
+            _uploadQueue.Add(item);
+            
+            // Fire and forget individual uploads so they run concurrently
+            _ = ProcessUploadAsync(item, tags);
+        }
+    }
+
+    private async Task ProcessUploadAsync(UploadItem item, string[] tags)
+    {
+        item.IsUploading = true;
+        StateHasChanged();
+
+        try
+        {
+            // Allowed size up to 100MB per file in this UI config
+            using var stream = item.File.OpenReadStream(maxAllowedSize: 104857600);
+            
+            await UploadApi.UploadFileAsync(
+                fileStream: stream,
+                fileName: item.File.Name,
+                taskName: _taskName,
+                category: _category,
+                tags: tags,
+                extraData: _extraData
+            );
+
+            item.IsDone = true;
+        }
+        catch (Exception ex)
+        {
+            item.HasError = true;
+            item.ErrorMessage = "Failed to upload.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            item.IsUploading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearDone()
+    {
+        _uploadQueue.RemoveAll(q => q.IsDone);
+    }
+
+    private class UploadItem
+    {
+        public required IBrowserFile File { get; set; }
+        public bool IsUploading { get; set; }
+        public bool IsDone { get; set; }
+        public bool HasError { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+}

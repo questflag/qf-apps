@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: 215 90% 45%;
+    --primary-foreground: 210 40% 98%;
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --border: 214 32% 91%;
+    --danger: 0 84% 60%;
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+  }
+
+  /* Minimal global resets above what Tailwind provides */
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* Reusable sleek UI components to prevent inline class bloat */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 shadow-sm border border-transparent;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 shadow-sm;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 shadow-sm border border-transparent;
+  }
+  
+  .input-field {
+    @apply flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-shadow;
+  }
+  
+  .card {
+    @apply rounded-xl border border-gray-200 bg-white text-gray-950 shadow-sm overflow-hidden;
+  }
+  
+  .table-header {
+    @apply h-12 px-4 text-left align-middle font-medium text-gray-500 bg-gray-50/50 uppercase tracking-wider text-xs border-b border-gray-200;
+  }
+  
+  .table-cell {
+    @apply p-4 align-middle text-sm border-b border-gray-100;
+  }
+  
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-default {
+    @apply bg-gray-100 text-gray-800;
+  }
+}

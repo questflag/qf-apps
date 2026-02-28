@@ -16,4 +16,8 @@
     <ProjectReference Include="..\QuestFlag.Infrastructure.WebApp.Client\QuestFlag.Infrastructure.WebApp.Client.csproj" />
   </ItemGroup>
 
+  <Target Name="Tailwind" BeforeTargets="Build">
+    <Exec Command="npx tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css" />
+  </Target>
+
 </Project>
