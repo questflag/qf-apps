@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.0.0" />
-    <PackageReference Include="OpenIddict.Abstractions" Version="6.1.0" />
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QuestFlag.Passport.Domain\QuestFlag.Passport.Domain.csproj" />

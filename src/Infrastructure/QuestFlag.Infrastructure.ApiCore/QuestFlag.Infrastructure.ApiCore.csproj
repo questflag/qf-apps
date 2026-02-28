@@ -5,9 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <!-- Gives access to Microsoft.AspNetCore.* types without making this an executable -->
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="6.1.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.2.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuestFlag.Infrastructure.Application\QuestFlag.Infrastructure.Application.csproj" />
   </ItemGroup>
 </Project>

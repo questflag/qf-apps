@@ -5,11 +5,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <!-- Gives access to Microsoft.AspNetCore.* types without making this an executable -->
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="OpenIddict.Abstractions" Version="6.1.1" />
+    <PackageReference Include="OpenIddict.Abstractions" Version="7.2.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
+    <ProjectReference Include="..\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj" />
   </ItemGroup>
 </Project>
