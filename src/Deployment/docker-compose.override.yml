@@ -61,7 +61,7 @@ services:
       - redis_data:/data
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: public.ecr.aws/bitnami/kafka:4.2
     container_name: kafka
     ports:
       - "9092:9092"
@@ -113,7 +113,7 @@ services:
   milvus:
     image: milvusdb/milvus:v2.4.5
     container_name: milvus-standalone
-    command: ["milvus", "run", "standalone"]
+    command: [ "milvus", "run", "standalone" ]
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
