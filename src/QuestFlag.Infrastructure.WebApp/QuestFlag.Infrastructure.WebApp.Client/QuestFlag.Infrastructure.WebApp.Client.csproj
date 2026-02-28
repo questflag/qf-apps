@@ -10,13 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
     <ProjectReference Include="..\..\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
+    <ProjectReference Include="..\..\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
 
 </Project>

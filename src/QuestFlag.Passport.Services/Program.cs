@@ -18,36 +18,50 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// OpenIddict Server Configuration
+// OpenIddict Server Configuration — Full SSO Provider
 builder.Services.AddOpenIddict()
     .AddServer(options =>
     {
-        // Enable endpoints
-        options.SetTokenEndpointUris("/connect/token");
+        // Enable all required endpoints
+        options.SetAuthorizationEndpointUris("/connect/authorize")
+               .SetTokenEndpointUris("/connect/token")
+               .SetUserInfoEndpointUris("/connect/userinfo")
+               .SetEndSessionEndpointUris("/connect/logout")
+               .SetIntrospectionEndpointUris("/connect/introspect");
 
-        // Enable flows
-        options.AllowPasswordFlow()
-               .AllowRefreshTokenFlow();
+        // Allow Authorization Code + PKCE (primary SSO flow)
+        options.AllowAuthorizationCodeFlow()
+               .RequireProofKeyForCodeExchange();
 
-        // Accept anonymous clients (we don't enforce client_id/client_secret for this internal app)
-        options.AcceptAnonymousClients();
+        // Keep refresh token flow
+        options.AllowRefreshTokenFlow();
 
-        // Encryption and Signing credentials (development only)
+        // Register scopes
+        options.RegisterScopes(
+            OpenIddictConstants.Scopes.OpenId,
+            OpenIddictConstants.Scopes.Profile,
+            OpenIddictConstants.Scopes.Email,
+            OpenIddictConstants.Scopes.Phone,
+            OpenIddictConstants.Scopes.Roles,
+            OpenIddictConstants.Scopes.OfflineAccess);
+
+        // Encryption and Signing credentials (swap for real certs in production)
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 
-        // Register scopes
-        options.RegisterScopes(OpenIddictConstants.Scopes.Roles, OpenIddictConstants.Scopes.OfflineAccess);
-
-        // Required to use AspNetCore integration
-        options.UseAspNetCore()
-               .EnableTokenEndpointPassthrough();
-               
-        // Configure JWT output
+        // Configure JWT output (disable encryption for external validation compat)
         options.DisableAccessTokenEncryption();
+
+        // ASP.NET Core integration + passthrough so controllers handle the endpoints
+        options.UseAspNetCore()
+               .EnableAuthorizationEndpointPassthrough()
+               .EnableTokenEndpointPassthrough()
+               .EnableUserInfoEndpointPassthrough()
+               .EnableEndSessionEndpointPassthrough();
     })
     .AddValidation(options =>
     {
+        // Validate tokens issued by this server + support remote introspection
         options.UseLocalServer();
         options.UseAspNetCore();
     });
@@ -60,28 +74,34 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("TenantAdmin", policy => policy.RequireClaim(OpenIddictConstants.Claims.Role, "tenant_admin"));
+    options.AddPolicy("PassportAdmin", policy =>
+        policy.RequireClaim(OpenIddictConstants.Claims.Role, "passport_admin"));
 });
 
-// Configure CORS
+// Configure CORS for all web app origins
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorClient",
-        b => b.WithOrigins("https://localhost:7000", "http://localhost:5000") // UI hosts
+    options.AddPolicy("PassportClients",
+        b => b.WithOrigins(
+                "https://localhost:7000",  // Infrastructure.WebApp
+                "http://localhost:5000",
+                "https://localhost:7003",  // Passport.WebApp (SSO portal)
+                "https://localhost:7004"   // Passport.AdminWebApp
+              )
               .AllowAnyMethod()
               .AllowAnyHeader()
+              .AllowCredentials()
               .WithExposedHeaders("Token-Expired"));
 });
 
 var app = builder.Build();
 
-app.UseCors("AllowBlazorClient");
+app.UseCors("PassportClients");
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    // Initialize Db and seed roles/admin if configured
     await app.InitializeDatabaseAsync();
 }
 
@@ -91,3 +111,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

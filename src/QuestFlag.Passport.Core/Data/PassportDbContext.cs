@@ -13,6 +13,7 @@ public class PassportDbContext : IdentityDbContext<ApplicationUser, IdentityRole
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<TrustedDevice> TrustedDevices => Set<TrustedDevice>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

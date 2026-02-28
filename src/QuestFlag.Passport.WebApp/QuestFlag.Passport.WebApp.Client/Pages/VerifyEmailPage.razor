@@ -1,0 +1,65 @@
+@page "/verify-email"
+@using QuestFlag.Passport.UserClient
+@inject PassportUserClient PassportClient
+@inject NavigationManager Nav
+
+<PageTitle>Verify Email — QuestFlag</PageTitle>
+
+<div class="sso-container">
+    <div class="sso-card">
+        <div class="sso-header">
+            <div class="brand-logo">QF</div>
+            <h1 class="tenant-name">Accept Invitation</h1>
+            <p class="sign-in-subtitle">Set your password to activate your account</p>
+        </div>
+
+        @if (_success)
+        {
+            <div class="success-banner">✓ Account activated! You can now sign in.</div>
+            <div class="sso-footer"><a href="/login">Sign In</a></div>
+        }
+        else
+        {
+            @if (_error != null) { <div class="error-banner">@_error</div> }
+            <form @onsubmit="HandleVerify">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input @bind="_password" type="password" placeholder="Create a password" required />
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input @bind="_confirm" type="password" placeholder="••••••••" required />
+                </div>
+                <button type="submit" class="btn-primary" disabled="@_isSubmitting">
+                    @(_isSubmitting ? "Activating…" : "Activate Account")
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public Guid   UserId { get; set; }
+    [SupplyParameterFromQuery] public string Token  { get; set; } = "";
+
+    private string _password   = "";
+    private string _confirm    = "";
+    private bool   _isSubmitting;
+    private bool   _success;
+    private string? _error;
+
+    private async Task HandleVerify()
+    {
+        if (_password != _confirm) { _error = "Passwords do not match."; return; }
+        _isSubmitting = true;
+        _error = null;
+        try
+        {
+            var ok = await PassportClient.VerifyEmailAsync(UserId, Token, _password);
+            if (ok) _success = true;
+            else _error = "This invite link is invalid or has expired. Contact your administrator.";
+        }
+        catch { _error = "An error occurred. Please try again."; }
+        finally { _isSubmitting = false; }
+    }
+}

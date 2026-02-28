@@ -1,0 +1,97 @@
+@page "/profile"
+@using Microsoft.AspNetCore.Authorization
+@using QuestFlag.Passport.UserClient
+@attribute [Authorize]
+@inject PassportUserClient PassportClient
+
+<PageTitle>My Profile</PageTitle>
+
+<div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="min-w-0 flex-1">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">My Profile</h2>
+        </div>
+    </div>
+
+    <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">User Information</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Personal details and application settings.</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Full name</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">@_userInfo?.Name</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Email address</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">@_userInfo?.Email</dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Phone Number</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">@(_userInfo?.PhoneNumber ?? "Not set")</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 relative">
+                    <dt class="text-sm font-medium text-gray-500">Two-Factor Auth</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        @if (_userInfo?.TwoFactorEnabled == true)
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Enabled</span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Disabled</span>
+                        }
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+         <div class="relative bg-white pt-5 px-4 pb-5 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
+            <dt>
+                <div class="absolute bg-indigo-500 rounded-md p-3">
+                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <p class="ml-16 text-sm font-medium text-gray-500 truncate">Security Settings</p>
+            </dt>
+            <dd class="ml-16 pb-6 flex items-baseline sm:pb-7">
+                <div class="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
+                    <div class="text-sm">
+                        <a href="/profile/two-factor" class="font-medium text-indigo-600 hover:text-indigo-500"> Manage 2FA<span class="sr-only"> Security Settings</span></a>
+                    </div>
+                </div>
+            </dd>
+        </div>
+        <div class="relative bg-white pt-5 px-4 pb-5 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
+            <dt>
+                <div class="absolute bg-indigo-500 rounded-md p-3">
+                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <p class="ml-16 text-sm font-medium text-gray-500 truncate">My Devices</p>
+            </dt>
+            <dd class="ml-16 pb-6 flex items-baseline sm:pb-7">
+                <div class="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
+                    <div class="text-sm">
+                        <a href="/profile/devices" class="font-medium text-indigo-600 hover:text-indigo-500"> View Devices<span class="sr-only"> My Devices</span></a>
+                    </div>
+                </div>
+            </dd>
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserProfileDto? _userInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userInfo = await PassportClient.GetUserInfoAsync();
+    }
+}

@@ -1,0 +1,28 @@
+@page "/logout"
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Signed Out — QuestFlag</PageTitle>
+
+<div class="sso-container">
+    <div class="sso-card sso-card-center">
+        <div class="sso-header">
+            <div class="brand-logo">QF</div>
+            <h1 class="tenant-name">You've been signed out</h1>
+            <p class="sign-in-subtitle">Thank you for using QuestFlag.</p>
+        </div>
+        <div class="logout-actions">
+            <a href="/login@(!string.IsNullOrEmpty(AppUrl) ? "?returnUrl=" + Uri.EscapeDataString(AppUrl) : "")"
+               class="btn-primary">Sign in again</a>
+            @if (!string.IsNullOrEmpty(AppUrl))
+            {
+                <a href="@AppUrl" class="btn-secondary">Return to @AppName</a>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string? AppUrl  { get; set; }
+    [SupplyParameterFromQuery] public string? AppName { get; set; }
+}

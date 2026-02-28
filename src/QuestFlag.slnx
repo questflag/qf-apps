@@ -1,4 +1,12 @@
 <Solution>
+  <Folder Name="/QuestFlag.Passport.AdminWebApp/">
+    <Project Path="QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.Client/QuestFlag.Passport.AdminWebApp.Client.csproj" />
+    <Project Path="QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.csproj" />
+  </Folder>
+  <Folder Name="/QuestFlag.Passport.WebApp/">
+    <Project Path="QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.Client/QuestFlag.Passport.WebApp.Client.csproj" />
+    <Project Path="QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../dependency.md" />
   </Folder>
@@ -13,10 +21,12 @@
   <Project Path="QuestFlag.Infrastructure.Services/QuestFlag.Infrastructure.Services.csproj" Id="a811e5a2-0a11-4106-9ec7-b1fb78ee466c" />
   <Project Path="QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp.Client/QuestFlag.Infrastructure.WebApp.Client.csproj" Id="1c83305a-d4b0-4d28-9e5a-72effd96492e" />
   <Project Path="QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp.csproj" Id="5c8c7ec9-0cc6-470a-a148-0bd76c34eb0e" />
+  <Project Path="QuestFlag.Passport.AdminClient/QuestFlag.Passport.AdminClient.csproj" />
   <Project Path="QuestFlag.Passport.ApiCore/QuestFlag.Passport.ApiCore.csproj" />
   <Project Path="QuestFlag.Passport.Application/QuestFlag.Passport.Application.csproj" />
   <Project Path="QuestFlag.Passport.Client/QuestFlag.Passport.Client.csproj" />
   <Project Path="QuestFlag.Passport.Core/QuestFlag.Passport.Core.csproj" />
   <Project Path="QuestFlag.Passport.Domain/QuestFlag.Passport.Domain.csproj" />
   <Project Path="QuestFlag.Passport.Services/QuestFlag.Passport.Services.csproj" />
+  <Project Path="QuestFlag.Passport.UserClient/QuestFlag.Passport.UserClient.csproj" />
 </Solution>

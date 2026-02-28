@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenIddict.Validation.AspNetCore;
 using QuestFlag.Infrastructure.Application.DependencyInjection;
 using QuestFlag.Infrastructure.Core.Data;
 using QuestFlag.Infrastructure.Core.DependencyInjection;
@@ -30,27 +32,26 @@ public class Program
         // 2. Swagger Configuration
         builder.Services.AddSwaggerGen();
 
-        // 3. Authentication & Authorization (Consuming Passport JWT)
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                var authOptions = builder.Configuration.GetSection("JwtSettings");
-                var issue = authOptions["Issuer"];
-                var aud = authOptions["Audience"];
+        // 3. Authentication & Authorization (Consuming Passport JWT via Introspection)
+        builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
 
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = issue,
-                    ValidateAudience = true,
-                    ValidAudience = aud,
-                    ValidateLifetime = true,
-                    SignatureValidator = delegate (string token, TokenValidationParameters parameters)
-                    {
-                        var jwt = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(token);
-                        return jwt; // Bypass crypto signature for pure demo simplicity over HTTPS
-                    }
-                };
+        builder.Services.AddOpenIddict()
+            .AddValidation(options =>
+            {
+                // The Passport Server's address
+                options.SetIssuer("https://localhost:7002");
+                options.AddAudiences("infra-api");
+
+                // We want to validate against the Passport Introspection endpoint
+                options.UseIntrospection()
+                       .SetClientId("infra-api")
+                       .SetClientSecret("infra-api-secret"); // Should come from config in production
+
+                // Register the System.Net.Http integration.
+                options.UseSystemNetHttp();
+
+                // Register the ASP.NET Core host.
+                options.UseAspNetCore();
             });
 
         builder.Services.AddAuthorization(options =>

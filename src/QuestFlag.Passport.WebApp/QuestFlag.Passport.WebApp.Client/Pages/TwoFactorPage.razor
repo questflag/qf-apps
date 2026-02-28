@@ -1,0 +1,81 @@
+@page "/login/two-factor"
+@using QuestFlag.Passport.UserClient
+@inject PassportUserClient PassportClient
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Two-Factor Authentication — QuestFlag</PageTitle>
+
+<div class="sso-container">
+    <div class="sso-card">
+        <div class="sso-header">
+            <div class="brand-logo">QF</div>
+            <h1 class="tenant-name">Verify It's You</h1>
+            <p class="sign-in-subtitle">Enter the 6-digit code sent to your phone</p>
+        </div>
+
+        @if (_error != null) { <div class="error-banner">@_error</div> }
+
+        <form @onsubmit="HandleVerify">
+            <div class="form-group otp-group">
+                <label>Verification Code</label>
+                <input @bind="_otp" type="text" inputmode="numeric" pattern="[0-9]*"
+                       maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
+            </div>
+
+            <div class="remember-device">
+                <input type="checkbox" id="rememberDevice" @bind="_rememberDevice" />
+                <label for="rememberDevice">Trust this device for 30 days</label>
+            </div>
+
+            <button type="submit" class="btn-primary" disabled="@_isSubmitting">
+                @(_isSubmitting ? "Verifying…" : "Verify")
+            </button>
+        </form>
+
+        <div class="sso-footer">
+            <a href="/login">← Back to Sign In</a> &nbsp;|&nbsp;
+            <a @onclick="ResendOtp" href="javascript:void(0)">Resend code</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public Guid   UserId    { get; set; }
+    [SupplyParameterFromQuery] public string ReturnUrl { get; set; } = "/";
+
+    private string _otp          = "";
+    private bool   _rememberDevice;
+    private bool   _isSubmitting;
+    private string? _error;
+
+    private async Task HandleVerify()
+    {
+        _isSubmitting = true;
+        _error = null;
+        try
+        {
+            var valid = await PassportClient.VerifyLoginOtpAsync(UserId, _otp);
+            if (!valid)
+            {
+                _error = "Invalid or expired code. Please try again.";
+                return;
+            }
+
+            if (_rememberDevice)
+            {
+                // Signal to the server-side OIDC handler to set a trust-device cookie
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "trustDevice", "1");
+            }
+
+            Nav.NavigateTo(ReturnUrl, forceLoad: true);
+        }
+        catch { _error = "An error occurred. Please try again."; }
+        finally { _isSubmitting = false; }
+    }
+
+    private async Task ResendOtp()
+    {
+        await PassportClient.SendLoginOtpAsync(UserId);
+    }
+}

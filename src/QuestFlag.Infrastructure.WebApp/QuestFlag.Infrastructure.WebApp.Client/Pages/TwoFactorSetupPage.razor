@@ -1,0 +1,188 @@
+@page "/profile/two-factor"
+@using Microsoft.AspNetCore.Authorization
+@using QuestFlag.Passport.UserClient
+@attribute [Authorize]
+@inject PassportUserClient PassportClient
+@inject NavigationManager NavManager
+
+<PageTitle>Two-Factor Authentication</PageTitle>
+
+<div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Two-Factor Authentication</h2>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4">
+             <button type="button" @onclick='() => NavManager.NavigateTo("/profile")' class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Back to Profile
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="rounded-md bg-red-50 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3 text-sm text-red-700">@_errorMessage</div>
+            </div>
+        </div>
+    }
+
+    @if (_isSetupComplete)
+    {
+         <div class="rounded-md bg-green-50 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3 text-sm text-green-700">Two-factor authentication is now enabled!</div>
+            </div>
+        </div>
+    }
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            @if (_userInfo?.TwoFactorEnabled == true)
+            {
+                <h3 class="text-lg leading-6 font-medium text-gray-900">2FA is Enabled</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Your account is secured with SMS two-factor authentication.</p>
+                <div class="mt-4">
+                    <button @onclick="Disable2FA" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200">
+                        Disable 2FA
+                    </button>
+                </div>
+            }
+            else
+            {
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Setup SMS Two-Factor</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Add an extra layer of security to your account.</p>
+
+                <div class="mt-6">
+                    @if (!_isVerifying)
+                    {
+                        <div class="max-w-xs">
+                            <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number (with country code)</label>
+                            <div class="mt-1">
+                                <input type="text" id="phone" @bind="_phoneNumber" placeholder="+1234567890" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <button @onclick="StartSetup" disabled="@_isLoading" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
+                                @(_isLoading ? "Sending..." : "Send Verification Code")
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="max-w-xs">
+                            <label for="otp" class="block text-sm font-medium text-gray-700">Enter Verification Code</label>
+                            <p class="my-2 text-sm text-gray-500">We sent a code to @_phoneNumber</p>
+                            <div class="mt-1">
+                                <input type="text" id="otp" @bind="_otp" placeholder="123456" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <button @onclick="VerifyOtp" disabled="@_isLoading" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 disabled:opacity-50">
+                                @(_isLoading ? "Verifying..." : "Verify and Enable")
+                            </button>
+                            <button @onclick="CancelSetup" class="mt-3 ml-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserProfileDto? _userInfo;
+    private string _phoneNumber = "";
+    private string _otp = "";
+    private bool _isVerifying = false;
+    private bool _isLoading = false;
+    private string? _errorMessage;
+    private bool _isSetupComplete = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserInfo();
+    }
+
+    private async Task LoadUserInfo()
+    {
+        _userInfo = await PassportClient.GetUserInfoAsync();
+    }
+
+    private async Task StartSetup()
+    {
+        if (string.IsNullOrWhiteSpace(_phoneNumber)) return;
+        _isLoading = true;
+        _errorMessage = null;
+        try
+        {
+            await PassportClient.SetupPhoneTwoFactorAsync(new SetupPhoneRequest { PhoneNumber = _phoneNumber });
+            _isVerifying = true;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Failed to send code: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task VerifyOtp()
+    {
+        if (string.IsNullOrWhiteSpace(_otp)) return;
+        _isLoading = true;
+        _errorMessage = null;
+        try
+        {
+            await PassportClient.VerifyPhoneTwoFactorAsync(new VerifyPhoneRequest { OtpCode = _otp });
+            await LoadUserInfo();
+            _isVerifying = false;
+            _isSetupComplete = true;
+            _otp = "";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Invalid code: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void CancelSetup()
+    {
+        _isVerifying = false;
+        _otp = "";
+        _errorMessage = null;
+    }
+
+    private async Task Disable2FA()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        try
+        {
+            await PassportClient.DisableTwoFactorAsync();
+            await LoadUserInfo();
+            _isSetupComplete = false;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Failed to disable 2FA: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

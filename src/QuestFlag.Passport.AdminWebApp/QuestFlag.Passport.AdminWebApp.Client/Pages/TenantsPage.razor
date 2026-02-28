@@ -1,0 +1,79 @@
+@page "/admin/tenants"
+@using QuestFlag.Passport.AdminClient
+@inject PassportAdminClient AdminClient
+
+<PageTitle>Tenants — Passport Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-header">
+        <h1>Tenants</h1>
+        <button class="btn-primary" @onclick="() => _showCreate = true">+ New Tenant</button>
+    </div>
+
+    @if (_showCreate)
+    {
+        <div class="admin-card">
+            <h3>Create Tenant</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Name</label><input @bind="_newName" placeholder="Acme Corp" /></div>
+                <div class="form-group"><label>Slug</label><input @bind="_newSlug" placeholder="acme" /></div>
+                <div class="form-group"><label>Custom Domain</label><input @bind="_newDomain" placeholder="acme.questflag.com" /></div>
+                <div class="form-group"><label>Subdomain Slug</label><input @bind="_newSubSlug" placeholder="acme" /></div>
+            </div>
+            @if (_createError != null) { <div class="error-banner">@_createError</div> }
+            <button class="btn-primary" @onclick="CreateTenant" disabled="@_creating">@(_creating ? "Creating…" : "Create")</button>
+            <button class="btn-secondary" @onclick="() => _showCreate = false">Cancel</button>
+        </div>
+    }
+
+    @if (_tenants == null)
+    {
+        <p class="loading">Loading tenants…</p>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead><tr><th>Name</th><th>Slug</th><th>Custom Domain</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var t in _tenants)
+            {
+                <tr>
+                    <td><a href="/admin/tenants/@t.Id">@t.Name</a></td>
+                    <td><code>@t.Slug</code></td>
+                    <td>@(t.CustomDomain ?? t.SubdomainSlug ?? "—")</td>
+                    <td><span class="badge @(t.IsActive ? "badge-success" : "badge-muted")">@(t.IsActive ? "Active" : "Inactive")</span></td>
+                    <td><a href="/admin/tenants/@t.Id/users">Users →</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private IReadOnlyList<TenantAdminDto>? _tenants;
+    private bool _showCreate;
+    private string _newName = "", _newSlug = "", _newDomain = "", _newSubSlug = "";
+    private bool _creating;
+    private string? _createError;
+
+    protected override async Task OnInitializedAsync()
+        => _tenants = await AdminClient.GetTenantsAsync();
+
+    private async Task CreateTenant()
+    {
+        _creating = true;
+        _createError = null;
+        try
+        {
+            await AdminClient.CreateTenantAsync(_newName, _newSlug,
+                string.IsNullOrWhiteSpace(_newDomain) ? null : _newDomain,
+                string.IsNullOrWhiteSpace(_newSubSlug) ? null : _newSubSlug);
+            _tenants = await AdminClient.GetTenantsAsync();
+            _showCreate = false;
+            _newName = _newSlug = _newDomain = _newSubSlug = "";
+        }
+        catch (Exception ex) { _createError = ex.Message; }
+        finally { _creating = false; }
+    }
+}

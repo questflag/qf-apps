@@ -1,0 +1,54 @@
+@page "/admin/users/{UserId:guid}/devices"
+@using QuestFlag.Passport.AdminClient
+@inject PassportAdminClient AdminClient
+
+<PageTitle>Devices — Passport Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-header">
+        <h1>Trusted Devices</h1>
+        <button class="btn-danger" @onclick="RevokeAll">Revoke All</button>
+    </div>
+
+    @if (_devices == null) { <p class="loading">Loading devices…</p> }
+    else if (_devices.Count == 0) { <p class="empty">No trusted devices.</p> }
+    else
+    {
+        <table class="admin-table">
+            <thead><tr><th>Device</th><th>IP</th><th>Trusted At</th><th>Expires</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var d in _devices)
+            {
+                <tr>
+                    <td>@d.DeviceName</td>
+                    <td>@d.IpAddress</td>
+                    <td>@d.TrustedAtUtc.ToLocalTime().ToString("g")</td>
+                    <td>@d.ExpiresAtUtc.ToLocalTime().ToString("g")</td>
+                    <td><button class="btn-danger-sm" @onclick="() => RevokeDevice(d.Id)">Revoke</button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid UserId { get; set; }
+    private IReadOnlyList<DeviceAdminDto>? _devices;
+
+    protected override async Task OnInitializedAsync()
+        => _devices = await AdminClient.GetUserDevicesAsync(UserId);
+
+    private async Task RevokeDevice(Guid deviceId)
+    {
+        await AdminClient.RevokeUserDeviceAsync(deviceId);
+        _devices = await AdminClient.GetUserDevicesAsync(UserId);
+    }
+
+    private async Task RevokeAll()
+    {
+        foreach (var d in _devices ?? [])
+            await AdminClient.RevokeUserDeviceAsync(d.Id);
+        _devices = await AdminClient.GetUserDevicesAsync(UserId);
+    }
+}

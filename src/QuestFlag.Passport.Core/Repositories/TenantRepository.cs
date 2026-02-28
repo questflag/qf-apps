@@ -33,6 +33,23 @@ public class TenantRepository : ITenantRepository
         return await _dbContext.Tenants.FirstOrDefaultAsync(t => t.Slug == slug, ct);
     }
 
+    public async Task<Tenant?> GetByDomainAsync(string host, CancellationToken ct = default)
+    {
+        // Strip port if present (e.g. "acme.questflag.com:7003" → "acme.questflag.com")
+        var hostWithoutPort = host.Split(':')[0].ToLowerInvariant();
+
+        // 1. Exact CustomDomain match
+        var byCustomDomain = await _dbContext.Tenants
+            .FirstOrDefaultAsync(t => t.CustomDomain != null && t.CustomDomain.ToLower() == hostWithoutPort, ct);
+
+        if (byCustomDomain != null) return byCustomDomain;
+
+        // 2. SubdomainSlug match: first segment of host (e.g. "acme" from "acme.questflag.com")
+        var firstSegment = hostWithoutPort.Split('.')[0];
+        return await _dbContext.Tenants
+            .FirstOrDefaultAsync(t => t.SubdomainSlug != null && t.SubdomainSlug.ToLower() == firstSegment, ct);
+    }
+
     public async Task<Tenant> AddAsync(Tenant tenant, CancellationToken ct = default)
     {
         _dbContext.Tenants.Add(tenant);

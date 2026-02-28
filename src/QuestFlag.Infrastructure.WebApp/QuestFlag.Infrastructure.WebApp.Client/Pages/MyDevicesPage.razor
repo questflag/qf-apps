@@ -1,0 +1,114 @@
+@page "/profile/devices"
+@using Microsoft.AspNetCore.Authorization
+@using QuestFlag.Passport.UserClient
+@attribute [Authorize]
+@inject PassportUserClient PassportClient
+@inject NavigationManager NavManager
+
+<PageTitle>My Trusted Devices</PageTitle>
+
+<div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">My Devices</h2>
+            <p class="mt-1 text-sm text-gray-500">Manage devices that can bypass two-factor authentication during login.</p>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+             <button type="button" @onclick='() => NavManager.NavigateTo("/profile")' class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                Back to Profile
+            </button>
+            @if (_devices != null && _devices.Any())
+            {
+                <button type="button" @onclick="RevokeAll" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    Revoke All
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+         <div class="text-center py-10 text-gray-500">Loading devices...</div>
+    }
+    else if (_devices == null || !_devices.Any())
+    {
+        <div class="text-center bg-white shadow rounded-lg px-4 py-10 sm:px-6">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No Trusted Devices</h3>
+            <p class="mt-1 text-sm text-gray-500">You don't have any devices saved to bypass 2FA.</p>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            <ul role="list" class="divide-y divide-gray-200">
+                @foreach (var device in _devices)
+                {
+                    <li>
+                        <div class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-sm font-medium text-indigo-600 truncate">@device.DeviceName</p>
+                                </div>
+                                <div class="ml-2 flex-shrink-0 flex">
+                                    <button @onclick="() => RevokeDevice(device.Id)" class="text-sm font-medium text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded">Revoke</button>
+                                </div>
+                            </div>
+                            <div class="mt-2 sm:flex sm:justify-between">
+                                <div class="sm:flex">
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        IP: @device.IpAddress
+                                    </p>
+                                </div>
+                                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 gap-4">
+                                    <p>Trusted: @device.TrustedAtUtc.ToString("MMM dd, yyyy")</p>
+                                    <p>Expires: @device.ExpiresAtUtc.ToString("MMM dd, yyyy")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+@code {
+    private List<DeviceDto>? _devices;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDevices();
+    }
+
+    private async Task LoadDevices()
+    {
+        _isLoading = true;
+        try
+        {
+            _devices = await PassportClient.GetMyDevicesAsync();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task RevokeDevice(Guid deviceId)
+    {
+        await PassportClient.RevokeDeviceAsync(deviceId);
+        await LoadDevices();
+    }
+
+    private async Task RevokeAll()
+    {
+        await PassportClient.RevokeAllMyDevicesAsync();
+        await LoadDevices();
+    }
+}

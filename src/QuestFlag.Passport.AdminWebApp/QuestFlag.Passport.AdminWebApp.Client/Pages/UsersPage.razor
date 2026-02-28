@@ -1,0 +1,86 @@
+@page "/admin/tenants/{TenantId:guid}/users"
+@using QuestFlag.Passport.AdminClient
+@inject PassportAdminClient AdminClient
+
+<PageTitle>Users — Passport Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-header">
+        <h1>Users</h1>
+        <button class="btn-primary" @onclick="() => _showInvite = true">✉ Invite User</button>
+    </div>
+
+    @if (_showInvite)
+    {
+        <div class="admin-card">
+            <h3>Invite User (sends an email to set their password)</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Username</label><input @bind="_invUsername" placeholder="jane.doe" /></div>
+                <div class="form-group"><label>Email</label><input @bind="_invEmail" type="email" placeholder="jane@acme.com" /></div>
+                <div class="form-group"><label>Display Name</label><input @bind="_invDisplayName" placeholder="Jane Doe" /></div>
+                <div class="form-group"><label>Role</label><input @bind="_invRole" placeholder="member" /></div>
+            </div>
+            @if (_inviteError != null) { <div class="error-banner">@_inviteError</div> }
+            @if (_inviteSent) { <div class="success-banner">✓ Invite sent to @_invEmail</div> }
+            <button class="btn-primary" @onclick="InviteUser" disabled="@_inviting">@(_inviting ? "Sending…" : "Send Invite")</button>
+            <button class="btn-secondary" @onclick="() => _showInvite = false">Cancel</button>
+        </div>
+    }
+
+    @if (_users == null) { <p class="loading">Loading users…</p> }
+    else
+    {
+        <table class="admin-table">
+            <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>2FA</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var u in _users)
+            {
+                <tr>
+                    <td>@u.DisplayName</td>
+                    <td><code>@u.Username</code></td>
+                    <td>@u.Email @(u.EmailConfirmed ? "✓" : "⏳")</td>
+                    <td>@(u.TwoFactorEnabled ? "✓ On" : "Off")</td>
+                    <td><span class="badge @(u.IsActive ? "badge-success" : "badge-muted")">@(u.IsActive ? "Active" : "Inactive")</span></td>
+                    <td class="action-row">
+                        <a href="/admin/users/@u.Id/devices">Devices</a>
+                        <button class="btn-danger-sm" @onclick="() => ForceLogout(u.Id)">Force Logout</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid TenantId { get; set; }
+    private IReadOnlyList<UserAdminDto>? _users;
+    private bool _showInvite;
+    private string _invUsername = "", _invEmail = "", _invDisplayName = "", _invRole = "member";
+    private bool _inviting;
+    private bool _inviteSent;
+    private string? _inviteError;
+
+    protected override async Task OnInitializedAsync()
+        => _users = await AdminClient.GetUsersAsync(TenantId);
+
+    private async Task InviteUser()
+    {
+        _inviting = true;
+        _inviteError = null;
+        _inviteSent = false;
+        try
+        {
+            await AdminClient.InviteUserAsync(TenantId, _invUsername, _invEmail, _invDisplayName, _invRole);
+            _inviteSent = true;
+            _users = await AdminClient.GetUsersAsync(TenantId);
+        }
+        catch (Exception ex) { _inviteError = ex.Message; }
+        finally { _inviting = false; }
+    }
+
+    private async Task ForceLogout(Guid userId)
+    {
+        await AdminClient.ForceLogoutUserAsync(userId);
+    }
+}
