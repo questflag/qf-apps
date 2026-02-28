@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Infrastructure.Client;
 using Microsoft.AspNetCore.Components;

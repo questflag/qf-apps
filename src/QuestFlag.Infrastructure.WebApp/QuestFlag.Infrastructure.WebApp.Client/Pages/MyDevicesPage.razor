@@ -79,7 +79,7 @@
 </div>
 
 @code {
-    private List<DeviceDto>? _devices;
+    private IReadOnlyList<DeviceDto>? _devices;
     private bool _isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -92,7 +92,8 @@
         _isLoading = true;
         try
         {
-            _devices = await PassportClient.GetMyDevicesAsync();
+            var rawDevices = await PassportClient.GetMyDevicesAsync();
+            _devices = rawDevices?.ToList();
         }
         finally
         {

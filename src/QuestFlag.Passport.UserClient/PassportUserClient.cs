@@ -19,6 +19,11 @@ public record TokenResponse(
     [property: JsonPropertyName("id_token")]      string? IdToken
 );
 
+public record UserProfileDto(Guid Id, string Email, string Name, bool EmailConfirmed, string? PhoneNumber, bool TwoFactorEnabled);
+public record DeviceDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
+public record SetupPhoneRequest(string PhoneNumber);
+public record VerifyPhoneRequest(string OtpCode);
+
 /// <summary>
 /// Client SDK for user-facing and anonymous Passport endpoints.
 /// Consumed by Passport.WebApp (SSO portal) and Infrastructure.WebApp (profile pages).
@@ -82,24 +87,36 @@ public class PassportUserClient
 
     // ── Authenticated user APIs (caller must set Authorization header) ─────────
 
-    /// <summary>Starts phone 2FA enrollment by sending an OTP.</summary>
-    public async Task<bool> SetupPhoneTwoFactorAsync(string phoneNumber, CancellationToken ct = default)
+    public async Task<UserProfileDto?> GetUserInfoAsync(CancellationToken ct = default)
     {
-        var r = await _http.PostAsJsonAsync("/account/two-factor/enable-phone", new { phoneNumber }, ct);
+        return await _http.GetFromJsonAsync<UserProfileDto>("/account/profile", ct);
+    }
+
+    /// <summary>Starts phone 2FA enrollment by sending an OTP.</summary>
+    public async Task<bool> SetupPhoneTwoFactorAsync(SetupPhoneRequest req, CancellationToken ct = default)
+    {
+        var r = await _http.PostAsJsonAsync("/account/two-factor/enable-phone", req, ct);
         return r.IsSuccessStatusCode;
     }
 
     /// <summary>Confirms the enrollment OTP and activates 2FA on the account.</summary>
-    public async Task<bool> ConfirmPhoneTwoFactorAsync(string phoneNumber, string otp, CancellationToken ct = default)
+    public async Task<bool> VerifyPhoneTwoFactorAsync(VerifyPhoneRequest req, CancellationToken ct = default)
     {
-        var r = await _http.PostAsJsonAsync("/account/two-factor/verify-phone", new { phoneNumber, otp }, ct);
+        var r = await _http.PostAsJsonAsync("/account/two-factor/verify-phone", req, ct);
+        return r.IsSuccessStatusCode;
+    }
+
+    /// <summary>Disables 2FA on the account.</summary>
+    public async Task<bool> DisableTwoFactorAsync(CancellationToken ct = default)
+    {
+        var r = await _http.PostAsync("/account/two-factor/disable", null, ct);
         return r.IsSuccessStatusCode;
     }
 
     /// <summary>Lists the current user's active trusted devices.</summary>
-    public async Task<IReadOnlyList<TrustedDeviceDto>> GetMyDevicesAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<DeviceDto>> GetMyDevicesAsync(CancellationToken ct = default)
     {
-        var result = await _http.GetFromJsonAsync<List<TrustedDeviceDto>>("/api/devices", ct);
+        var result = await _http.GetFromJsonAsync<List<DeviceDto>>("/api/devices", ct);
         return result ?? [];
     }
 
@@ -116,5 +133,3 @@ public class PassportUserClient
         await _http.DeleteAsync("/api/devices", ct);
     }
 }
-
-public record TrustedDeviceDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
