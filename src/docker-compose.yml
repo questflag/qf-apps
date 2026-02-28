@@ -1,6 +1,0 @@
-services:
-  questflag.infrastructure.services:
-    image: ${DOCKER_REGISTRY-}questflaginfrastructureservices
-    build:
-      context: .
-      dockerfile: QuestFlag.Infrastructure.Services/Dockerfile
