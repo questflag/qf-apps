@@ -1,0 +1,399 @@
+@page "/uploads"
+@using QuestFlag.Infrastructure.Client
+@using QuestFlag.Passport.Client
+@using System.Text.Json
+@implements IDisposable
+@inject UploadApiService UploadApi
+@inject PassportApiClient PassportApi
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<PageTitle>My Uploads - QuestFlag</PageTitle>
+
+<div class="max-w-7xl mx-auto p-4 space-y-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Upload Records</h1>
+        <button class="btn btn-primary" @onclick='() => Nav.NavigateTo("/upload")'>+ New Upload</button>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="card p-4 bg-gray-50 mb-6 border-0 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 items-end">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-1">Tenant</label>
+                <select @bind="FilterTenantSlug" @bind:after="OnTenantFilterChanged" class="input-field text-sm">
+                    <option value="">All Tenants</option>
+                    @if (_tenants != null)
+                    {
+                        @foreach (var t in _tenants)
+                        {
+                            <option value="@t.Slug">@t.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-1">User</label>
+                <select @bind="FilterUserId" class="input-field text-sm" disabled="@(string.IsNullOrEmpty(FilterTenantSlug))">
+                    <option value="">Any User</option>
+                    @if (_usersForFilter != null)
+                    {
+                        @foreach (var u in _usersForFilter)
+                        {
+                            <option value="@u.Id">@u.DisplayName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-1">Category</label>
+                <select @bind="FilterCategory" class="input-field text-sm">
+                    <option value="">All</option>
+                    <option value="backup">Backup</option>
+                    <option value="core">Core System</option>
+                    <option value="agents">Agents</option>
+                    <option value="users">Users</option>
+                    <option value="default">Default</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-widest mb-1">Status</label>
+                <select @bind="FilterStatus" class="input-field text-sm">
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Uploading">Uploading</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Failed">Failed</option>
+                    <option value="Paused">Paused</option>
+                </select>
+            </div>
+            <div class="flex space-x-2">
+                <button class="btn btn-primary w-full" @onclick="ApplyFilters">Apply</button>
+                <button class="btn btn-secondary w-full" @onclick="ResetFilters">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("TenantName")'>
+                        <div class="flex items-center space-x-1"><span>Tenant</span> @SortIndicator("TenantName")</div>
+                    </th>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("UserName")'>
+                        <div class="flex items-center space-x-1"><span>User</span> @SortIndicator("UserName")</div>
+                    </th>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("StoredFileName")'>
+                        <div class="flex items-center space-x-1"><span>Filename</span> @SortIndicator("StoredFileName")</div>
+                    </th>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("Category")'>
+                        <div class="flex items-center space-x-1"><span>Category</span> @SortIndicator("Category")</div>
+                    </th>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("Status")'>
+                        <div class="flex items-center space-x-1"><span>Status</span> @SortIndicator("Status")</div>
+                    </th>
+                    <th class="table-header cursor-pointer select-none hover:bg-gray-100" @onclick='() => Sort("CreatedAtUtc")'>
+                        <div class="flex items-center space-x-1"><span>Uploaded At</span> @SortIndicator("CreatedAtUtc")</div>
+                    </th>
+                    <th class="table-header w-32 border-b border-gray-200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_loading)
+                {
+                    <tr><td colspan="7" class="table-cell text-center p-8 text-gray-500">Loading records...</td></tr>
+                }
+                else if (_results == null || _results.Items.Count == 0)
+                {
+                    <tr><td colspan="7" class="table-cell text-center p-8 text-gray-500">No records found. Try adjusting filters.</td></tr>
+                }
+                else
+                {
+                    @foreach (var record in _results.Items)
+                    {
+                        var isCompleted = record.Status == 2; // Completed enum
+                        var isFailed = record.Status == 3;
+                        <tr class="hover:bg-blue-50/30 transition-colors group">
+                            <td class="table-cell text-gray-600 text-xs font-mono">@record.TenantId.ToString().Substring(0,8)</td>
+                            <td class="table-cell text-gray-600 text-xs font-mono">@record.UserId.ToString().Substring(0,8)</td>
+                            <td class="table-cell font-medium max-w-[200px] truncate" title="@record.StoredFileName">@record.StoredFileName</td>
+                            <td class="table-cell"><span class="badge badge-default">@record.Category</span></td>
+                            <td class="table-cell">
+                                @if (isCompleted) { <span class="badge badge-success">Completed</span> }
+                                else if (isFailed) { <span class="badge border border-red-200 text-red-700 bg-red-50">Failed</span> }
+                                else { <span class="badge badge-warning text-[10px] animate-pulse">Processing</span> }
+                            </td>
+                            <td class="table-cell text-gray-500 text-xs">@record.CreatedAtUtc.ToLocalTime().ToString("g")</td>
+                            <td class="table-cell space-x-2 align-middle">
+                                @if (isCompleted)
+                                {
+                                    <button class="text-blue-600 hover:text-blue-800 transition-colors p-1" title="Download" @onclick="() => DownloadLinkAsync(record.Id)">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    </button>
+                                }
+                                @if (IsTenantAdmin)
+                                {
+                                    <button class="text-red-600 hover:text-red-800 transition-colors p-1 opacity-0 group-hover:opacity-100" title="Delete" @onclick="() => DeleteRecordAsync(record.Id)">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    @if (_results != null && _results.TotalCount > 0)
+    {
+        <div class="flex items-center justify-between mt-4">
+            <span class="text-sm text-gray-500">Showing @((_page - 1) * _pageSize + 1) to @(Math.Min(_page * _pageSize, _results.TotalCount)) of @_results.TotalCount results</span>
+            <div class="flex space-x-2">
+                <button class="btn btn-secondary text-xs h-8" disabled="@(_page == 1)" @onclick="PrevPage">Previous</button>
+                <button class="btn btn-secondary text-xs h-8" disabled="@(_page * _pageSize >= _results.TotalCount)" @onclick="NextPage">Next</button>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private bool _loading = true;
+    private PagedResult<UploadRecordDto>? _results;
+    private PeriodicTimer? _timer;
+
+    private List<TenantDto>? _tenants;
+    private List<UserSummaryDto>? _usersForFilter;
+    
+    // Auth State
+    private string? _token;
+    private bool IsTenantAdmin => HasRole("tenant_admin");
+
+    // Filter State
+    private string FilterTenantSlug = "";
+    private string FilterUserId = "";
+    private string FilterCategory = "";
+    private string FilterStatus = "";
+
+    // Sort State
+    private string _sortBy = "CreatedAtUtc";
+    private string _sortDir = "desc";
+
+    // Pager
+    private int _page = 1;
+    private int _pageSize = 50;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
+        if (string.IsNullOrEmpty(_token))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        UploadApi.SetBearerToken(_token);
+        
+        // Load initial lookup data
+        try {
+            _tenants = (await PassportApi.GetTenantsAsync()).ToList();
+        } catch {}
+
+        await LoadDataAsync();
+
+        // Start polling if any item is not completed
+        StartPolling();
+    }
+
+    private void StartPolling()
+    {
+        _timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        _ = PollAsync();
+    }
+
+    private async Task PollAsync()
+    {
+        try
+        {
+            while (await _timer!.WaitForNextTickAsync())
+            {
+                if (_results?.Items.Any(r => r.Status == 0 || r.Status == 1) == true)
+                {
+                    await LoadDataAsync(background: true);
+                }
+            }
+        }
+        catch { /* ignored if task canceled */ }
+    }
+
+    private async Task LoadDataAsync(bool background = false)
+    {
+        if (!background) _loading = true;
+        
+        if (!background) StateHasChanged();
+
+        try
+        {
+            _results = await UploadApi.GetUploadsAsync(
+                tenantSlug: FilterTenantSlug,
+                userIdFilter: FilterUserId,
+                category: FilterCategory,
+                status: FilterStatus,
+                sortBy: _sortBy,
+                sortDir: _sortDir,
+                page: _page,
+                pageSize: _pageSize
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnTenantFilterChanged()
+    {
+        FilterUserId = "";
+        _usersForFilter = null;
+
+        var token = _token;
+        if (!string.IsNullOrEmpty(FilterTenantSlug) && _tenants != null)
+        {
+            var t = _tenants.FirstOrDefault(x => x.Slug == FilterTenantSlug);
+            if (t != null)
+            {
+                try {
+                    _usersForFilter = (await PassportApi.GetUsersByTenantAsync(t.Id)).ToList();
+                } catch { } // Might fail if they aren't admin and request another tenant's users
+            }
+        }
+    }
+
+    private async Task ApplyFilters()
+    {
+        _page = 1;
+        await LoadDataAsync();
+    }
+
+    private async Task ResetFilters()
+    {
+        FilterTenantSlug = "";
+        FilterUserId = "";
+        FilterCategory = "";
+        FilterStatus = "";
+        _page = 1;
+        await LoadDataAsync();
+    }
+
+    private async Task Sort(string column)
+    {
+        if (_sortBy == column)
+        {
+            _sortDir = _sortDir == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            _sortBy = column;
+            _sortDir = "asc";
+        }
+        await LoadDataAsync();
+    }
+
+    private async Task DeleteRecordAsync(Guid id)
+    {
+        if (await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this record entirely?"))
+        {
+            try
+            {
+                await UploadApi.DeleteUploadAsync(id);
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", $"Failed to delete: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task DownloadLinkAsync(Guid id)
+    {
+        try
+        {
+            var url = await UploadApi.GetSignedDownloadUrlAsync(id);
+            await JS.InvokeVoidAsync("open", url, "_blank");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Failed to get download URL: {ex.Message}");
+        }
+    }
+
+    private async Task PrevPage() { if (_page > 1) { _page--; await LoadDataAsync(); } }
+    private async Task NextPage() { if (_page * _pageSize < _results?.TotalCount) { _page++; await LoadDataAsync(); } }
+
+    private Microsoft.AspNetCore.Components.RenderFragment SortIndicator(string column) => builder =>
+    {
+        if (_sortBy == column)
+        {
+            builder.OpenElement(0, "span");
+            builder.AddAttribute(1, "class", "text-blue-500 ml-1");
+            builder.AddContent(2, _sortDir == "asc" ? "▲" : "▼");
+            builder.CloseElement();
+        }
+    };
+
+    private bool HasRole(string roleName)
+    {
+        if (string.IsNullOrEmpty(_token)) return false;
+        try
+        {
+            // Simple JWT decode without external libraries
+            var parts = _token.Split('.');
+            if (parts.Length < 2) return false;
+            
+            var payload = parts[1];
+            payload = payload.Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2: payload += "=="; break;
+                case 3: payload += "="; break;
+            }
+            
+            var jsonBytes = Convert.FromBase64String(payload);
+            var json = System.Text.Encoding.UTF8.GetString(jsonBytes);
+            using var doc = JsonDocument.Parse(json);
+            
+            if (doc.RootElement.TryGetProperty("role", out var roleEl))
+            {
+                if (roleEl.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var element in roleEl.EnumerateArray())
+                        if (element.GetString() == roleName) return true;
+                }
+                else
+                {
+                    return roleEl.GetString() == roleName;
+                }
+            }
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

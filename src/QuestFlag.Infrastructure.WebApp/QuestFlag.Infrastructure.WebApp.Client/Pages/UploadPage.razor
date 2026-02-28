@@ -153,7 +153,7 @@
         _error = null;
         var tags = _tagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles: 20))
+        foreach (var file in e.GetMultipleFiles(maximumFileCount: 20))
         {
             var item = new UploadItem { File = file };
             _uploadQueue.Add(item);
