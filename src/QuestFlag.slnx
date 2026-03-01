@@ -9,13 +9,11 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../dependency.md" />
-  </Folder>
-  <Folder Name="/Deployment/">
     <File Path=".env" />
-    <Project Path="docker-compose.dcproj">
-      <Build />
-    </Project>
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
   <Folder Name="/Infrastructure/">
     <Project Path="Infrastructure/QuestFlag.Infrastructure.ApiCore/QuestFlag.Infrastructure.ApiCore.csproj" Id="798e447a-9dca-42b7-a33e-2a5ca3cb6f6c" />
     <Project Path="Infrastructure/QuestFlag.Infrastructure.Application/QuestFlag.Infrastructure.Application.csproj" Id="ca15bdbe-0e35-4ec3-af3c-307b6acc624e" />
