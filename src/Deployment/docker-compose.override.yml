@@ -73,6 +73,7 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_KRAFT_CLUSTER_ID=L697XvT_Scy_Y_Z7Q_L7_A
     volumes:
       - kafka_data:/bitnami/kafka
 
@@ -84,7 +85,7 @@ services:
       - "9001:9001"
     environment:
       - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=m1n10!$tr0ngP@ss!
+      - MINIO_ROOT_PASSWORD=m1n10!$$tr0ngP@ss!
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -133,13 +134,16 @@ services:
       - "7474:7474"
       - "7687:7687"
     environment:
-      NEO4J_AUTH: neo4j/N3o4j!$tr0ngP@ss!
+      NEO4J_AUTH: neo4j/N3o4j!$$tr0ngP@ss!
     volumes:
       - neo4j_data:/data
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
+    command: [ "--config=/etc/otel-collector.yml" ]
+    volumes:
+      - ./Configs/otel-collector.yml:/etc/otel-collector.yml
     ports:
       - "4317:4317"
       - "4318:4318"
@@ -148,9 +152,15 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - "9090:9090"
     volumes:
+      - ./Configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
   grafana:
@@ -160,7 +170,7 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=gr@fan@!$tr0ngP@ss!
+      - GF_SECURITY_ADMIN_PASSWORD=gr@fan@!$$tr0ngP@ss!
     volumes:
       - grafana_data:/var/lib/grafana
 
@@ -169,8 +179,9 @@ services:
     container_name: loki
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yml
     volumes:
+      - ./Configs/loki.yml:/etc/loki/local-config.yml
       - loki_data:/loki
 
   tempo:
@@ -179,7 +190,9 @@ services:
     command: [ "-config.file=/etc/tempo.yaml" ]
     ports:
       - "3200:3200"
+      - "4317" # otlp grpc
     volumes:
+      - ./Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
 
 volumes:

@@ -39,7 +39,9 @@ public static class CoreServiceExtensions
         // Register GCP
         if (!string.IsNullOrEmpty(minioSettings.GcpCredentialsJson))
         {
-            var credential = GoogleCredential.FromJson(minioSettings.GcpCredentialsJson);
+            using var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(minioSettings.GcpCredentialsJson));
+            var credential = GoogleCredential.FromStream(stream)
+                .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
             services.AddSingleton(StorageClient.Create(credential));
             services.AddSingleton(UrlSigner.FromCredential(credential));
             services.AddScoped<GcpCloudStorageService>();
