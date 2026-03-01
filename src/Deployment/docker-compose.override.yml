@@ -1,17 +1,17 @@
 services:
-  questflag.infrastructure.services:
+  service-qf-infra:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - Storage__MinioAccessKey=admin
-      - Storage__MinioSecretKey=m1n10!$$tr0ngP@ss!
-      - Storage__MinioEndpoint=minio:9000
-      - Kafka__BootstrapServers=kafka:9092
-      - ConnectionStrings__InfrastructureConnection=Host=postgres;Port=5432;Database=questflag_infrastructure;Username=postgres;Password=P@ssw0rd!Qf2026!
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_HTTP_PORTS=${INFRASTRUCTURE_SERVICES_HTTP_PORT}
+      - ASPNETCORE_HTTPS_PORTS=${INFRASTRUCTURE_SERVICES_HTTPS_PORT}
+      - Storage__MinioAccessKey=${STORAGE_MINIO_ACCESS_KEY}
+      - Storage__MinioSecretKey=${STORAGE_MINIO_SECRET_KEY}
+      - Storage__MinioEndpoint=infra-minio:9000
+      - Kafka__BootstrapServers=infra-kafka:9092
+      - ConnectionStrings__InfrastructureConnection=Host=infra-postgres;Port=5432;Database=questflag_infrastructure;Username=postgres;Password=P@ssw0rd!Qf2026!
     ports:
-      - "8080"
-      - "8081"
+      - "${INFRASTRUCTURE_SERVICES_HTTP_PORT}"
+      - "${INFRASTRUCTURE_SERVICES_HTTPS_PORT}"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -19,98 +19,98 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  questflag.passport.webapp:
+  app-qf-passport:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=7003
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_HTTP_PORTS=${PASSPORT_WEBAPP_HTTP_PORT}
+      - ASPNETCORE_HTTPS_PORTS=${PASSPORT_WEBAPP_HTTPS_PORT}
     ports:
-      - "7003:7003"
+      - "${PASSPORT_WEBAPP_HTTPS_PORT}:${PASSPORT_WEBAPP_HTTPS_PORT}"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  questflag.passport.adminwebapp:
+  app-qf-passport-admin:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=7004
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_HTTP_PORTS=${PASSPORT_ADMINWEBAPP_HTTP_PORT}
+      - ASPNETCORE_HTTPS_PORTS=${PASSPORT_ADMINWEBAPP_HTTPS_PORT}
     ports:
-      - "7004:7004"
+      - "${PASSPORT_ADMINWEBAPP_HTTPS_PORT}:${PASSPORT_ADMINWEBAPP_HTTPS_PORT}"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  postgres:
+  infra-postgres:
     image: postgres:15-alpine
-    container_name: postgres
+    container_name: infra-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: P@ssw0rd!Qf2026!
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
-  redis:
+  infra-redis:
     image: redis:7-alpine
-    container_name: redis
+    container_name: infra-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis_data:/data
 
-  kafka:
+  infra-kafka:
     image: apache/kafka:3.7.0
-    container_name: kafka
+    container_name: infra-kafka
     ports:
-      - "9092:9092"
+      - "${KAFKA_PORT}:${KAFKA_PORT}"
     environment:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:${KAFKA_PORT},CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://infra-kafka:9092
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@infra-kafka:9093
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
-      - KAFKA_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_QUORUM_VOTERS=1@infra-kafka:9093
     volumes:
       - kafka_data:/bitnami/kafka
 
-  minio:
+  infra-minio:
     image: minio/minio:latest
-    container_name: minio
+    container_name: infra-minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT}:${MINIO_PORT}"
+      - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=m1n10!$$tr0ngP@ss!
-    command: server /data --console-address ":9001"
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT}"
     volumes:
       - minio_data:/data
 
-  qdrant:
+  infra-qdrant:
     image: qdrant/qdrant:latest
-    container_name: qdrant
+    container_name: infra-qdrant
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - "${QDRANT_HTTP_PORT}:${QDRANT_HTTP_PORT}"
+      - "${QDRANT_GRPC_PORT}:${QDRANT_GRPC_PORT}"
     volumes:
       - qdrant_data:/qdrant/storage
 
-  etcd:
+  infra-etcd:
     image: quay.io/coreos/etcd:v3.5.5
-    container_name: milvus-etcd
+    container_name: infra-etcd
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
       - ETCD_AUTO_COMPACTION_RETENTION=1000
@@ -118,89 +118,89 @@ services:
       - ETCD_SNAPSHOT_COUNT=50000
     volumes:
       - etcd_data:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:${ETCD_CLIENT_PORT} -listen-client-urls http://0.0.0.0:${ETCD_CLIENT_PORT} --data-dir /etcd
 
-  milvus:
+  infra-milvus:
     image: milvusdb/milvus:v2.4.5
-    container_name: milvus-standalone
+    container_name: infra-milvus
     command: [ "milvus", "run", "standalone" ]
     environment:
-      ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
+      ETCD_ENDPOINTS: infra-etcd:2379
+      MINIO_ADDRESS: infra-minio:9000
       MINIO_ACCESS_KEY_ID: admin
       MINIO_SECRET_ACCESS_KEY: m1n10!$$tr0ngP@ss!
     ports:
       - "19530:19530"
       - "9091:9091"
     depends_on:
-      - etcd
-      - minio
+      - infra-etcd
+      - infra-minio
     volumes:
       - milvus_data:/var/lib/milvus
 
-  neo4j:
+  infra-neo4j:
     image: neo4j:5.20.0-community
-    container_name: neo4j
+    container_name: infra-neo4j
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      - "${NEO4J_HTTP_PORT}:${NEO4J_HTTP_PORT}"
+      - "${NEO4J_BOLT_PORT}:${NEO4J_BOLT_PORT}"
     environment:
-      NEO4J_AUTH: neo4j/N3o4j!$$tr0ngP@ss!
+      NEO4J_AUTH: ${NEO4J_AUTH}
     volumes:
       - neo4j_data:/data
 
-  otel-collector:
+  infra-otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
-    container_name: otel-collector
+    container_name: infra-otel-collector
     command: [ "--config=/etc/otel-collector.yml" ]
     volumes:
       - ./Configs/otel-collector.yml:/etc/otel-collector.yml
     ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "8889:8889"
+      - "${OTEL_COLLECTOR_GRPC_PORT}:${OTEL_COLLECTOR_GRPC_PORT}"
+      - "${OTEL_COLLECTOR_HTTP_PORT}:${OTEL_COLLECTOR_HTTP_PORT}"
+      - "${OTEL_COLLECTOR_METRICS_PORT}:${OTEL_COLLECTOR_METRICS_PORT}"
 
-  prometheus:
+  infra-prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: infra-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     volumes:
       - ./Configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
-  grafana:
+  infra-grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: infra-grafana
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=gr@fan@!$$tr0ngP@ss!
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
 
-  loki:
+  infra-loki:
     image: grafana/loki:latest
-    container_name: loki
+    container_name: infra-loki
     ports:
-      - "3100:3100"
+      - "${LOKI_PORT}:${LOKI_PORT}"
     command: -config.file=/etc/loki/local-config.yml
     volumes:
       - ./Configs/loki.yml:/etc/loki/local-config.yml
       - loki_data:/loki
 
-  tempo:
+  infra-tempo:
     image: grafana/tempo:latest
-    container_name: tempo
+    container_name: infra-tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     ports:
-      - "3200:3200"
+      - "${TEMPO_PORT}:${TEMPO_PORT}"
       - "4317" # otlp grpc
     volumes:
       - ./Configs/tempo.yaml:/etc/tempo.yaml
