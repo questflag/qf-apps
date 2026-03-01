@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>ed1e39a3-a7c3-4d2b-a7e8-93c2fcf44ea5</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\QuestFlag.Passport.AdminWebApp.Client\QuestFlag.Passport.AdminWebApp.Client.csproj" />
