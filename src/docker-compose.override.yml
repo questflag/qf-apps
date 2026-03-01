@@ -234,6 +234,8 @@ services:
       - tempo_data:/var/tempo
 
   questflag.passport.services:
+    depends_on:
+      - infra-postgres
     extra_hosts:
       - "localhost:host-gateway"
     environment:
