@@ -86,12 +86,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    private UserProfileDto? _userInfo;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _userInfo = await PassportClient.GetUserInfoAsync();
-    }
-}
