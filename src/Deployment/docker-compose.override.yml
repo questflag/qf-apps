@@ -233,31 +233,31 @@ services:
       - ../Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
 
-  questflag.passport.services:
-    depends_on:
-      - infra-postgres
-    extra_hosts:
-      - "localhost:host-gateway"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ASPNETCORE_HTTP_PORTS=${PASSPORT_SERVICES_HTTP_PORT}
-      - ASPNETCORE_HTTPS_PORTS=${PASSPORT_SERVICES_HTTPS_PORT}
-      - ConnectionStrings__PassportConnection=${PASSPORT_CONNECTION_STRING}
-      - ServiceUrls__InfraWebApp=${URL_INFRA_WEBAPP}
-      - ServiceUrls__InfraWebAppHttp=http://localhost:${INFRA_WEBAPP_HTTP_PORT}
-      - ServiceUrls__PassportWebApp=${URL_PASSPORT_WEBAPP}
-      - ServiceUrls__PassportAdminWebApp=${URL_PASSPORT_ADMIN_WEBAPP}
-      - OpenIddictApplications__infra-webapp=${URL_INFRA_WEBAPP}
-      - OpenIddictApplications__passport-webapp=${URL_PASSPORT_WEBAPP}
-      - OpenIddictApplications__passport-admin=${URL_PASSPORT_ADMIN_WEBAPP}
-    ports:
-      - "${PASSPORT_SERVICES_HTTP_PORT}:${PASSPORT_SERVICES_HTTP_PORT}"
-      - "${PASSPORT_SERVICES_HTTPS_PORT}:${PASSPORT_SERVICES_HTTPS_PORT}"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  # questflag.passport.services:
+  #   depends_on:
+  #     - infra-postgres
+  #   extra_hosts:
+  #     - "localhost:host-gateway"
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+  #     - ASPNETCORE_HTTP_PORTS=${PASSPORT_SERVICES_HTTP_PORT}
+  #     - ASPNETCORE_HTTPS_PORTS=${PASSPORT_SERVICES_HTTPS_PORT}
+  #     - ConnectionStrings__PassportConnection=${PASSPORT_CONNECTION_STRING}
+  #     - ServiceUrls__InfraWebApp=${URL_INFRA_WEBAPP}
+  #     - ServiceUrls__InfraWebAppHttp=http://localhost:${INFRA_WEBAPP_HTTP_PORT}
+  #     - ServiceUrls__PassportWebApp=${URL_PASSPORT_WEBAPP}
+  #     - ServiceUrls__PassportAdminWebApp=${URL_PASSPORT_ADMIN_WEBAPP}
+  #     - OpenIddictApplications__infra-webapp=${URL_INFRA_WEBAPP}
+  #     - OpenIddictApplications__passport-webapp=${URL_PASSPORT_WEBAPP}
+  #     - OpenIddictApplications__passport-admin=${URL_PASSPORT_ADMIN_WEBAPP}
+  #   ports:
+  #     - "${PASSPORT_SERVICES_HTTP_PORT}:${PASSPORT_SERVICES_HTTP_PORT}"
+  #     - "${PASSPORT_SERVICES_HTTPS_PORT}:${PASSPORT_SERVICES_HTTPS_PORT}"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 volumes:
   postgres_data:
   redis_data:
