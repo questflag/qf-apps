@@ -206,6 +206,19 @@ services:
       - ./Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
 
+  questflag.passport.services:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+    ports:
+      - "8080"
+      - "8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 volumes:
   postgres_data:
   redis_data:
@@ -219,3 +232,4 @@ volumes:
   grafana_data:
   loki_data:
   tempo_data:
+
