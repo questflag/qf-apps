@@ -13,6 +13,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Infrastructure/QuestFlag.Infrastructure.Services/QuestFlag.Infrastructure.Services.csproj", "Infrastructure/QuestFlag.Infrastructure.Services/"]
+COPY ["Infrastructure/QuestFlag.Infrastructure.Application/QuestFlag.Infrastructure.Application.csproj", "Infrastructure/QuestFlag.Infrastructure.Application/"]
+COPY ["Infrastructure/QuestFlag.Infrastructure.ApiCore/QuestFlag.Infrastructure.ApiCore.csproj", "Infrastructure/QuestFlag.Infrastructure.ApiCore/"]
+COPY ["Infrastructure/QuestFlag.Infrastructure.Domain/QuestFlag.Infrastructure.Domain.csproj", "Infrastructure/QuestFlag.Infrastructure.Domain/"]
+COPY ["Infrastructure/QuestFlag.Infrastructure.Core/QuestFlag.Infrastructure.Core.csproj", "Infrastructure/QuestFlag.Infrastructure.Core/"]
 RUN dotnet restore "./Infrastructure/QuestFlag.Infrastructure.Services/QuestFlag.Infrastructure.Services.csproj"
 COPY . .
 WORKDIR "/src/Infrastructure/QuestFlag.Infrastructure.Services"

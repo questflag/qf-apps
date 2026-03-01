@@ -4,6 +4,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+      - Storage__MinioAccessKey=admin
+      - Storage__MinioSecretKey=m1n10!$tr0ngP@ss!
+      - Storage__MinioEndpoint=minio:9000
+      - Kafka__BootstrapServers=kafka:9092
+      - ConnectionStrings__InfrastructureConnection=Host=postgres;Port=5432;Database=questflag_infrastructure;Username=postgres;Password=P@ssw0rd!Qf2026!
     ports:
       - "8080"
       - "8081"
@@ -46,11 +51,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: P@ssw0rd!Qf2026!
-      POSTGRES_DB: questflag_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   redis:
     image: redis:7-alpine
@@ -61,19 +66,23 @@ services:
       - redis_data:/data
 
   kafka:
-    image: public.ecr.aws/bitnami/kafka:4.2
+    image: apache/kafka:3.7.0
     container_name: kafka
     ports:
       - "9092:9092"
     environment:
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_KRAFT_CLUSTER_ID=L697XvT_Scy_Y_Z7Q_L7_A
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_QUORUM_VOTERS=1@kafka:9093
     volumes:
       - kafka_data:/bitnami/kafka
 
@@ -85,7 +94,7 @@ services:
       - "9001:9001"
     environment:
       - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=m1n10!$$tr0ngP@ss!
+      - MINIO_ROOT_PASSWORD=m1n10!$tr0ngP@ss!
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -118,6 +127,8 @@ services:
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: m1n10!$tr0ngP@ss!
     ports:
       - "19530:19530"
       - "9091:9091"

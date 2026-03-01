@@ -8,8 +8,8 @@ public class StorageSettings
     
     // Minio Settings
     public string MinioEndpoint { get; set; } = "localhost:9000";
-    public string MinioAccessKey { get; set; } = "minioadmin";
-    public string MinioSecretKey { get; set; } = "minioadmin";
+    public string MinioAccessKey { get; set; } = "admin";
+    public string MinioSecretKey { get; set; } = "m1n10!$tr0ngP@ss!";
     public bool MinioUseSSL { get; set; } = false;
 
     // GCP Settings
