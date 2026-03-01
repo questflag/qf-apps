@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuestFlag.Infrastructure.ApiCore.Extensions;
 using QuestFlag.Infrastructure.ApiCore.Models;
-using QuestFlag.Infrastructure.Application.Common.Models;
+using QuestFlag.Infrastructure.Core.Common.Models;
 using QuestFlag.Infrastructure.Application.Common.DTOs;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Commands;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
@@ -115,7 +115,8 @@ public class UploadController : ControllerBase
             pageSize);
 
         var result = await _mediator.Send(query);
-        return Ok(ApiResponse<PagedResult<UploadRecordDto>>.Ok(result));
+        var pagedResult = new PagedResult<UploadRecordDto>(result.Items, result.TotalCount, page, pageSize);
+        return Ok(ApiResponse<PagedResult<UploadRecordDto>>.Ok(pagedResult));
     }
 
     [HttpGet("{id}/download")]

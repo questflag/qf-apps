@@ -16,7 +16,7 @@ public interface ITrustedDeviceRepository
 
     Task<TrustedDevice?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
-    Task AddAsync(TrustedDevice device, CancellationToken ct = default);
+    Task<TrustedDevice> AddAsync(TrustedDevice device, CancellationToken ct = default);
 
     Task UpdateAsync(TrustedDevice device, CancellationToken ct = default);
 

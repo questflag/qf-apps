@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QuestFlag.Infrastructure.Application.Common.Models;
+namespace QuestFlag.Infrastructure.Core.Common.Models;
 
 public class PagedResult<T>
 {

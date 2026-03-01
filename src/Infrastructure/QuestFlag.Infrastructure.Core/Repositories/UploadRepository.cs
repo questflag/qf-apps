@@ -11,27 +11,13 @@ using QuestFlag.Infrastructure.Domain.Interfaces;
 
 namespace QuestFlag.Infrastructure.Core.Repositories;
 
-public class UploadRepository : IUploadRepository
+public class UploadRepository : Repository<UploadRecord, AppDbContext>, IUploadRepository
 {
-    private readonly AppDbContext _dbContext;
-
-    public UploadRepository(AppDbContext dbContext)
+    public UploadRepository(AppDbContext dbContext) : base(dbContext)
     {
-        _dbContext = dbContext;
     }
 
-    public async Task<UploadRecord> AddAsync(UploadRecord record, CancellationToken ct = default)
-    {
-        _dbContext.UploadRecords.Add(record);
-        await _dbContext.SaveChangesAsync(ct);
-        return record;
-    }
 
-    public async Task UpdateAsync(UploadRecord record, CancellationToken ct = default)
-    {
-        _dbContext.UploadRecords.Update(record);
-        await _dbContext.SaveChangesAsync(ct);
-    }
 
     public async Task DeleteAsync(Guid id, string deletedByUserId, CancellationToken ct = default)
     {
@@ -42,14 +28,13 @@ public class UploadRepository : IUploadRepository
             record.DeletedAtUtc = DateTime.UtcNow;
             record.DeletedByUserId = deletedByUserId;
             
-            _dbContext.UploadRecords.Update(record);
-            await _dbContext.SaveChangesAsync(ct);
+            await UpdateAsync(record, ct);
         }
     }
 
     public async Task<UploadRecord?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await _dbContext.UploadRecords.FindAsync(new object[] { id }, ct);
+        return await base.GetByIdAsync(id, ct);
     }
 
     public async Task<(IReadOnlyList<UploadRecord> Items, int TotalCount)> GetListAsync(
@@ -66,7 +51,7 @@ public class UploadRepository : IUploadRepository
         int pageSize = 10,
         CancellationToken ct = default)
     {
-        var query = _dbContext.UploadRecords.AsQueryable();
+        var query = GetQueryable();
 
         // 1. Mandatory Filters (Tenant isolation & Role based constraints)
         query = query.Where(x => x.TenantId == tenantId);

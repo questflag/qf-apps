@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using QuestFlag.Infrastructure.Application.Common.DTOs;
-using QuestFlag.Infrastructure.Application.Common.Models;
 using QuestFlag.Infrastructure.Domain.Interfaces;
 
 namespace QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
@@ -21,9 +20,9 @@ public record GetUploadsQuery(
     string SortBy = "CreatedAtUtc",
     string SortDir = "desc",
     int PageIndex = 1,
-    int PageSize = 10) : IRequest<PagedResult<UploadRecordDto>>;
+    int PageSize = 10) : IRequest<(IReadOnlyList<UploadRecordDto> Items, int TotalCount)>;
 
-public class GetUploadsQueryHandler : IRequestHandler<GetUploadsQuery, PagedResult<UploadRecordDto>>
+public class GetUploadsQueryHandler : IRequestHandler<GetUploadsQuery, (IReadOnlyList<UploadRecordDto> Items, int TotalCount)>
 {
     private readonly IUploadRepository _repository;
 
@@ -32,7 +31,7 @@ public class GetUploadsQueryHandler : IRequestHandler<GetUploadsQuery, PagedResu
         _repository = repository;
     }
 
-    public async Task<PagedResult<UploadRecordDto>> Handle(GetUploadsQuery request, CancellationToken cancellationToken)
+    public async Task<(IReadOnlyList<UploadRecordDto> Items, int TotalCount)> Handle(GetUploadsQuery request, CancellationToken cancellationToken)
     {
         bool descending = request.SortDir.Equals("desc", StringComparison.OrdinalIgnoreCase);
 
@@ -68,6 +67,6 @@ public class GetUploadsQueryHandler : IRequestHandler<GetUploadsQuery, PagedResu
             r.CompletedAtUtc
         )).ToList();
 
-        return new PagedResult<UploadRecordDto>(dtos, totalCount, request.PageIndex, request.PageSize);
+        return (dtos, totalCount);
     }
 }
