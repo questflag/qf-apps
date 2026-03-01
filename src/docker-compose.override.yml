@@ -1,3 +1,5 @@
+name: qf-app-infra
+
 services:
   service-qf-infra:
     environment:
@@ -10,8 +12,8 @@ services:
       - Kafka__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
       - ConnectionStrings__InfrastructureConnection=${INFRASTRUCTURE_CONNECTION_STRING}
     ports:
-      - "${INFRASTRUCTURE_SERVICES_HTTP_PORT}"
-      - "${INFRASTRUCTURE_SERVICES_HTTPS_PORT}"
+      - "${INFRASTRUCTURE_SERVICES_HTTP_PORT}:${INFRASTRUCTURE_SERVICES_HTTP_PORT}"
+      - "${INFRASTRUCTURE_SERVICES_HTTPS_PORT}:${INFRASTRUCTURE_SERVICES_HTTPS_PORT}"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -201,19 +203,20 @@ services:
     command: [ "-config.file=/etc/tempo.yaml" ]
     ports:
       - "${TEMPO_PORT}:${TEMPO_PORT}"
-      - "${TEMPO_OTLP_GRPC_PORT:-4317}:${TEMPO_OTLP_GRPC_PORT:-4317}" # otlp grpc
+      - "${TEMPO_OTLP_GRPC_PORT}:${TEMPO_OTLP_GRPC_CONTAINER_PORT}" # otlp grpc
     volumes:
       - ./Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
 
   questflag.passport.services:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_HTTP_PORTS=${PASSPORT_SERVICES_HTTP_PORT}
+      - ASPNETCORE_HTTPS_PORTS=${PASSPORT_SERVICES_HTTPS_PORT}
+      - ConnectionStrings__PassportConnection=${PASSPORT_CONNECTION_STRING}
     ports:
-      - "8080"
-      - "8081"
+      - "${PASSPORT_SERVICES_HTTP_PORT}:${PASSPORT_SERVICES_HTTP_PORT}"
+      - "${PASSPORT_SERVICES_HTTPS_PORT}:${PASSPORT_SERVICES_HTTPS_PORT}"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -232,4 +235,5 @@ volumes:
   grafana_data:
   loki_data:
   tempo_data:
+
 

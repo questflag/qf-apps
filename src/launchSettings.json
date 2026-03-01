@@ -4,8 +4,24 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "questflag.infrastructure.services": "StartDebugging",
+        "service-qf-infra": "StartDebugging",
+        "app-qf-passport": "StartDebugging",
+        "app-qf-passport-admin": "StartDebugging",
         "questflag.passport.services": "StartDebugging"
+      },
+      "serviceDebugSettings": {
+        "app-qf-passport": {
+          "httpPort": 8080,
+          "httpsPort": 7003,
+          "useSSL": true,
+          "launchBrowser": true
+        },
+        "app-qf-passport-admin": {
+          "httpPort": 8080,
+          "httpsPort": 7004,
+          "useSSL": true,
+          "launchBrowser": true
+        }
       }
     }
   }

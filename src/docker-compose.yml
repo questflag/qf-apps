@@ -1,3 +1,5 @@
+name: qf-app-infra
+
 services:
   service-qf-infra:
     image: ${DOCKER_REGISTRY}${SERVICE_INFRA_IMAGE}

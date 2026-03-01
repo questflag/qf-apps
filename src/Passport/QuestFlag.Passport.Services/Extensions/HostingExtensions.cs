@@ -28,7 +28,7 @@ public static class HostingExtensions
             await context.Database.MigrateAsync();
 
             // Seed Roles
-            string[] roles = { PassportRole.TenantAdmin, PassportRole.User };
+            string[] roles = [PassportRole.TenantAdmin, PassportRole.User];
             foreach (var roleName in roles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
