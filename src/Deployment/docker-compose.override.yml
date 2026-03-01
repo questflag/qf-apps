@@ -79,7 +79,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ../Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
@@ -88,7 +88,7 @@ services:
     image: ${REDIS_IMAGE}
     container_name: infra-redis
     ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+      - "${REDIS_PORT}:6379"
     volumes:
       - redis_data:/data
 
@@ -117,7 +117,7 @@ services:
     image: ${MINIO_IMAGE}
     container_name: infra-minio
     ports:
-      - "${MINIO_PORT}:${MINIO_PORT}"
+      - "${MINIO_PORT}:9000"
       - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
@@ -130,8 +130,8 @@ services:
     image: ${QDRANT_IMAGE}
     container_name: infra-qdrant
     ports:
-      - "${QDRANT_HTTP_PORT}:${QDRANT_HTTP_PORT}"
-      - "${QDRANT_GRPC_PORT}:${QDRANT_GRPC_PORT}"
+      - "${QDRANT_HTTP_PORT}:6333"
+      - "${QDRANT_GRPC_PORT}:6334"
     volumes:
       - qdrant_data:/qdrant/storage
 
@@ -145,7 +145,7 @@ services:
       - ETCD_SNAPSHOT_COUNT=50000
     volumes:
       - etcd_data:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:${ETCD_CLIENT_PORT} -listen-client-urls http://0.0.0.0:${ETCD_CLIENT_PORT} --data-dir /etcd
+    command: etcd -advertise-client-urls=http://infra-etcd:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir=/etcd
 
   infra-milvus:
     image: ${MILVUS_IMAGE}
@@ -157,8 +157,8 @@ services:
       MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "${MILVUS_PORT}:${MILVUS_PORT}"
-      - "${MILVUS_WEB_PORT}:${MILVUS_WEB_PORT}"
+      - "${MILVUS_PORT}:19530"
+      - "${MILVUS_WEB_PORT}:9091"
     depends_on:
       - infra-etcd
       - infra-minio
@@ -169,8 +169,8 @@ services:
     image: ${NEO4J_IMAGE}
     container_name: infra-neo4j
     ports:
-      - "${NEO4J_HTTP_PORT}:${NEO4J_HTTP_PORT}"
-      - "${NEO4J_BOLT_PORT}:${NEO4J_BOLT_PORT}"
+      - "${NEO4J_HTTP_PORT}:7474"
+      - "${NEO4J_BOLT_PORT}:7687"
     environment:
       NEO4J_AUTH: ${NEO4J_AUTH}
     volumes:
@@ -183,9 +183,9 @@ services:
     volumes:
       - ../Configs/otel-collector.yml:/etc/otel-collector.yml
     ports:
-      - "${OTEL_COLLECTOR_GRPC_PORT}:${OTEL_COLLECTOR_GRPC_PORT}"
-      - "${OTEL_COLLECTOR_HTTP_PORT}:${OTEL_COLLECTOR_HTTP_PORT}"
-      - "${OTEL_COLLECTOR_METRICS_PORT}:${OTEL_COLLECTOR_METRICS_PORT}"
+      - "${OTEL_COLLECTOR_GRPC_PORT}:4317"
+      - "${OTEL_COLLECTOR_HTTP_PORT}:4318"
+      - "${OTEL_COLLECTOR_METRICS_PORT}:8889"
 
   infra-prometheus:
     image: ${PROMETHEUS_IMAGE}
@@ -196,7 +196,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+      - "${PROMETHEUS_PORT}:9090"
     volumes:
       - ../Configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -205,7 +205,7 @@ services:
     image: ${GRAFANA_IMAGE}
     container_name: infra-grafana
     ports:
-      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+      - "${GRAFANA_PORT}:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
@@ -216,7 +216,7 @@ services:
     image: ${LOKI_IMAGE}
     container_name: infra-loki
     ports:
-      - "${LOKI_PORT}:${LOKI_PORT}"
+      - "${LOKI_PORT}:3100"
     command: -config.file=/etc/loki/local-config.yml
     volumes:
       - ../Configs/loki.yml:/etc/loki/local-config.yml
@@ -227,12 +227,11 @@ services:
     container_name: infra-tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     ports:
-      - "${TEMPO_PORT}:${TEMPO_PORT}"
+      - "${TEMPO_PORT}:3200"
       - "${TEMPO_OTLP_GRPC_PORT}:${TEMPO_OTLP_GRPC_CONTAINER_PORT}" # otlp grpc
     volumes:
       - ../Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
-
   # questflag.passport.services:
   #   depends_on:
   #     - infra-postgres
