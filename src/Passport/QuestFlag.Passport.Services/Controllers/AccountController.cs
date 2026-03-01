@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using QuestFlag.Passport.ApiCore.Extensions;
+using QuestFlag.Infrastructure.ApiCore.Extensions;
 using QuestFlag.Passport.Application.Features.Users.Commands;
 
 namespace QuestFlag.Passport.Services.Controllers;
@@ -112,7 +112,7 @@ public class AccountController : ControllerBase
     }
 
     // ─────────────────────────────────────────────────────────
-    // Helpers via QuestFlag.Passport.ApiCore.Extensions
+    // Helpers via QuestFlag.Infrastructure.ApiCore.Extensions
     // ─────────────────────────────────────────────────────────
 
     private Guid? GetCurrentUserId() => User.GetCurrentUserId();

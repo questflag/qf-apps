@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuestFlag.Passport.ApiCore.Extensions;
+using QuestFlag.Infrastructure.ApiCore.Extensions;
 using QuestFlag.Passport.Application.Features.Users.Commands;
 using QuestFlag.Passport.Application.Features.Users.Queries;
 

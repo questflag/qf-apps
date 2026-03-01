@@ -1,5 +1,6 @@
 using System;
 using System.Security.Claims;
+using OpenIddict.Abstractions;
 
 namespace QuestFlag.Infrastructure.ApiCore.Extensions;
 
@@ -34,6 +35,7 @@ public static class ClaimsPrincipalExtensions
     public static Guid? GetCurrentUserId(this ClaimsPrincipal principal)
     {
         var value = principal.FindFirst("user_id")?.Value
+                 ?? principal.FindFirst(OpenIddictConstants.Claims.Subject)?.Value
                  ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(value, out var id) ? id : null;
     }
