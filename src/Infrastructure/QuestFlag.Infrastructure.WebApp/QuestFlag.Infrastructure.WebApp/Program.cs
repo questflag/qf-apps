@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Infrastructure.WebApp.State;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Passport.Client;
+using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddQuestFlagApiServices();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
 builder.Services.AddHttpContextAccessor();
 
@@ -87,6 +89,7 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseQuestFlagApiPipeline();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

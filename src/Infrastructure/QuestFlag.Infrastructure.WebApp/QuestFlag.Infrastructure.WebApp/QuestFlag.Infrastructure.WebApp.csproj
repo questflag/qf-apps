@@ -8,12 +8,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
     <ProjectReference Include="..\QuestFlag.Infrastructure.WebApp.Client\QuestFlag.Infrastructure.WebApp.Client.csproj" />
+    <ProjectReference Include="..\..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
     <Exec Command="npx @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/app.css" />

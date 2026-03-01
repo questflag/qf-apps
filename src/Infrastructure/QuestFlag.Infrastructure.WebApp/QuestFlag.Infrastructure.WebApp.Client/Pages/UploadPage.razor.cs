@@ -15,17 +15,21 @@ public partial class UploadPage
 
     private List<UploadItem> _uploadQueue = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
-        if (string.IsNullOrEmpty(_token))
+        if (firstRender)
         {
-            Nav.NavigateTo("/login");
-            return;
-        }
+            _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
+            if (string.IsNullOrEmpty(_token))
+            {
+                Nav.NavigateTo("/login");
+                return;
+            }
 
-        // Initialize the Typed Client with Bearer token
-        UploadApi.SetBearerToken(_token);
+            // Initialize the Typed Client with Bearer token
+            UploadApi.SetBearerToken(_token);
+            StateHasChanged();
+        }
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)

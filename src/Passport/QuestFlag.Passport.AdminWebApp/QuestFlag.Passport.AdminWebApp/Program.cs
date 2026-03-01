@@ -1,9 +1,11 @@
 using QuestFlag.Passport.AdminWebApp.Client.Pages;
 using QuestFlag.Passport.AdminWebApp.Components;
+using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddQuestFlagApiServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -27,8 +29,8 @@ else
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-
 app.UseAntiforgery();
+app.UseQuestFlagApiPipeline();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

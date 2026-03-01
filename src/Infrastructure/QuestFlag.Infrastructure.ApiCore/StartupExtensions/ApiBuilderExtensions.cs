@@ -27,8 +27,16 @@ public static class ApiBuilderExtensions
     {
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwagger(options =>
+            {
+                options.RouteTemplate = "docs/{documentName}/swagger.json";
+            });
+
+            app.UseSwaggerUI(options =>
+            {
+                options.RoutePrefix = "docs";
+                options.SwaggerEndpoint("v1/swagger.json", "V1");
+            });
         }
 
         app.UseHttpsRedirection();

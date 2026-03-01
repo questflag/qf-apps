@@ -32,28 +32,32 @@ public partial class UploadsListPage : IDisposable
     private int _page = 1;
     private int _pageSize = 50;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
-        if (string.IsNullOrEmpty(_token))
+        if (firstRender)
         {
-            Nav.NavigateTo("/login");
-            return;
+            _token = await JS.InvokeAsync<string>("localStorage.getItem", "jwt_token");
+            if (string.IsNullOrEmpty(_token))
+            {
+                Nav.NavigateTo("/login");
+                return;
+            }
+
+            UploadApi.SetBearerToken(_token);
+
+            // Load initial lookup data
+            try
+            {
+                _tenants = (await PassportApi.GetTenantsAsync()).ToList();
+            }
+            catch { }
+
+            await LoadDataAsync();
+
+            // Start polling if any item is not completed
+            StartPolling();
+            StateHasChanged();
         }
-
-        UploadApi.SetBearerToken(_token);
-
-        // Load initial lookup data
-        try
-        {
-            _tenants = (await PassportApi.GetTenantsAsync()).ToList();
-        }
-        catch { }
-
-        await LoadDataAsync();
-
-        // Start polling if any item is not completed
-        StartPolling();
     }
 
     private void StartPolling()
