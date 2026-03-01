@@ -9,14 +9,14 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../dependency.md" />
-    <File Path=".env" />
+    <File Path="Deployment/.env" />
   </Folder>
   <Folder Name="/Deployment/">
-    <Project Path="docker-compose.dcproj">
+    <Project Path="Deployment/docker-compose.dcproj">
       <Build />
     </Project>
-    <Project Path="QuestFlag.AppHost/QuestFlag.AppHost.csproj" Id="ed0cb053-623b-429f-acfe-577c983da68c" />
-    <Project Path="QuestFlag.ServiceDefaults/QuestFlag.ServiceDefaults.csproj" />
+    <Project Path="Deployment/QuestFlag.AppHost/QuestFlag.AppHost.csproj" Id="ed0cb053-623b-429f-acfe-577c983da68c" />
+    <Project Path="Deployment/QuestFlag.ServiceDefaults/QuestFlag.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
     <Folder Name="/Infrastructure/QuestFlag.Infrastructure.WebApp/">

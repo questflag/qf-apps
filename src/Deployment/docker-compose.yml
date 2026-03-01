@@ -4,26 +4,26 @@ name: qf-app-infra
 #   service-qf-infra:
 #     image: ${DOCKER_REGISTRY}${SERVICE_INFRA_IMAGE}
 #     build:
-#       context: .
+#       context: ..
 #       dockerfile: Infrastructure/QuestFlag.Infrastructure.Services/Dockerfile
 #   app-qf-passport:
 #     image: ${DOCKER_REGISTRY}${APP_PASSPORT_IMAGE}
 #     build:
-#       context: .
+#       context: ..
 #       dockerfile: Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/Dockerfile
 #   app-qf-infra:
 #     image: ${DOCKER_REGISTRY}${APP_INFRA_IMAGE}
 #     build:
-#       context: .
+#       context: ..
 #       dockerfile: Infrastructure/QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp/Dockerfile
 #   app-qf-passport-admin:
 #     image: ${DOCKER_REGISTRY}${APP_PASSPORT_ADMIN_IMAGE}
 #     build:
-#       context: .
+#       context: ..
 #       dockerfile: Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp/Dockerfile
 
 #   questflag.passport.services:
 #     image: ${DOCKER_REGISTRY-}questflagpassportservices
 #     build:
-#       context: .
+#       context: ..
 #       dockerfile: Passport/QuestFlag.Passport.Services/Dockerfile

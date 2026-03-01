@@ -6,7 +6,7 @@
     <UserSecretsId>5e4e484b-53a8-4184-a737-0e82d3d4312b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerComposeProjectPath>..\..\Deployment\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
@@ -23,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
-    <ProjectReference Include="..\..\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
     <ProjectReference Include="..\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj" />
     <ProjectReference Include="..\QuestFlag.Passport.Core\QuestFlag.Passport.Core.csproj" />
   </ItemGroup>

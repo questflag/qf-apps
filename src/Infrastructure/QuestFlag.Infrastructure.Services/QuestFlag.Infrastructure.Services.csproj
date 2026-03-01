@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>964db156-f4f0-4368-8e96-a844a76b8e73</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerComposeProjectPath>..\..\Deployment\docker-compose.dcproj</DockerComposeProjectPath>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
   <ItemGroup>
@@ -21,7 +21,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
     <ProjectReference Include="..\QuestFlag.Infrastructure.Application\QuestFlag.Infrastructure.Application.csproj" />
     <ProjectReference Include="..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
     <ProjectReference Include="..\QuestFlag.Infrastructure.Domain\QuestFlag.Infrastructure.Domain.csproj" />
