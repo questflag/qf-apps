@@ -9,6 +9,7 @@
     <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
     <ProjectReference Include="..\QuestFlag.Passport.WebApp.Client\QuestFlag.Passport.WebApp.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />

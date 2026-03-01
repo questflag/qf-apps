@@ -15,6 +15,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.AddServiceDefaults();
 
         // 1. Layer DI
         builder.Services.AddInfrastructureApplication();
@@ -70,6 +71,8 @@ public class Program
         });
 
         var app = builder.Build();
+
+        app.MapDefaultEndpoints();
 
         // 5. EF Migrate on startup
         using (var scope = app.Services.CreateScope())

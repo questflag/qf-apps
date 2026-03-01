@@ -9,6 +9,8 @@ using QuestFlag.Passport.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // 1. Layer DI
 builder.Services.AddPassportApplication();
 builder.Services.AddPassportCore(builder.Configuration);
@@ -98,6 +100,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseCors("PassportClients");
 

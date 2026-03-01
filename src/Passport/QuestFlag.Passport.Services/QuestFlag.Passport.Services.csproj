@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
+    <ProjectReference Include="..\..\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
     <ProjectReference Include="..\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj" />
     <ProjectReference Include="..\QuestFlag.Passport.Core\QuestFlag.Passport.Core.csproj" />
   </ItemGroup>

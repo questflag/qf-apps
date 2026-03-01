@@ -1,0 +1,19 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>2c68829b-7d3a-44b6-b6da-a9c50739d11c</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\QuestFlag.Infrastructure.WebApp\QuestFlag.Infrastructure.WebApp\QuestFlag.Infrastructure.WebApp.csproj" />
+    <ProjectReference Include="..\Infrastructure\QuestFlag.Infrastructure.Services\QuestFlag.Infrastructure.Services.csproj" />
+    <ProjectReference Include="..\Passport\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp.csproj" />
+    <ProjectReference Include="..\Passport\QuestFlag.Passport.Services\QuestFlag.Passport.Services.csproj" />
+    <ProjectReference Include="..\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.csproj" />
+  </ItemGroup>
+
+</Project>
