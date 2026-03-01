@@ -6,9 +6,9 @@ services:
       - ASPNETCORE_HTTPS_PORTS=${INFRASTRUCTURE_SERVICES_HTTPS_PORT}
       - Storage__MinioAccessKey=${STORAGE_MINIO_ACCESS_KEY}
       - Storage__MinioSecretKey=${STORAGE_MINIO_SECRET_KEY}
-      - Storage__MinioEndpoint=infra-minio:9000
-      - Kafka__BootstrapServers=infra-kafka:9092
-      - ConnectionStrings__InfrastructureConnection=Host=infra-postgres;Port=5432;Database=questflag_infrastructure;Username=postgres;Password=P@ssw0rd!Qf2026!
+      - Storage__MinioEndpoint=${STORAGE_MINIO_ENDPOINT}
+      - Kafka__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - ConnectionStrings__InfrastructureConnection=${INFRASTRUCTURE_CONNECTION_STRING}
     ports:
       - "${INFRASTRUCTURE_SERVICES_HTTP_PORT}"
       - "${INFRASTRUCTURE_SERVICES_HTTPS_PORT}"
@@ -46,7 +46,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   infra-postgres:
-    image: postgres:15-alpine
+    image: ${POSTGRES_IMAGE}
     container_name: infra-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -58,7 +58,7 @@ services:
       - ./Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   infra-redis:
-    image: redis:7-alpine
+    image: ${REDIS_IMAGE}
     container_name: infra-redis
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
@@ -66,28 +66,28 @@ services:
       - redis_data:/data
 
   infra-kafka:
-    image: apache/kafka:3.7.0
+    image: ${KAFKA_IMAGE}
     container_name: infra-kafka
     ports:
       - "${KAFKA_PORT}:${KAFKA_PORT}"
     environment:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
-      - KAFKA_LISTENERS=PLAINTEXT://:${KAFKA_PORT},CONTROLLER://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://infra-kafka:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:${KAFKA_PORT},CONTROLLER://:${KAFKA_CONTROLLER_PORT}
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://infra-kafka:${KAFKA_PORT}
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@infra-kafka:9093
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@infra-kafka:${KAFKA_CONTROLLER_PORT}
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
-      - KAFKA_QUORUM_VOTERS=1@infra-kafka:9093
+      - KAFKA_QUORUM_VOTERS=1@infra-kafka:${KAFKA_CONTROLLER_PORT}
     volumes:
       - kafka_data:/bitnami/kafka
 
   infra-minio:
-    image: minio/minio:latest
+    image: ${MINIO_IMAGE}
     container_name: infra-minio
     ports:
       - "${MINIO_PORT}:${MINIO_PORT}"
@@ -100,7 +100,7 @@ services:
       - minio_data:/data
 
   infra-qdrant:
-    image: qdrant/qdrant:latest
+    image: ${QDRANT_IMAGE}
     container_name: infra-qdrant
     ports:
       - "${QDRANT_HTTP_PORT}:${QDRANT_HTTP_PORT}"
@@ -109,7 +109,7 @@ services:
       - qdrant_data:/qdrant/storage
 
   infra-etcd:
-    image: quay.io/coreos/etcd:v3.5.5
+    image: ${ETCD_IMAGE}
     container_name: infra-etcd
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
@@ -121,17 +121,17 @@ services:
     command: etcd -advertise-client-urls=http://127.0.0.1:${ETCD_CLIENT_PORT} -listen-client-urls http://0.0.0.0:${ETCD_CLIENT_PORT} --data-dir /etcd
 
   infra-milvus:
-    image: milvusdb/milvus:v2.4.5
+    image: ${MILVUS_IMAGE}
     container_name: infra-milvus
     command: [ "milvus", "run", "standalone" ]
     environment:
-      ETCD_ENDPOINTS: infra-etcd:2379
-      MINIO_ADDRESS: infra-minio:9000
-      MINIO_ACCESS_KEY_ID: admin
-      MINIO_SECRET_ACCESS_KEY: m1n10!$$tr0ngP@ss!
+      ETCD_ENDPOINTS: ${MILVUS_ETCD_ENDPOINTS}
+      MINIO_ADDRESS: ${MILVUS_MINIO_ADDRESS}
+      MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "19530:19530"
-      - "9091:9091"
+      - "${MILVUS_PORT}:${MILVUS_PORT}"
+      - "${MILVUS_WEB_PORT}:${MILVUS_WEB_PORT}"
     depends_on:
       - infra-etcd
       - infra-minio
@@ -139,7 +139,7 @@ services:
       - milvus_data:/var/lib/milvus
 
   infra-neo4j:
-    image: neo4j:5.20.0-community
+    image: ${NEO4J_IMAGE}
     container_name: infra-neo4j
     ports:
       - "${NEO4J_HTTP_PORT}:${NEO4J_HTTP_PORT}"
@@ -150,7 +150,7 @@ services:
       - neo4j_data:/data
 
   infra-otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: ${OTEL_COLLECTOR_IMAGE}
     container_name: infra-otel-collector
     command: [ "--config=/etc/otel-collector.yml" ]
     volumes:
@@ -161,7 +161,7 @@ services:
       - "${OTEL_COLLECTOR_METRICS_PORT}:${OTEL_COLLECTOR_METRICS_PORT}"
 
   infra-prometheus:
-    image: prom/prometheus:latest
+    image: ${PROMETHEUS_IMAGE}
     container_name: infra-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -175,7 +175,7 @@ services:
       - prometheus_data:/prometheus
 
   infra-grafana:
-    image: grafana/grafana:latest
+    image: ${GRAFANA_IMAGE}
     container_name: infra-grafana
     ports:
       - "${GRAFANA_PORT}:${GRAFANA_PORT}"
@@ -186,7 +186,7 @@ services:
       - grafana_data:/var/lib/grafana
 
   infra-loki:
-    image: grafana/loki:latest
+    image: ${LOKI_IMAGE}
     container_name: infra-loki
     ports:
       - "${LOKI_PORT}:${LOKI_PORT}"
@@ -196,12 +196,12 @@ services:
       - loki_data:/loki
 
   infra-tempo:
-    image: grafana/tempo:latest
+    image: ${TEMPO_IMAGE}
     container_name: infra-tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     ports:
       - "${TEMPO_PORT}:${TEMPO_PORT}"
-      - "4317" # otlp grpc
+      - "${TEMPO_OTLP_GRPC_PORT:-4317}:${TEMPO_OTLP_GRPC_PORT:-4317}" # otlp grpc
     volumes:
       - ./Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
