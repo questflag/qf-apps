@@ -12,5 +12,8 @@
   "type": "commonjs",
   "devDependencies": {
     "tailwindcss": "^4.2.1"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.1"
   }
 }

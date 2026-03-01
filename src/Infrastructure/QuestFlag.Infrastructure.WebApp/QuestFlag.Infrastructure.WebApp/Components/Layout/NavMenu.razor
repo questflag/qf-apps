@@ -1,51 +1,51 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">QuestFlag Portal</a>
-    </div>
+﻿<div class="px-6 py-4 border-b border-gray-100 mb-4">
+    <a class="text-lg font-bold text-blue-600 tracking-tight" href="">QuestFlag Portal</a>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<nav class="mt-2 flex-1 px-4 space-y-1 bg-white" aria-label="Sidebar">
+    <div class="space-y-1">
+        <NavLink class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200" href="" Match="NavLinkMatch.All" ActiveClass="bg-blue-50 text-blue-700 shadow-sm" @onclick="() => {}">
+            <span class="bi bi-house-door mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+            <span>Home</span>
+        </NavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="upload">
-                <span class="bi bi-upload-nav-menu" aria-hidden="true"></span> Upload Files
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="uploads">
-                <span class="bi bi-list-nav-menu" aria-hidden="true"></span> My Uploads
-            </NavLink>
-        </div>
+        <NavLink class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="upload" ActiveClass="bg-blue-50 text-blue-700 shadow-sm">
+            <span class="bi bi-upload mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+            <span>Upload Files</span>
+        </NavLink>
+
+        <NavLink class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="uploads" ActiveClass="bg-blue-50 text-blue-700 shadow-sm">
+            <span class="bi bi-list mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+            <span>My Uploads</span>
+        </NavLink>
+    </div>
+
+    <div class="pt-4 mt-4 border-t border-gray-100">
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3 mb-2">
-                    <NavLink class="nav-link" href="profile">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> My Profile
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3 mt-auto border-t border-gray-700 pt-2">
+                <NavLink class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="profile" ActiveClass="bg-blue-50 text-blue-700 shadow-sm">
+                    <span class="bi bi-person mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                    <span>My Profile</span>
+                </NavLink>
+
+                <div class="mt-4">
                     <form action="/account/logout" method="post">
                         <AntiforgeryToken />
-                        <button type="submit" class="nav-link bg-transparent border-0 text-left w-100">
-                            <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Sign Out
+                        <button type="submit" class="group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200">
+                            <span class="bi bi-box-arrow-right mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                            <span>Sign Out</span>
                         </button>
                     </form>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3 mt-auto">
-                    <a class="nav-link" href="/login">
-                        <span class="bi bi-key-nav-menu" aria-hidden="true"></span> Sign In (SSO)
+                <div class="mt-4">
+                    <a class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200" href="/login">
+                        <span class="bi bi-key mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                        <span>Sign In (SSO)</span>
                     </a>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
-    </nav>
-</div>
+    </div>
+</nav>

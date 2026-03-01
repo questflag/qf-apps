@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Infrastructure.WebApp.State;
+using QuestFlag.Infrastructure.Client;
+using QuestFlag.Passport.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,20 @@ builder.Services.AddHttpContextAccessor();
 
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
     ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
+
+var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
+    ?? throw new InvalidOperationException("ServiceUrls:InfraServices is required in configuration.");
+
+// Register Client APIs for server-side rendering/pre-rendering
+builder.Services.AddHttpClient<PassportApiClient>(client =>
+{
+    client.BaseAddress = new Uri(passportServicesUrl);
+});
+
+builder.Services.AddHttpClient<UploadApiService>(client =>
+{
+    client.BaseAddress = new Uri(infraServicesUrl);
+});
 
 builder.Services.AddAuthentication(options =>
 {
