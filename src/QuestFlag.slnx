@@ -11,6 +11,7 @@
     <File Path="../dependency.md" />
   </Folder>
   <Folder Name="/Deployment/">
+    <File Path="Deployment/.env" />
     <Project Path="Deployment/docker-compose.dcproj">
       <Build />
     </Project>
