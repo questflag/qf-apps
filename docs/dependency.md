@@ -1,84 +1,99 @@
 # QuestFlag Architecture Dependencies (.NET 10)
 
-This document maps NuGet package dependencies to each project in the Clean Architecture solution, organized by service set.
+This document maps NuGet package dependencies to each project in the QuestFlag solution, organized by service set.
 
-> **Solution file**: `src/QuestFlag.slnx`  
-> **Framework**: `net10.0`  
+> **Solution file**: `QuestFlag.slnx`  
+> **Framework**: `net10.0`
+> **Orchestration**: `.NET Aspire 13.1.0`
 
 ---
 
 ## 🏗️ INFRASTRUCTURE SERVICE SET
 
 ### 1. QuestFlag.Infrastructure.Domain
-_SDK: `Microsoft.NET.Sdk` | Core domain entities (`UploadRecord`, `UploadStatus`, `UserRole`) and repository interfaces._
+_Core domain entities and repository interfaces._
 - *(no NuGet packages)*
 
 ### 2. QuestFlag.Infrastructure.Application (BLL)
-_SDK: `Microsoft.NET.Sdk` | Business rules, use cases (`UploadFileCommand`, `GetUploadsQuery`), validators._
-- `MediatR` 12.x ✅ Installed
-- `FluentValidation.DependencyInjectionExtensions` 11.x ✅ Installed
+_Business rules, use cases, and repository implementations._
+- `MediatR` 14.x ✅
+- `FluentValidation.DependencyInjectionExtensions` 12.x ✅
+- `Microsoft.EntityFrameworkCore` 10.x ✅
+- `Confluent.Kafka` 2.x ✅
 
-### 3. QuestFlag.Infrastructure.Core
-_SDK: `Microsoft.NET.Sdk` | Shared implementations: `UploadRepository`, `AppDbContext`, `MinioStorageService`, `KafkaUploadEventPublisher`._
-- `Microsoft.EntityFrameworkCore` 10.0.x ✅ Installed
-- `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.x ✅ Installed
-- `Confluent.Kafka` 2.x ✅ Installed
-- `Minio` 7.x ✅ Installed
-- `Google.Cloud.Storage.V1` 4.x ✅ Installed
-- `Polly` 8.x ✅ Installed
+### 3. QuestFlag.Infrastructure.Core (DAL)
+_Infrastructure-specific implementations (Storage, Messaging)._
+- `Microsoft.EntityFrameworkCore` 10.x ✅
+- `Npgsql.EntityFrameworkCore.PostgreSQL` 10.x ✅
+- `Confluent.Kafka` 2.x ✅
+- `Minio` 7.x ✅
+- `Google.Cloud.Storage.V1` 4.x ✅
+- `Polly` 8.x ✅
 
 ### 4. QuestFlag.Infrastructure.Services (API Host)
-_SDK: `Microsoft.NET.Sdk.Web` | Running Upload API (`/api/upload`)._
-- `Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.x ✅ Installed
-- `Microsoft.EntityFrameworkCore.Design` 10.0.x ✅ Installed
-- `Microsoft.EntityFrameworkCore.Tools` 10.0.x ✅ Installed
-- `Swashbuckle.AspNetCore` 10.x ✅ Installed
+_Upload API and shared Infrastructure services._
+- `Microsoft.AspNetCore.Authentication.JwtBearer` 10.x ✅
+- `Microsoft.AspNetCore.OpenApi` 10.x ✅
+- `OpenIddict.Validation.AspNetCore` 7.x ✅
+- `Swashbuckle.AspNetCore` 10.x ✅
 
-### 5. QuestFlag.Infrastructure.Client (SDK)
-_SDK: `Microsoft.NET.Sdk` | Client wrapper for Uploads API._
-- *(no NuGet packages)*
+### 5. QuestFlag.Infrastructure.ApiCore
+_Shared API logic and middleware._
+- `Microsoft.AspNetCore.Http.Abstractions` 10.x ✅
 
 ---
 
 ## 🛂 PASSPORT SERVICE SET
 
 ### 1. QuestFlag.Passport.Domain
-_SDK: `Microsoft.NET.Sdk` | Domain entities (`Tenant`, `ApplicationUser`)._
+_Identity and Tenant domain entities._
 - *(no NuGet packages)*
 
 ### 2. QuestFlag.Passport.Application
-_SDK: `Microsoft.NET.Sdk` | Business rules (`LoginCommand`, `GetTenantsQuery`)._
-- `MediatR` 12.x ✅ Installed
-- `FluentValidation.DependencyInjectionExtensions` 11.x ✅ Installed
+_Passport business rules (Login, Registration, Tenant Management)._
+- `MediatR` 14.x ✅
+- `FluentValidation.DependencyInjectionExtensions` 12.x ✅
 
 ### 3. QuestFlag.Passport.Core
-_SDK: `Microsoft.NET.Sdk` | Implementations: `PassportDbContext`, Repositories._
-- `Microsoft.EntityFrameworkCore` 10.0.x ✅ Installed
-- `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.x ✅ Installed
-- `Microsoft.AspNetCore.Identity.EntityFrameworkCore` 10.0.x ✅ Installed
-- `OpenIddict.EntityFrameworkCore` 5.x ✅ Installed
+_Identity and Passport data implementations._
+- `Microsoft.AspNetCore.Identity.EntityFrameworkCore` 10.x ✅
+- `Microsoft.EntityFrameworkCore` 10.x ✅
+- `Npgsql.EntityFrameworkCore.PostgreSQL` 10.x ✅
+- `OpenIddict.EntityFrameworkCore` 7.x ✅
 
 ### 4. QuestFlag.Passport.Services (Auth Host)
-_SDK: `Microsoft.NET.Sdk.Web` | Running Auth API (`/connect/token`, `/api/passport/tenants`)._
-- `OpenIddict.AspNetCore` 5.x ✅ Installed
-- `Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.x ✅ Installed
-- `Microsoft.EntityFrameworkCore.Design` 10.0.x ✅ Installed
-- `Microsoft.EntityFrameworkCore.Tools` 10.0.x ✅ Installed
-- `Swashbuckle.AspNetCore` 10.x ✅ Installed
-
-### 5. QuestFlag.Passport.Client (SDK)
-_SDK: `Microsoft.NET.Sdk` | Client wrapper for Passport API._
-- `Polly` 8.x ✅ Installed
+_OIDC and Identity Service API._
+- `OpenIddict.AspNetCore` 7.x ✅
+- `Microsoft.AspNetCore.Authentication.JwtBearer` 10.x ✅
+- `Swashbuckle.AspNetCore` 10.x ✅
 
 ---
 
-## 🖥️ FRONTEND WEB APP (Blazor)
+## 🖥️ FRONTEND APPLICATIONS (Blazor InteractiveAuto)
 
-### 1. QuestFlag.Infrastructure.WebApp (Blazor Server Host)
-_SDK: `Microsoft.NET.Sdk.Web` | Static asset provider and host. Uses TailwindCSS target._
-- `Microsoft.AspNetCore.Components.WebAssembly.Server` 10.0.x ✅ Installed
+### 1. WebApps (Infrastructure, Passport, Admin)
+_Blazor Server Host projects._
+- `Microsoft.AspNetCore.Components.WebAssembly.Server` 10.x ✅
 
-### 2. QuestFlag.Infrastructure.WebApp.Client (WASM)
-_SDK: `Microsoft.NET.Sdk.BlazorWebAssembly` | Client side views (`UploadsListPage`, `LoginPage`)._
-- `Microsoft.AspNetCore.Components.WebAssembly` 10.0.x ✅ Installed
-- `Microsoft.Extensions.Http` 10.0.x ✅ Installed
+### 2. WebApp.Client Projects
+_Blazor WebAssembly client-side views._
+- `Microsoft.AspNetCore.Components.WebAssembly` 10.x ✅
+- `Microsoft.Extensions.Http` 10.x ✅
+
+---
+
+## 🚀 DEPLOYMENT & ORCHESTRATION
+
+### 1. QuestFlag.AppHost
+_Aspire Orchestration logic._
+- `Aspire.AppHost.Sdk` 13.x ✅
+
+### 2. QuestFlag.ServiceDefaults
+_Common configuration for OTel, Health Checks, and Discovery._
+- `Microsoft.Extensions.Http.Resilience` 10.x ✅
+- `Microsoft.Extensions.ServiceDiscovery` 10.x ✅
+- `OpenTelemetry.Exporter.OpenTelemetryProtocol` 1.x ✅
+- `OpenTelemetry.Extensions.Hosting` 1.x ✅
+- `OpenTelemetry.Instrumentation.AspNetCore` 1.x ✅
+- `OpenTelemetry.Instrumentation.Http` 1.x ✅
+- `OpenTelemetry.Instrumentation.Runtime` 1.x ✅
