@@ -8,22 +8,22 @@ using QuestFlag.Passport.Domain.Interfaces;
 
 namespace QuestFlag.Passport.Application.Features.Users.Queries;
 
-public record GetUsersByTenantQuery(Guid TenantId, string? SearchTerm = null) : IRequest<IReadOnlyList<UserSummaryDto>>;
+public record GetAllUsersQuery(string? SearchTerm = null) : IRequest<IReadOnlyList<UserSummaryDto>>;
 
-public class GetUsersByTenantQueryHandler : IRequestHandler<GetUsersByTenantQuery, IReadOnlyList<UserSummaryDto>>
+public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, IReadOnlyList<UserSummaryDto>>
 {
     private readonly IUserRepository _userRepository;
 
-    public GetUsersByTenantQueryHandler(IUserRepository userRepository)
+    public GetAllUsersQueryHandler(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
 
-    public async Task<IReadOnlyList<UserSummaryDto>> Handle(GetUsersByTenantQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<UserSummaryDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
         var users = string.IsNullOrWhiteSpace(request.SearchTerm)
-            ? await _userRepository.GetByTenantIdAsync(request.TenantId, cancellationToken)
-            : await _userRepository.SearchAsync(request.TenantId, request.SearchTerm, cancellationToken);
+            ? await _userRepository.GetAllAsync(cancellationToken)
+            : await _userRepository.SearchAllAsync(request.SearchTerm, cancellationToken);
         
         var dtos = new List<UserSummaryDto>();
         foreach (var u in users)

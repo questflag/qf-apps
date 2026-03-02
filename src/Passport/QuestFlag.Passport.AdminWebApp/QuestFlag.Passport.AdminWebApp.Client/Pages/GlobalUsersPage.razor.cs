@@ -4,11 +4,12 @@ using QuestFlag.Passport.AdminClient;
 
 namespace QuestFlag.Passport.AdminWebApp.Client.Pages;
 
-public partial class UsersPage
+public partial class GlobalUsersPage
 {
-    [Parameter] public Guid TenantId { get; set; }
     private IReadOnlyList<UserAdminDto>? _users;
+    private IReadOnlyList<TenantAdminDto>? _tenants;
     private string _searchQuery = "";
+    
     private string SearchQuery
     {
         get => _searchQuery;
@@ -23,6 +24,7 @@ public partial class UsersPage
     }
 
     private bool _showInvite;
+    private string _invTenantId = "";
     private string _invUsername = "", _invEmail = "", _invDisplayName = "", _invRole = "member";
     private bool _inviting;
     private bool _inviteSent;
@@ -37,21 +39,42 @@ public partial class UsersPage
     private IEnumerable<UserAdminDto>? FilteredUsers => _users;
 
     protected override async Task OnInitializedAsync()
-        => await LoadUsersAsync();
+    {
+        await LoadUsersAsync();
+    }
 
     private async Task LoadUsersAsync()
-        => _users = await AdminClient.GetUsersAsync(TenantId, _searchQuery);
+    {
+        _users = await AdminClient.GetGlobalUsersAsync(_searchQuery);
+    }
+    
+    private async Task PrepareInvite()
+    {
+        if (_tenants == null)
+        {
+            _tenants = await AdminClient.GetTenantsAsync();
+        }
+        _showInvite = true;
+        _inviteSent = false;
+        _inviteError = null;
+    }
 
     private async Task InviteUser()
     {
+        if (!Guid.TryParse(_invTenantId, out var tenantId))
+        {
+            _inviteError = "Please select a valid tenant.";
+            return;
+        }
+
         _inviting = true;
         _inviteError = null;
         _inviteSent = false;
         try
         {
-            await AdminClient.InviteUserAsync(TenantId, _invUsername, _invEmail, _invDisplayName, _invRole);
+            await AdminClient.InviteUserAsync(tenantId, _invUsername, _invEmail, _invDisplayName, _invRole);
             _inviteSent = true;
-            _users = await AdminClient.GetUsersAsync(TenantId);
+            await LoadUsersAsync();
         }
         catch (Exception ex) { _inviteError = ex.Message; }
         finally { _inviting = false; }
@@ -82,23 +105,23 @@ public partial class UsersPage
         _editError = null;
         try
         {
-            await AdminClient.UpdateUserAsync(TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRole);
-            _users = await AdminClient.GetUsersAsync(TenantId);
+            await AdminClient.UpdateUserAsync(_editingUser.TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRole);
+            await LoadUsersAsync();
             _editingUser = null;
         }
         catch (Exception ex) { _editError = ex.Message; }
         finally { _updating = false; }
     }
 
-    private async Task DeleteUser(Guid userId)
+    private async Task DeleteUser(UserAdminDto user)
     {
-        if (!await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this user? This cannot be undone."))
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {user.DisplayName}? This cannot be undone."))
             return;
 
         try
         {
-            await AdminClient.DeleteUserAsync(TenantId, userId);
-            _users = await AdminClient.GetUsersAsync(TenantId);
+            await AdminClient.DeleteUserAsync(user.TenantId, user.Id);
+            await LoadUsersAsync();
         }
         catch (Exception) { /* Log error */ }
     }

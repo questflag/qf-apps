@@ -47,7 +47,7 @@ public static class HostingExtensions
                 context.Tenants.Add(tenant);
                 await context.SaveChangesAsync();
 
-                var adminUser = new ApplicationUser
+                var admin = new ApplicationUser
                 {
                     UserName = "admin",
                     Email = "admin@questflag.local",
@@ -56,10 +56,24 @@ public static class HostingExtensions
                     IsActive = true
                 };
 
-                var result = await userManager.CreateAsync(adminUser, "Admin123!");
+                var result = await userManager.CreateAsync(admin, "Admin123!");
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(admin, PassportRole.PassportAdmin);
+                    await userManager.AddToRoleAsync(admin, PassportRole.TenantAdmin);
+                }
+            }
+
+            // Ensure existing Admin user has roles (in case seeding was partial or roles were cleared)
+            var adminUser = await userManager.FindByNameAsync("admin");
+            if (adminUser != null)
+            {
+                if (!await userManager.IsInRoleAsync(adminUser, PassportRole.PassportAdmin))
+                {
                     await userManager.AddToRoleAsync(adminUser, PassportRole.PassportAdmin);
+                }
+                if (!await userManager.IsInRoleAsync(adminUser, PassportRole.TenantAdmin))
+                {
                     await userManager.AddToRoleAsync(adminUser, PassportRole.TenantAdmin);
                 }
             }

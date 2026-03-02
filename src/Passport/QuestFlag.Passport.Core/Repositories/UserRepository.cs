@@ -21,14 +21,31 @@ public class UserRepository : IUserRepository
 
     public async Task<IReadOnlyList<ApplicationUser>> GetByTenantIdAsync(Guid tenantId, CancellationToken ct = default)
     {
-        return await _userManager.Users.Where(u => u.TenantId == tenantId).ToListAsync(ct);
+        return await _userManager.Users.Include(u => u.Tenant).Where(u => u.TenantId == tenantId).ToListAsync(ct);
     }
 
     public async Task<IReadOnlyList<ApplicationUser>> SearchAsync(Guid tenantId, string query, CancellationToken ct = default)
     {
         var normalizedQuery = query.ToUpperInvariant();
         return await _userManager.Users
+            .Include(u => u.Tenant)
             .Where(u => u.TenantId == tenantId)
+            .Where(u => u.NormalizedUserName!.Contains(normalizedQuery) 
+                     || u.NormalizedEmail!.Contains(normalizedQuery)
+                     || u.DisplayName.ToUpper().Contains(normalizedQuery))
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<ApplicationUser>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _userManager.Users.Include(u => u.Tenant).ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<ApplicationUser>> SearchAllAsync(string query, CancellationToken ct = default)
+    {
+        var normalizedQuery = query.ToUpperInvariant();
+        return await _userManager.Users
+            .Include(u => u.Tenant)
             .Where(u => u.NormalizedUserName!.Contains(normalizedQuery) 
                      || u.NormalizedEmail!.Contains(normalizedQuery)
                      || u.DisplayName.ToUpper().Contains(normalizedQuery))
@@ -86,6 +103,11 @@ public class UserRepository : IUserRepository
 
     public async Task AssignRoleAsync(ApplicationUser user, string roleName)
     {
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        if (currentRoles.Count > 0)
+        {
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        }
         await _userManager.AddToRoleAsync(user, roleName);
     }
 }

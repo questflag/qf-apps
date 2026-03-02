@@ -5,6 +5,7 @@ using OpenIddict.Abstractions;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Passport.Application.DependencyInjection;
 using QuestFlag.Passport.Core.DependencyInjection;
+using QuestFlag.Passport.Domain.Enums;
 using QuestFlag.Passport.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -75,10 +76,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("PassportAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, "passport_admin"));
+        policy.RequireRole(PassportRole.PassportAdmin));
 
     options.AddPolicy("TenantAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, "tenant_admin"));
+        policy.RequireRole(PassportRole.TenantAdmin, PassportRole.PassportAdmin));
 });
 
 // 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json

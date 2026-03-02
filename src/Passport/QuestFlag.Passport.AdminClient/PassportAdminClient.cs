@@ -9,7 +9,7 @@ namespace QuestFlag.Passport.AdminClient;
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 public record TenantAdminDto(Guid Id, string Name, string Slug, bool IsActive, string? CustomDomain, string? SubdomainSlug);
-public record UserAdminDto(Guid Id, string Username, string DisplayName, string Email, bool IsActive, bool TwoFactorEnabled, bool EmailConfirmed);
+public record UserAdminDto(Guid Id, Guid TenantId, string TenantName, string Username, string DisplayName, string Email, bool IsActive, bool TwoFactorEnabled, bool EmailConfirmed, string Role);
 public record RoleDto(Guid Id, string Name);
 public record DeviceAdminDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
 public record AgentDto(string ClientId, string DisplayName, string Type, HashSet<string> Permissions, HashSet<Uri> RedirectUris, HashSet<Uri> PostLogoutRedirectUris);
@@ -56,6 +56,17 @@ public class PassportAdminClient
     }
 
     // ── Users ──────────────────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<UserAdminDto>> GetGlobalUsersAsync(string? searchTerm = null, CancellationToken ct = default)
+    {
+        var url = "/api/users";
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            url += $"?searchTerm={Uri.EscapeDataString(searchTerm)}";
+        }
+        var result = await _http.GetFromJsonAsync<List<UserAdminDto>>(url, ct);
+        return result ?? [];
+    }
 
     public async Task<IReadOnlyList<UserAdminDto>> GetUsersAsync(Guid tenantId, string? searchTerm = null, CancellationToken ct = default)
     {
