@@ -18,6 +18,6 @@
     <ProjectReference Include="..\..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npx @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/app.css" />
+    <Exec Command="npx -y @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/app.css" />
   </Target>
 </Project>
