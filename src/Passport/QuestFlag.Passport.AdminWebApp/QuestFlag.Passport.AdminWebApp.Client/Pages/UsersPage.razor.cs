@@ -23,13 +23,20 @@ public partial class UsersPage
     }
 
     private bool _showInvite;
-    private string _invUsername = "", _invEmail = "", _invDisplayName = "", _invRole = "member";
+    private string _invUsername = "", _invEmail = "", _invDisplayName = "";
+    private List<string> _invRoles = new();
+    private List<string> _invAgentClientIds = new();
+    
+    private IReadOnlyList<RoleDto>? _availableRoles;
+    private IReadOnlyList<AgentDto>? _availableAgents;
     private bool _inviting;
     private bool _inviteSent;
     private string? _inviteError;
 
     private UserAdminDto? _editingUser;
-    private string _editUsername = "", _editEmail = "", _editDisplayName = "", _editRole = "";
+    private string _editUsername = "", _editEmail = "", _editDisplayName = "";
+    private List<string> _editRoles = new();
+    private List<string> _editAgentClientIds = new();
     private bool _editIsActive;
     private bool _updating;
     private string? _editError;
@@ -37,10 +44,27 @@ public partial class UsersPage
     private IEnumerable<UserAdminDto>? FilteredUsers => _users;
 
     protected override async Task OnInitializedAsync()
-        => await LoadUsersAsync();
+    {
+        await Task.WhenAll(LoadUsersAsync(), LoadMetadataAsync());
+    }
+
+    private async Task LoadMetadataAsync()
+    {
+        _availableRoles = await AdminClient.GetRolesAsync();
+        _availableAgents = await AdminClient.GetAgentsAsync();
+    }
 
     private async Task LoadUsersAsync()
         => _users = await AdminClient.GetUsersAsync(TenantId, _searchQuery);
+
+    private async Task PrepareInvite()
+    {
+        _showInvite = true;
+        _inviteSent = false;
+        _inviteError = null;
+        _invRoles = new List<string> { "member" };
+        _invAgentClientIds = new List<string>();
+    }
 
     private async Task InviteUser()
     {
@@ -49,9 +73,9 @@ public partial class UsersPage
         _inviteSent = false;
         try
         {
-            await AdminClient.InviteUserAsync(TenantId, _invUsername, _invEmail, _invDisplayName, _invRole);
+            await AdminClient.InviteUserAsync(TenantId, _invUsername, _invEmail, _invDisplayName, _invRoles, _invAgentClientIds);
             _inviteSent = true;
-            _users = await AdminClient.GetUsersAsync(TenantId);
+            await LoadUsersAsync();
         }
         catch (Exception ex) { _inviteError = ex.Message; }
         finally { _inviting = false; }
@@ -71,7 +95,8 @@ public partial class UsersPage
         _editEmail = user.Email;
         _editDisplayName = user.DisplayName;
         _editIsActive = user.IsActive;
-        _editRole = user.Role;
+        _editRoles = user.Roles?.ToList() ?? new List<string>();
+        _editAgentClientIds = user.AssignedAgentIds?.ToList() ?? new List<string>();
         _editError = null;
     }
 
@@ -82,8 +107,8 @@ public partial class UsersPage
         _editError = null;
         try
         {
-            await AdminClient.UpdateUserAsync(TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRole);
-            _users = await AdminClient.GetUsersAsync(TenantId);
+            await AdminClient.UpdateUserAsync(TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRoles, _editAgentClientIds);
+            await LoadUsersAsync();
             _editingUser = null;
         }
         catch (Exception ex) { _editError = ex.Message; }

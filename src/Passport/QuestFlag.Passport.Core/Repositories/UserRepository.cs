@@ -7,21 +7,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuestFlag.Passport.Domain.Entities;
 using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Core.Data;
 
 namespace QuestFlag.Passport.Core.Repositories;
 
 public class UserRepository : IUserRepository
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly PassportDbContext _dbContext;
 
-    public UserRepository(UserManager<ApplicationUser> userManager)
+    public UserRepository(UserManager<ApplicationUser> userManager, PassportDbContext dbContext)
     {
         _userManager = userManager;
+        _dbContext = dbContext;
     }
 
     public async Task<IReadOnlyList<ApplicationUser>> GetByTenantIdAsync(Guid tenantId, CancellationToken ct = default)
     {
-        return await _userManager.Users.Include(u => u.Tenant).Where(u => u.TenantId == tenantId).ToListAsync(ct);
+        return await _userManager.Users
+            .Include(u => u.Tenant)
+            .Include(u => u.UserAgents)
+            .Where(u => u.TenantId == tenantId)
+            .ToListAsync(ct);
     }
 
     public async Task<IReadOnlyList<ApplicationUser>> SearchAsync(Guid tenantId, string query, CancellationToken ct = default)
@@ -62,15 +69,15 @@ public class UserRepository : IUserRepository
         return await _userManager.FindByNameAsync(username);
     }
 
-    public async Task<ApplicationUser> AddAsync(ApplicationUser user, string password, string role, CancellationToken ct = default)
+    public async Task<ApplicationUser> AddAsync(ApplicationUser user, string password, IEnumerable<string> roles, CancellationToken ct = default)
     {
         var result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)
             throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        var roleResult = await _userManager.AddToRoleAsync(user, role);
+        var roleResult = await _userManager.AddToRolesAsync(user, roles);
         if (!roleResult.Succeeded)
-            throw new InvalidOperationException($"Failed to add user to role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"Failed to add user to roles: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
 
         return user;
     }
@@ -101,13 +108,36 @@ public class UserRepository : IUserRepository
         return await _userManager.GetRolesAsync(user);
     }
 
-    public async Task AssignRoleAsync(ApplicationUser user, string roleName)
+    public async Task SetRolesAsync(ApplicationUser user, IEnumerable<string> roles)
     {
         var currentRoles = await _userManager.GetRolesAsync(user);
         if (currentRoles.Count > 0)
         {
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
         }
-        await _userManager.AddToRoleAsync(user, roleName);
+        await _userManager.AddToRolesAsync(user, roles);
+    }
+
+    public async Task SetAssignedAgentsAsync(ApplicationUser user, IEnumerable<string> agentClientIds)
+    {
+        // 1. Remove existing
+        var existing = await _dbContext.UserAgents.Where(x => x.UserId == user.Id).ToListAsync();
+        _dbContext.UserAgents.RemoveRange(existing);
+
+        // 2. Add new
+        foreach (var clientId in agentClientIds)
+        {
+            _dbContext.UserAgents.Add(new UserAgent { UserId = user.Id, ClientId = clientId });
+        }
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<string>> GetAssignedAgentIdsAsync(ApplicationUser user)
+    {
+        return await _dbContext.UserAgents
+            .Where(x => x.UserId == user.Id)
+            .Select(x => x.ClientId)
+            .ToListAsync();
     }
 }

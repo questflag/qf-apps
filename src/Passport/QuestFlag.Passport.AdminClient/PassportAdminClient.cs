@@ -9,7 +9,7 @@ namespace QuestFlag.Passport.AdminClient;
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 public record TenantAdminDto(Guid Id, string Name, string Slug, bool IsActive, string? CustomDomain, string? SubdomainSlug);
-public record UserAdminDto(Guid Id, Guid TenantId, string TenantName, string Username, string DisplayName, string Email, bool IsActive, bool TwoFactorEnabled, bool EmailConfirmed, string Role);
+public record UserAdminDto(Guid Id, Guid TenantId, string TenantName, string Username, string DisplayName, string Email, bool IsActive, bool TwoFactorEnabled, bool EmailConfirmed, List<string> Roles, List<string> AssignedAgentIds);
 public record RoleDto(Guid Id, string Name);
 public record DeviceAdminDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
 public record AgentDto(string ClientId, string DisplayName, string Type, HashSet<string> Permissions, HashSet<Uri> RedirectUris, HashSet<Uri> PostLogoutRedirectUris);
@@ -80,26 +80,26 @@ public class PassportAdminClient
     }
 
     /// <summary>Creates active user with password (admin-set). prefer InviteUserAsync for onboarding.</summary>
-    public async Task<Guid> CreateUserAsync(Guid tenantId, string username, string email, string password, string displayName, string roleName, CancellationToken ct = default)
+    public async Task<Guid> CreateUserAsync(Guid tenantId, string username, string email, string password, string displayName, List<string> roles, List<string> agentClientIds, CancellationToken ct = default)
     {
-        var r = await _http.PostAsJsonAsync($"/api/tenants/{tenantId}/users", new { username, email, password, displayName, roleName }, ct);
+        var r = await _http.PostAsJsonAsync($"/api/tenants/{tenantId}/users", new { username, email, password, displayName, roles, agentClientIds }, ct);
         r.EnsureSuccessStatusCode();
         var result = await r.Content.ReadFromJsonAsync<IdResponse>(cancellationToken: ct);
         return result!.Id;
     }
 
     /// <summary>Invites a user by email — creates inactive account, sends invite email.</summary>
-    public async Task<Guid> InviteUserAsync(Guid tenantId, string username, string email, string displayName, string roleName, CancellationToken ct = default)
+    public async Task<Guid> InviteUserAsync(Guid tenantId, string username, string email, string displayName, List<string> roles, List<string> agentClientIds, CancellationToken ct = default)
     {
-        var r = await _http.PostAsJsonAsync($"/api/tenants/{tenantId}/users/invite", new { username, email, displayName, roleName }, ct);
+        var r = await _http.PostAsJsonAsync($"/api/tenants/{tenantId}/users/invite", new { username, email, displayName, roles, agentClientIds }, ct);
         r.EnsureSuccessStatusCode();
         var result = await r.Content.ReadFromJsonAsync<IdResponse>(cancellationToken: ct);
         return result!.Id;
     }
 
-    public async Task UpdateUserAsync(Guid tenantId, Guid userId, string username, string email, string displayName, bool isActive, string roleName, CancellationToken ct = default)
+    public async Task UpdateUserAsync(Guid tenantId, Guid userId, string username, string email, string displayName, bool isActive, List<string> roles, List<string> agentClientIds, CancellationToken ct = default)
     {
-        var r = await _http.PutAsJsonAsync($"/api/tenants/{tenantId}/users/{userId}", new { id = userId, username, email, displayName, isActive, roleName }, ct);
+        var r = await _http.PutAsJsonAsync($"/api/tenants/{tenantId}/users/{userId}", new { id = userId, username, email, displayName, isActive, roles, agentClientIds }, ct);
         r.EnsureSuccessStatusCode();
     }
 

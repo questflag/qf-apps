@@ -17,22 +17,26 @@ public record InviteUserCommand(
     string Username,
     string Email,
     string DisplayName,
-    string RoleName,
+    List<string> Roles,
+    List<string> AgentClientIds,
     string BaseUrl   // e.g. "https://passport.questflag.com"
 ) : IRequest<Guid>;
 
 public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, Guid>
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserRepository _userRepository;
     private readonly ITenantRepository _tenantRepository;
     private readonly IEmailSender _emailSender;
 
     public InviteUserCommandHandler(
         UserManager<ApplicationUser> userManager,
+        IUserRepository userRepository,
         ITenantRepository tenantRepository,
         IEmailSender emailSender)
     {
         _userManager = userManager;
+        _userRepository = userRepository;
         _tenantRepository = tenantRepository;
         _emailSender = emailSender;
     }
@@ -57,7 +61,12 @@ public class InviteUserCommandHandler : IRequestHandler<InviteUserCommand, Guid>
         if (!result.Succeeded)
             throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        await _userManager.AddToRoleAsync(user, request.RoleName);
+        await _userRepository.SetRolesAsync(user, request.Roles);
+
+        if (request.AgentClientIds != null && request.AgentClientIds.Any())
+        {
+            await _userRepository.SetAssignedAgentsAsync(user, request.AgentClientIds);
+        }
 
         // Generate email confirmation token + encode it
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);

@@ -28,9 +28,21 @@ public class GetUsersByTenantQueryHandler : IRequestHandler<GetUsersByTenantQuer
         var dtos = new List<UserSummaryDto>();
         foreach (var u in users)
         {
-            var roles = await _userRepository.GetRolesAsync(u);
-            var mainRole = roles.Count > 0 ? roles[0] : "None";
-            dtos.Add(new UserSummaryDto(u.Id, u.TenantId, u.Tenant?.Name ?? "Unknown", u.UserName ?? "", u.Email ?? "", u.DisplayName, u.IsActive, u.TwoFactorEnabled, u.EmailConfirmed, mainRole));
+            var roles = (await _userRepository.GetRolesAsync(u)).ToList();
+            var agentIds = await _userRepository.GetAssignedAgentIdsAsync(u);
+            
+            dtos.Add(new UserSummaryDto(
+                u.Id, 
+                u.TenantId, 
+                u.Tenant?.Name ?? "Unknown", 
+                u.UserName ?? "", 
+                u.Email ?? "", 
+                u.DisplayName, 
+                u.IsActive, 
+                u.TwoFactorEnabled, 
+                u.EmailConfirmed, 
+                roles, 
+                agentIds));
         }
 
         return dtos;

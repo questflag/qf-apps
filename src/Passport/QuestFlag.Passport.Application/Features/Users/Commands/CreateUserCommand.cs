@@ -8,7 +8,7 @@ using QuestFlag.Passport.Domain.Interfaces;
 
 namespace QuestFlag.Passport.Application.Features.Users.Commands;
 
-public record CreateUserCommand(Guid TenantId, string Username, string Email, string Password, string DisplayName, string RoleName) : IRequest<Guid>;
+public record CreateUserCommand(Guid TenantId, string Username, string Email, string Password, string DisplayName, List<string> Roles, List<string> AgentClientIds) : IRequest<Guid>;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
@@ -19,7 +19,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
         RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.RoleName).NotEmpty();
+        RuleFor(x => x.Roles).NotEmpty();
     }
 }
 
@@ -53,7 +53,13 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
             IsActive = true
         };
 
-        var createdUser = await _userRepository.AddAsync(user, request.Password, request.RoleName, cancellationToken);
+        var createdUser = await _userRepository.AddAsync(user, request.Password, request.Roles, cancellationToken);
+        
+        if (request.AgentClientIds != null && request.AgentClientIds.Any())
+        {
+            await _userRepository.SetAssignedAgentsAsync(createdUser, request.AgentClientIds);
+        }
+
         return createdUser.Id;
     }
 }

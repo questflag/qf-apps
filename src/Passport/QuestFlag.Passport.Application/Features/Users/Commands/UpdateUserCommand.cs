@@ -7,7 +7,7 @@ using QuestFlag.Passport.Domain.Interfaces;
 
 namespace QuestFlag.Passport.Application.Features.Users.Commands;
 
-public record UpdateUserCommand(Guid Id, string Username, string Email, string DisplayName, bool IsActive, string RoleName) : IRequest<Unit>;
+public record UpdateUserCommand(Guid Id, string Username, string Email, string DisplayName, bool IsActive, List<string> Roles, List<string> AgentClientIds) : IRequest<Unit>;
 
 public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
@@ -17,7 +17,7 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
         RuleFor(x => x.Username).NotEmpty().MinimumLength(3).MaximumLength(50);
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.RoleName).NotEmpty();
+        RuleFor(x => x.Roles).NotEmpty();
     }
 }
 
@@ -55,8 +55,14 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
 
         await _userRepository.UpdateAsync(user, cancellationToken);
         
-        // Update role
-        await _userRepository.AssignRoleAsync(user, request.RoleName);
+        // Update roles
+        await _userRepository.SetRolesAsync(user, request.Roles);
+
+        // Update agents
+        if (request.AgentClientIds != null)
+        {
+            await _userRepository.SetAssignedAgentsAsync(user, request.AgentClientIds);
+        }
 
         return Unit.Value;
     }

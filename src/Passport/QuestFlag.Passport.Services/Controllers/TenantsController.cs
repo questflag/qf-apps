@@ -92,7 +92,8 @@ public class TenantsController : ControllerBase
             request.Email,
             request.Password,
             request.DisplayName,
-            request.RoleName);
+            request.Roles,
+            request.AgentClientIds);
 
         var id = await _mediator.Send(command);
         return Ok(new { id });
@@ -112,7 +113,8 @@ public class TenantsController : ControllerBase
             request.Username,
             request.Email,
             request.DisplayName,
-            request.RoleName,
+            request.Roles,
+            request.AgentClientIds,
             baseUrl));
 
         return Ok(new { id });
@@ -136,6 +138,6 @@ public class TenantsController : ControllerBase
     }
 }
 
-public record CreateUserRequest(string Username, string Email, string Password, string DisplayName, string RoleName);
-public record InviteUserRequest(string Username, string Email, string DisplayName, string RoleName);
+public record CreateUserRequest(string Username, string Email, string Password, string DisplayName, List<string> Roles, List<string> AgentClientIds);
+public record InviteUserRequest(string Username, string Email, string DisplayName, List<string> Roles, List<string> AgentClientIds);
 

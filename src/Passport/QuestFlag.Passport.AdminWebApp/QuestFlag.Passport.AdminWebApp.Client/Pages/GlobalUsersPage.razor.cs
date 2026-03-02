@@ -25,13 +25,20 @@ public partial class GlobalUsersPage
 
     private bool _showInvite;
     private string _invTenantId = "";
-    private string _invUsername = "", _invEmail = "", _invDisplayName = "", _invRole = "member";
+    private string _invUsername = "", _invEmail = "", _invDisplayName = "";
+    private List<string> _invRoles = new();
+    private List<string> _invAgentClientIds = new();
+    
+    private IReadOnlyList<RoleDto>? _availableRoles;
+    private IReadOnlyList<AgentDto>? _availableAgents;
     private bool _inviting;
     private bool _inviteSent;
     private string? _inviteError;
 
     private UserAdminDto? _editingUser;
-    private string _editUsername = "", _editEmail = "", _editDisplayName = "", _editRole = "";
+    private string _editUsername = "", _editEmail = "", _editDisplayName = "";
+    private List<string> _editRoles = new();
+    private List<string> _editAgentClientIds = new();
     private bool _editIsActive;
     private bool _updating;
     private string? _editError;
@@ -40,7 +47,13 @@ public partial class GlobalUsersPage
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadUsersAsync();
+        await Task.WhenAll(LoadUsersAsync(), LoadMetadataAsync());
+    }
+
+    private async Task LoadMetadataAsync()
+    {
+        _availableRoles = await AdminClient.GetRolesAsync();
+        _availableAgents = await AdminClient.GetAgentsAsync();
     }
 
     private async Task LoadUsersAsync()
@@ -57,6 +70,8 @@ public partial class GlobalUsersPage
         _showInvite = true;
         _inviteSent = false;
         _inviteError = null;
+        _invRoles = new List<string> { "member" };
+        _invAgentClientIds = new List<string>();
     }
 
     private async Task InviteUser()
@@ -72,7 +87,7 @@ public partial class GlobalUsersPage
         _inviteSent = false;
         try
         {
-            await AdminClient.InviteUserAsync(tenantId, _invUsername, _invEmail, _invDisplayName, _invRole);
+            await AdminClient.InviteUserAsync(tenantId, _invUsername, _invEmail, _invDisplayName, _invRoles, _invAgentClientIds);
             _inviteSent = true;
             await LoadUsersAsync();
         }
@@ -94,7 +109,8 @@ public partial class GlobalUsersPage
         _editEmail = user.Email;
         _editDisplayName = user.DisplayName;
         _editIsActive = user.IsActive;
-        _editRole = user.Role;
+        _editRoles = user.Roles?.ToList() ?? new List<string>();
+        _editAgentClientIds = user.AssignedAgentIds?.ToList() ?? new List<string>();
         _editError = null;
     }
 
@@ -105,7 +121,7 @@ public partial class GlobalUsersPage
         _editError = null;
         try
         {
-            await AdminClient.UpdateUserAsync(_editingUser.TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRole);
+            await AdminClient.UpdateUserAsync(_editingUser.TenantId, _editingUser.Id, _editUsername, _editEmail, _editDisplayName, _editIsActive, _editRoles, _editAgentClientIds);
             await LoadUsersAsync();
             _editingUser = null;
         }

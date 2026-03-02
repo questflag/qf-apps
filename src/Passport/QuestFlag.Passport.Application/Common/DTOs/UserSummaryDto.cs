@@ -12,5 +12,6 @@ public record UserSummaryDto(
     bool IsActive,
     bool TwoFactorEnabled,
     bool EmailConfirmed,
-    string Role
+    List<string> Roles,
+    List<string> AssignedAgentIds
 );
