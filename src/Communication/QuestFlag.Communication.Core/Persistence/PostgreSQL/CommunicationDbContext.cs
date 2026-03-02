@@ -18,7 +18,7 @@ public class CommunicationDbContext : DbContext
             entity.Property(e => e.TenantId).IsRequired();
             entity.Property(e => e.ProviderType).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Credentials).IsRequired();
-            entity.Property(e => e.Priority).IsDefaultValue(0);
+            entity.Property(e => e.Priority).HasDefaultValue(0);
         });
     }
 }

@@ -1,5 +1,9 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace QuestFlag.Communication.Core.Messaging.Kafka;
 
