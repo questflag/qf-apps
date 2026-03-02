@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuestFlag.Passport.Core.Data;
@@ -11,9 +12,11 @@ using QuestFlag.Passport.Core.Data;
 namespace QuestFlag.Passport.Core.Migrations
 {
     [DbContext(typeof(PassportDbContext))]
-    partial class PassportDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260302010534_AddOpenIddict")]
+    partial class AddOpenIddict
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -476,7 +479,7 @@ namespace QuestFlag.Passport.Core.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("QuestFlag.Passport.Domain.Entities.TrustedDevice", b =>
@@ -513,7 +516,7 @@ namespace QuestFlag.Passport.Core.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrustedDevices", (string)null);
+                    b.ToTable("TrustedDevices");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
