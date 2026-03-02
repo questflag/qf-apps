@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuestFlag.Infrastructure.Domain.Entities;
 
-namespace QuestFlag.Infrastructure.Core.Data.Configurations;
+namespace QuestFlag.Infrastructure.Application.Data.Configurations;
 
 public class UploadRecordConfiguration : IEntityTypeConfiguration<UploadRecord>
 {

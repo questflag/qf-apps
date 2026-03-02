@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using QuestFlag.Infrastructure.Core.Data;
+using global::QuestFlag.Infrastructure.Application.Data;
 
 #nullable disable
 
-namespace QuestFlag.Infrastructure.Core.Migrations
+namespace QuestFlag.Infrastructure.Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot

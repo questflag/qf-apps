@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using QuestFlag.Infrastructure.Core.Data;
+using global::QuestFlag.Infrastructure.Application.Data;
 
 #nullable disable
 
-namespace QuestFlag.Infrastructure.Core.Migrations
+namespace QuestFlag.Infrastructure.Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260228172911_InitUploadService")]

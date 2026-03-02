@@ -13,6 +13,8 @@ public class ApplicationUser : IdentityUser<Guid>
     public DateTime CreatedAtUtc { get; init; } = DateTime.UtcNow;
     public DateTime? LastLogoutAtUtc { get; set; }
 
+    public ICollection<UserAgent> UserAgents { get; set; } = new List<UserAgent>();
+
     // Inherited from IdentityUser — used for SSO identity lifecycle:
     // PhoneNumber, PhoneNumberConfirmed  → used for SMS 2FA
     // TwoFactorEnabled                  → gates the 2FA step at login

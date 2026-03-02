@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Validation.AspNetCore;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
+using QuestFlag.Infrastructure.Application.Data;
 using QuestFlag.Infrastructure.Application.DependencyInjection;
-using QuestFlag.Infrastructure.Core.Data;
 using QuestFlag.Infrastructure.Core.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +18,7 @@ public class Program
         builder.AddServiceDefaults();
 
         // 1. Layer DI
-        builder.Services.AddInfrastructureApplication();
+        builder.Services.AddInfrastructureApplication(builder.Configuration);
         builder.Services.AddInfrastructureCore(builder.Configuration);
 
         // HttpClient for Kafka consumer downstream calls

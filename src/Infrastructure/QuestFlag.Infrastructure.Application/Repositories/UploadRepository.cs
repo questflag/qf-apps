@@ -4,20 +4,36 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using QuestFlag.Infrastructure.Core.Data;
+using QuestFlag.Infrastructure.Application.Data;
 using QuestFlag.Infrastructure.Domain.Entities;
 using QuestFlag.Infrastructure.Domain.Enums;
 using QuestFlag.Infrastructure.Domain.Interfaces;
 
-namespace QuestFlag.Infrastructure.Core.Repositories;
+namespace QuestFlag.Infrastructure.Application.Repositories;
 
-public class UploadRepository : Repository<UploadRecord, AppDbContext>, IUploadRepository
+public class UploadRepository : IUploadRepository
 {
-    public UploadRepository(AppDbContext dbContext) : base(dbContext)
+    private readonly AppDbContext _dbContext;
+    private readonly DbSet<UploadRecord> _dbSet;
+
+    public UploadRepository(AppDbContext dbContext)
     {
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _dbSet = dbContext.UploadRecords;
     }
 
+    public virtual async Task<UploadRecord> AddAsync(UploadRecord entity, CancellationToken ct = default)
+    {
+        _dbSet.Add(entity);
+        await _dbContext.SaveChangesAsync(ct);
+        return entity;
+    }
 
+    public virtual async Task UpdateAsync(UploadRecord entity, CancellationToken ct = default)
+    {
+        _dbSet.Update(entity);
+        await _dbContext.SaveChangesAsync(ct);
+    }
 
     public async Task DeleteAsync(Guid id, string deletedByUserId, CancellationToken ct = default)
     {
@@ -34,7 +50,7 @@ public class UploadRepository : Repository<UploadRecord, AppDbContext>, IUploadR
 
     public async Task<UploadRecord?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await base.GetByIdAsync(id, ct);
+        return await _dbSet.FindAsync(new object[] { id }, ct);
     }
 
     public async Task<(IReadOnlyList<UploadRecord> Items, int TotalCount)> GetListAsync(
@@ -51,7 +67,7 @@ public class UploadRepository : Repository<UploadRecord, AppDbContext>, IUploadR
         int pageSize = 10,
         CancellationToken ct = default)
     {
-        var query = GetQueryable();
+        var query = _dbSet.AsQueryable();
 
         // 1. Mandatory Filters (Tenant isolation & Role based constraints)
         query = query.Where(x => x.TenantId == tenantId);
@@ -59,7 +75,7 @@ public class UploadRepository : Repository<UploadRecord, AppDbContext>, IUploadR
         if (!string.Equals(role, UserRole.TenantAdmin, StringComparison.OrdinalIgnoreCase))
         {
             // Regular user only sees their own
-            query = query.Where(x => x.UserId == userIdFilter); // Note: if user is not admin, the controller should force their own ID here
+            query = query.Where(x => x.UserId == userIdFilter); 
         }
         else if (userIdFilter.HasValue)
         {

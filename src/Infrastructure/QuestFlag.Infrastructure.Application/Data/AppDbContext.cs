@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuestFlag.Infrastructure.Domain.Entities;
 
-namespace QuestFlag.Infrastructure.Core.Data;
+namespace QuestFlag.Infrastructure.Application.Data;
 
 public class AppDbContext : DbContext
 {

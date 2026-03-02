@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QuestFlag.Infrastructure.Domain.Events;
 
-namespace QuestFlag.Infrastructure.Core.Messaging;
+namespace QuestFlag.Infrastructure.Application.Messaging;
 
 public class UploadCompletedConsumer : BackgroundService
 {

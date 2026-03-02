@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using QuestFlag.Infrastructure.Domain.Events;
 using QuestFlag.Infrastructure.Domain.Interfaces;
 
-namespace QuestFlag.Infrastructure.Core.Messaging;
+namespace QuestFlag.Infrastructure.Application.Messaging;
 
 public class KafkaUploadEventPublisher : IUploadEventPublisher, IDisposable
 {

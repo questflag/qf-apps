@@ -7,9 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Minio;
 using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
-using QuestFlag.Infrastructure.Core.Data;
-using QuestFlag.Infrastructure.Core.Messaging;
-using QuestFlag.Infrastructure.Core.Repositories;
 using QuestFlag.Infrastructure.Core.Storage;
 using QuestFlag.Infrastructure.Domain.Interfaces;
 
@@ -19,11 +16,7 @@ public static class CoreServiceExtensions
 {
     public static IServiceCollection AddInfrastructureCore(this IServiceCollection services, IConfiguration configuration)
     {
-        // 1. Data Access
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("InfrastructureConnection")));
 
-        services.AddScoped<IUploadRepository, UploadRepository>();
 
         // 2. Storage Setup
         services.Configure<StorageSettings>(configuration.GetSection(StorageSettings.SectionName));
@@ -54,12 +47,7 @@ public static class CoreServiceExtensions
         // Factory
         services.AddScoped<IStorageService>(StorageServiceFactory.Create);
 
-        // 3. Messaging (Kafka)
-        services.Configure<KafkaSettings>(configuration.GetSection(KafkaSettings.SectionName));
-        services.AddSingleton<IUploadEventPublisher, KafkaUploadEventPublisher>();
-        
-        // Background Service for Kafka consuming
-        services.AddHostedService<UploadCompletedConsumer>();
+
 
         return services;
     }
