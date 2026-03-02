@@ -68,6 +68,9 @@ public class AuthController : ControllerBase
             {
                 identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
                     .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+                    
+                identity.AddClaim(new Claim(ClaimTypes.Role, role)
+                    .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
             }
 
             var principal = new ClaimsPrincipal(identity);
@@ -102,7 +105,8 @@ public class AuthController : ControllerBase
                     claim.Type == OpenIddictConstants.Claims.Username ||
                     claim.Type == "tenant_id" ||
                     claim.Type == "user_id" ||
-                    claim.Type == OpenIddictConstants.Claims.Role)
+                    claim.Type == OpenIddictConstants.Claims.Role ||
+                    claim.Type == ClaimTypes.Role)
                 {
                     claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken);
                 }

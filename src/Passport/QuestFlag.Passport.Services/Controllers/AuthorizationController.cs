@@ -102,6 +102,9 @@ public class AuthorizationController : ControllerBase
         {
             identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+                
+            identity.AddClaim(new Claim(ClaimTypes.Role, role)
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
         }
 
         var openIdPrincipal = new ClaimsPrincipal(identity);
