@@ -35,4 +35,12 @@
     <Project Path="Passport/QuestFlag.Passport.Services/QuestFlag.Passport.Services.csproj" />
     <Project Path="Passport/QuestFlag.Passport.UserClient/QuestFlag.Passport.UserClient.csproj" />
   </Folder>
+  <Folder Name="/Communication/">
+    <Project Path="Communication/QuestFlag.Communication.ApiCore/QuestFlag.Communication.ApiCore.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Application/QuestFlag.Communication.Application.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Client/QuestFlag.Communication.Client.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Core/QuestFlag.Communication.Core.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Domain/QuestFlag.Communication.Domain.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Services/QuestFlag.Communication.Services.csproj" />
+  </Folder>
 </Solution>

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp.csproj" />
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.Services\QuestFlag.Passport.Services.csproj" />
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.csproj" />
+    <ProjectReference Include="..\..\Communication\QuestFlag.Communication.Services\QuestFlag.Communication.Services.csproj" />
   </ItemGroup>
 
 </Project>

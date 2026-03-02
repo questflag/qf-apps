@@ -18,6 +18,8 @@ var passportAdminWebAppHttpPort = int.Parse(Compose("PASSPORT_ADMINWEBAPP_HTTP_P
 var passportAdminWebAppHttpsPort = int.Parse(Compose("PASSPORT_ADMINWEBAPP_HTTPS_PORT", "7003"));
 var passportServicesHttpPort = int.Parse(Compose("PASSPORT_SERVICES_HTTP_PORT", "8004"));
 var passportServicesHttpsPort = int.Parse(Compose("PASSPORT_SERVICES_HTTPS_PORT", "7004"));
+var commServicesHttpPort = int.Parse(Compose("COMM_SERVICES_HTTP_PORT", "8005"));
+var commServicesHttpsPort = int.Parse(Compose("COMM_SERVICES_HTTPS_PORT", "7005"));
 
 // 1. Passport Services (Identity Provider)
 var passportServices = builder.AddProject<Projects.QuestFlag_Passport_Services>("services-passport", launchProfileName: null)
@@ -73,6 +75,18 @@ var passportAdminWebApp = builder.AddProject<Projects.QuestFlag_Passport_AdminWe
     .WithHttpsEndpoint(port: passportAdminWebAppHttpsPort, targetPort: passportAdminWebAppHttpsPort, name: "https", isProxied: false)
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", aspnetCoreEnvironment)
     .WithEnvironment("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true")
+    .WithReference(passportServices);
+
+// 4. Communication Services
+var commServices = builder.AddProject<Projects.QuestFlag_Communication_Services>("services-comm", launchProfileName: null)
+    .WithHttpEndpoint(port: commServicesHttpPort, targetPort: commServicesHttpPort, name: "http", isProxied: false)
+    .WithHttpsEndpoint(port: commServicesHttpsPort, targetPort: commServicesHttpsPort, name: "https", isProxied: false)
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", aspnetCoreEnvironment)
+    .WithEnvironment("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true")
+    .WithEnvironment("ConnectionStrings__Postgres", Compose("COMM_POSTGRES_CONNECTION_STRING", "Host=localhost;Port=15432;Database=QuestFlag_Comm;Username=postgres;Password=P@ssw0rd!Qf2026!"))
+    .WithEnvironment("ConnectionStrings__Mongo", Compose("COMM_MONGO_CONNECTION_STRING", "mongodb://localhost:27017"))
+    .WithEnvironment("Kafka__BootstrapServers", Compose("KAFKA_BOOTSTRAP_SERVERS", "localhost:19092"))
+    .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
     .WithReference(passportServices);
 
 builder.Build().Run();
