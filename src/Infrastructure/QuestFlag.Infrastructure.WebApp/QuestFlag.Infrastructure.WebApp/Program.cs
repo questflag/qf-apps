@@ -20,9 +20,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddQuestFlagApiServices();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
@@ -96,8 +96,6 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
-app.UseAuthentication();
-app.UseAuthorization();
 app.UseQuestFlagApiPipeline();
 
 app.MapStaticAssets();
