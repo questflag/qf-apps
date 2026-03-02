@@ -10,6 +10,9 @@ using QuestFlag.Passport.Core.Data;
 using QuestFlag.Passport.Core.DependencyInjection;
 using QuestFlag.Passport.Domain.Entities;
 using QuestFlag.Passport.Domain.Enums;
+using OpenIddict.Abstractions;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace QuestFlag.Passport.Services.Extensions;
 
@@ -61,11 +64,61 @@ public static class HostingExtensions
             }
 
             logger.LogInformation("Database initialized and default data seeded.");
+
+            await SeedOpenIddictApplicationsAsync(scope.ServiceProvider);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while initializing the database.");
             throw;
+        }
+    }
+
+    private static async Task SeedOpenIddictApplicationsAsync(IServiceProvider services)
+    {
+        var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        var apps = configuration.GetSection("OpenIddictApplications").Get<Dictionary<string, string>>();
+        if (apps == null) return;
+
+        foreach (var app in apps)
+        {
+            if (await manager.FindByClientIdAsync(app.Key) == null)
+            {
+                logger.LogInformation("Seeding OpenIddict application: {ClientId}", app.Key);
+
+                var descriptor = new OpenIddictApplicationDescriptor
+                {
+                    ClientId = app.Key,
+                    DisplayName = app.Key == "infra-webapp" ? "Infrastructure Web App" :
+                                 app.Key == "passport-webapp" ? "Passport Web App" :
+                                 "Passport Admin Web App",
+                    RedirectUris = { new Uri($"{app.Value}/signin-oidc") },
+                    PostLogoutRedirectUris = { new Uri($"{app.Value}/signout-callback-oidc") },
+                    Permissions =
+                    {
+                        OpenIddictConstants.Permissions.Endpoints.Authorization,
+                        OpenIddictConstants.Permissions.Endpoints.EndSession,
+                        OpenIddictConstants.Permissions.Endpoints.Token,
+                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                        OpenIddictConstants.Permissions.ResponseTypes.Code,
+                        OpenIddictConstants.Permissions.Scopes.Email,
+                        OpenIddictConstants.Permissions.Scopes.Profile,
+                        OpenIddictConstants.Permissions.Scopes.Roles,
+                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OpenId,
+                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OfflineAccess
+                    },
+                    Requirements =
+                    {
+                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                    }
+                };
+
+                await manager.CreateAsync(descriptor);
+            }
         }
     }
 }

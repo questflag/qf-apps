@@ -1,6 +1,7 @@
 using QuestFlag.Passport.WebApp.Client.Pages;
 using QuestFlag.Passport.WebApp.Components;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
+using QuestFlag.Passport.UserClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,14 @@ builder.Services.AddQuestFlagApiServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddHttpClient<PassportUserClient>(client =>
+{
+    var passportServicesUrl = builder.Configuration["Passport:PassportServicesBaseUrl"] 
+        ?? builder.Configuration["ServiceUrls:PassportServices"]
+        ?? "https://localhost:7004";
+    client.BaseAddress = new Uri(passportServicesUrl);
+});
 
 var app = builder.Build();
 

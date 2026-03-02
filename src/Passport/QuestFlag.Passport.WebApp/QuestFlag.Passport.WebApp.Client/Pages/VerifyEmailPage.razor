@@ -5,34 +5,60 @@
 
 <PageTitle>Verify Email — QuestFlag</PageTitle>
 
-<div class="sso-container">
-    <div class="sso-card">
-        <div class="sso-header">
-            <div class="brand-logo">QF</div>
-            <h1 class="tenant-name">Accept Invitation</h1>
-            <p class="sign-in-subtitle">Set your password to activate your account</p>
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)] bg-white px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-premium border border-gray-100">
+        <div class="text-center">
+            <div class="mx-auto h-12 w-12 bg-primary text-white rounded-lg flex items-center justify-center text-xl font-bold mb-4 shadow-sm">QF</div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Accept Invitation</h1>
+            <p class="mt-2 text-sm text-gray-500">Set your password to activate your account</p>
         </div>
 
         @if (_success)
         {
-            <div class="success-banner">✓ Account activated! You can now sign in.</div>
-            <div class="sso-footer"><a href="/login">Sign In</a></div>
+            <div class="rounded-md bg-green-50 p-4 border border-green-200">
+                <div class="flex">
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">
+                            ✓ Account activated! You can now sign in.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/login" class="text-sm font-medium text-primary hover:text-primary-hover transition-colors">Sign In</a>
+            </div>
         }
         else
         {
-            @if (_error != null) { <div class="error-banner">@_error</div> }
-            <form @onsubmit="HandleVerify">
-                <div class="form-group">
-                    <label>Password</label>
-                    <input @bind="_password" type="password" placeholder="Create a password" required />
+            @if (_error != null)
+            {
+                <div class="rounded-md bg-red-50 p-4 border border-red-200">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Error</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>@_error</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input @bind="_confirm" type="password" placeholder="••••••••" required />
+            }
+            <form @onsubmit="HandleVerify" class="mt-8 space-y-6">
+                <div class="space-y-4 rounded-md shadow-sm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input @bind="_password" type="password" placeholder="Create a password" required class="relative block w-full rounded-md border-0 py-2.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 shadow-sm transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input @bind="_confirm" type="password" placeholder="••••••••" required class="relative block w-full rounded-md border-0 py-2.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 shadow-sm transition-colors" />
+                    </div>
                 </div>
-                <button type="submit" class="btn-primary" disabled="@_isSubmitting">
-                    @(_isSubmitting ? "Activating…" : "Activate Account")
-                </button>
+                <div>
+                    <button type="submit" disabled="@_isSubmitting" class="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-70 disabled:cursor-not-allowed shadow-sm transition-all duration-200">
+                        @(_isSubmitting ? "Activating…" : "Activate Account")
+                    </button>
+                </div>
             </form>
         }
     </div>

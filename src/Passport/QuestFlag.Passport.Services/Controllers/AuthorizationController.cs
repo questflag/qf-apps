@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using QuestFlag.Passport.Domain.Entities;
 
 namespace QuestFlag.Passport.Services.Controllers;
 
@@ -17,10 +19,17 @@ namespace QuestFlag.Passport.Services.Controllers;
 public class AuthorizationController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public AuthorizationController(IConfiguration config)
+    public AuthorizationController(
+        IConfiguration config,
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager)
     {
         _config = config;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [HttpGet("~/connect/authorize")]
@@ -31,11 +40,26 @@ public class AuthorizationController : ControllerBase
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        // Retrieve the user principal stored in the authentication cookie.
-        var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        // 1. If it's a POST and we have credentials, try to sign the user in
+        if (Request.Method == "POST" && !string.IsNullOrEmpty(Request.Form["username"]) && !string.IsNullOrEmpty(Request.Form["password"]))
+        {
+            var user = await _userManager.FindByNameAsync(Request.Form["username"]!);
+            if (user != null && await _userManager.CheckPasswordAsync(user, Request.Form["password"]!))
+            {
+                await _signInManager.SignInAsync(user, isPersistent: true);
+                
+                // Refresh the request so OpenIddict sees the new identity
+                return Redirect(Request.Path + Request.QueryString);
+            }
 
-        // If the user principal can't be extracted, redirect the user to the login page.
-        if (!result.Succeeded)
+            ModelState.AddModelError(string.Empty, "Invalid username or password.");
+        }
+
+        // 2. Retrieve the user principal stored in the authentication cookie (Identity).
+        var result = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+
+        // 3. If the user principal can't be extracted, redirect the user to the login page.
+        if (!result.Succeeded || result.Principal == null || !result.Principal.Identity!.IsAuthenticated)
         {
             var webAppBaseUrl = _config["Passport:WebAppBaseUrl"]
                 ?? throw new InvalidOperationException("Passport:WebAppBaseUrl is required in configuration.");
@@ -46,7 +70,7 @@ public class AuthorizationController : ControllerBase
             return Redirect($"{loginUrl}{query}");
         }
 
-        // Create a new claims principal
+        // 4. Create a new claims principal for OpenIddict
         var principal = result.Principal;
 
         // Note: in this simple implementation, we assume the user is already signed in

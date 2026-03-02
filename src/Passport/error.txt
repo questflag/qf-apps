@@ -1,0 +1,9 @@
+d:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\Program.cs(8,18): error CS1061: 'IServiceCollection' does not contain a definition for 'AddHttpClient' and no accessible extension method 'AddHttpClient' accepting a first argument of type 'IServiceCollection' could be found (are you missing a using directive or an assembly reference?) [d:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\QuestFlag.Passport.WebApp.Client.csproj]
+
+Build FAILED.
+
+d:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\Program.cs(8,18): error CS1061: 'IServiceCollection' does not contain a definition for 'AddHttpClient' and no accessible extension method 'AddHttpClient' accepting a first argument of type 'IServiceCollection' could be found (are you missing a using directive or an assembly reference?) [d:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\QuestFlag.Passport.WebApp.Client.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:04.06

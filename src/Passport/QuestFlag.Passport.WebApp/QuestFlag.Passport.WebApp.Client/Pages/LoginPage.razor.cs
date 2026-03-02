@@ -20,6 +20,7 @@ public partial class LoginPage
     private string _password = "";
     private string? _error;
     private bool _isSubmitting;
+    private string _authorizeUrl = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,45 +49,32 @@ public partial class LoginPage
         }
 
         _loadingTenants = false;
+        UpdateAuthorizeUrl();
     }
 
-    private async Task HandleLogin()
+    private void OnInputChange() => UpdateAuthorizeUrl();
+
+    private void UpdateAuthorizeUrl()
     {
-        if (string.IsNullOrWhiteSpace(_tenantSlug)) { _error = "Please select an organization."; return; }
-
-        _error = null;
-        _isSubmitting = true;
-
         try
         {
-            // Build the authorize URL — redirect to Passport.Services /connect/authorize
-            // URLs are configured via Passport:PassportServicesBaseUrl and Passport:InfraWebAppBaseUrl in appsettings.json
-            var passportServicesBaseUrl = Config["Passport:PassportServicesBaseUrl"]
-                ?? throw new InvalidOperationException("Passport:PassportServicesBaseUrl is required in configuration.");
-            var infraWebAppBaseUrl = Config["Passport:InfraWebAppBaseUrl"]
-                ?? throw new InvalidOperationException("Passport:InfraWebAppBaseUrl is required in configuration.");
+            var passportServicesBaseUrl = Config["Passport:PassportServicesBaseUrl"] ?? "";
+            var infraWebAppBaseUrl = Config["Passport:InfraWebAppBaseUrl"] ?? "";
 
-            var authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize" +
-                               $"?response_type=code" +
-                               $"&client_id={Uri.EscapeDataString(ClientId ?? "passport-webapp")}" +
-                               $"&scope=openid profile roles offline_access" +
-                               $"&redirect_uri={Uri.EscapeDataString(ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc")}" +
-                               $"&tenant={Uri.EscapeDataString(_tenantSlug)}" +
-                               $"&login_hint={Uri.EscapeDataString(_username)}";
+            _authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize" +
+                           $"?response_type=code" +
+                           $"&client_id={Uri.EscapeDataString(ClientId ?? "infra-webapp")}" +
+                           $"&scope={Uri.EscapeDataString("openid profile roles offline_access")}" +
+                           $"&redirect_uri={Uri.EscapeDataString(ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc")}" +
+                           $"&tenant={Uri.EscapeDataString(_tenantSlug)}" +
+                           $"&login_hint={Uri.EscapeDataString(_username)}";
+        }
+        catch { /* ignore */ }
+    }
 
-            // Post credentials to Passport.Services via form, then redirect
-            // The actual credential validation happens in AuthController which reads the form post
-            await JS.InvokeVoidAsync("history.replaceState", null, "", Nav.Uri);
-            Nav.NavigateTo(authorizeUrl, forceLoad: true);
-        }
-        catch (Exception ex)
-        {
-            _error = "Sign-in failed. Please check your credentials.";
-            Console.WriteLine(ex);
-        }
-        finally
-        {
-            _isSubmitting = false;
-        }
+    private void HandleLogin()
+    {
+        // This is now handled by the native form submission to allow POSTing credentials
+        _isSubmitting = true;
     }
 }
