@@ -7,10 +7,6 @@
     <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.Client/QuestFlag.Passport.WebApp.Client.csproj" />
     <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.csproj" />
   </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path="../dependency.md" />
-    <File Path="Deployment/.env" />
-  </Folder>
   <Folder Name="/Deployment/">
     <Project Path="Deployment/docker-compose.dcproj">
       <Build />
