@@ -71,10 +71,42 @@ public class AuthorizationController : ControllerBase
         }
 
         // 4. Create a new claims principal for OpenIddict
-        var principal = result.Principal;
+        var userId = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
 
-        // Note: in this simple implementation, we assume the user is already signed in
-        // and we just return a sign-in result with the user's principal.
-        return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        var loggedInUser = await _userManager.FindByIdAsync(userId);
+        if (loggedInUser == null)
+        {
+            return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
+
+        var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, loggedInUser.Id.ToString())
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+            
+        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, loggedInUser.UserName ?? string.Empty)
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        identity.AddClaim(new Claim("tenant_id", loggedInUser.TenantId.ToString())
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        identity.AddClaim(new Claim("user_id", loggedInUser.Id.ToString())
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        var roles = await _userManager.GetRolesAsync(loggedInUser);
+        foreach (var role in roles)
+        {
+            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+        }
+
+        var openIdPrincipal = new ClaimsPrincipal(identity);
+        openIdPrincipal.SetScopes(request.GetScopes());
+
+        return SignIn(openIdPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 }

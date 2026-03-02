@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -41,6 +42,8 @@ public class UploadCompletedConsumer : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await EnsureTopicExistsAsync();
+
         _logger.LogInformation("UploadCompletedConsumer started. Subscribing to topic: {Topic}", _settings.TopicName);
         _consumer.Subscribe(_settings.TopicName);
 
@@ -67,7 +70,15 @@ public class UploadCompletedConsumer : BackgroundService
                 }
                 catch (ConsumeException ex)
                 {
-                    _logger.LogError(ex, "Kafka consumer error");
+                    if (ex.Error.Code == ErrorCode.UnknownTopicOrPart)
+                    {
+                        _logger.LogWarning("Topic {Topic} not found. Waiting before retry...", _settings.TopicName);
+                    }
+                    else
+                    {
+                        _logger.LogError(ex, "Kafka consumer error");
+                    }
+                    await Task.Delay(5000, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -84,6 +95,32 @@ public class UploadCompletedConsumer : BackgroundService
         finally
         {
             _consumer.Close();
+        }
+    }
+
+    private async Task EnsureTopicExistsAsync()
+    {
+        try
+        {
+            using var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _settings.BootstrapServers }).Build();
+            await adminClient.CreateTopicsAsync(new[]
+            {
+                new TopicSpecification
+                {
+                    Name = _settings.TopicName,
+                    ReplicationFactor = 1,
+                    NumPartitions = 1
+                }
+            });
+            _logger.LogInformation("Topic {Topic} created successfully.", _settings.TopicName);
+        }
+        catch (CreateTopicsException ex)
+        {
+            _logger.LogInformation("Topic creation skipped (usually means it already exists). Message: {Message}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to ensure topic {Topic} exists. The consumer will continue to run and auto-retry.", _settings.TopicName);
         }
     }
 

@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Infrastructure.WebApp.State;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Passport.Client;
+using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +40,11 @@ builder.Services.AddHttpClient<PassportApiClient>(client =>
 builder.Services.AddHttpClient<UploadApiService>(client =>
 {
     client.BaseAddress = new Uri(infraServicesUrl);
+});
+
+builder.Services.AddHttpClient<PassportUserClient>(client =>
+{
+    client.BaseAddress = new Uri(passportServicesUrl);
 });
 
 builder.Services.AddAuthentication(options =>

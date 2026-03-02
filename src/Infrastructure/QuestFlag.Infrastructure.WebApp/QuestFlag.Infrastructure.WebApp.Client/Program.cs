@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Passport.Client;
+using QuestFlag.Passport.UserClient;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Infrastructure.WebApp.Client.State;
@@ -16,6 +17,11 @@ var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
 
 // Register PassportApiClient pointing to Passport API Host — configured via ServiceUrls:PassportServices
 builder.Services.AddHttpClient<PassportApiClient>(client =>
+{
+    client.BaseAddress = new Uri(passportServicesUrl);
+});
+
+builder.Services.AddHttpClient<PassportUserClient>(client =>
 {
     client.BaseAddress = new Uri(passportServicesUrl);
 });

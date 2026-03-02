@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
 using QuestFlag.Passport.Domain.Entities;
 
 namespace QuestFlag.Passport.Services.Controllers;
@@ -18,10 +19,14 @@ namespace QuestFlag.Passport.Services.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public AuthController(UserManager<ApplicationUser> userManager)
+    public AuthController(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [HttpPost("token"), IgnoreAntiforgeryToken]
@@ -45,17 +50,24 @@ public class AuthController : ControllerBase
             var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             
             // Core Identity claims
-            identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id.ToString());
-            identity.AddClaim(OpenIddictConstants.Claims.Username, user.UserName ?? string.Empty);
+            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id.ToString())
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+            
+            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, user.UserName ?? string.Empty)
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
             
             // Custom Claims for QF
-            identity.AddClaim("tenant_id", user.TenantId.ToString(), OpenIddictConstants.Destinations.AccessToken);
-            identity.AddClaim("user_id", user.Id.ToString(), OpenIddictConstants.Destinations.AccessToken);
+            identity.AddClaim(new Claim("tenant_id", user.TenantId.ToString())
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+            
+            identity.AddClaim(new Claim("user_id", user.Id.ToString())
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
-                identity.AddClaim(OpenIddictConstants.Claims.Role, role, OpenIddictConstants.Destinations.AccessToken);
+                identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
+                    .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
             }
 
             var principal = new ClaimsPrincipal(identity);
@@ -69,9 +81,9 @@ public class AuthController : ControllerBase
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
-        else if (request.IsRefreshTokenGrantType())
+        else if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
-            // Retrieve the claims principal stored in the refresh token.
+            // Retrieve the claims principal stored in the authorization code / refresh token.
             var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             if (authResult.Principal == null)
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -81,6 +93,21 @@ public class AuthController : ControllerBase
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
             var identity = new ClaimsIdentity(authResult.Principal.Claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            
+            // Re-apply destinations to ensure they are carried over to the token payload
+            foreach (var claim in identity.Claims)
+            {
+                // Core claims
+                if (claim.Type == OpenIddictConstants.Claims.Subject ||
+                    claim.Type == OpenIddictConstants.Claims.Username ||
+                    claim.Type == "tenant_id" ||
+                    claim.Type == "user_id" ||
+                    claim.Type == OpenIddictConstants.Claims.Role)
+                {
+                    claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken);
+                }
+            }
+            
             var principal = new ClaimsPrincipal(identity);
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -89,13 +116,66 @@ public class AuthController : ControllerBase
         return BadRequest(new { error = "The specified grant type is not supported." });
     }
 
-    [HttpPost("logout"), Authorize]
+    [HttpGet("userinfo"), HttpPost("userinfo"), Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> UserInfo()
+    {
+        var user = await _userManager.FindByIdAsync(User.GetClaim(OpenIddictConstants.Claims.Subject) ?? string.Empty);
+        if (user == null)
+        {
+            return Challenge(
+                authenticationSchemes: OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties(new Dictionary<string, string?>
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = OpenIddictConstants.Errors.InvalidToken,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                        "The specified access token is no longer valid."
+                }));
+        }
+
+        var claims = new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [OpenIddictConstants.Claims.Subject] = user.Id.ToString()
+        };
+
+        if (User.HasScope(OpenIddictConstants.Scopes.Email))
+        {
+            claims[OpenIddictConstants.Claims.Email] = user.Email ?? string.Empty;
+            claims[OpenIddictConstants.Claims.EmailVerified] = user.EmailConfirmed;
+        }
+
+        if (User.HasScope(OpenIddictConstants.Scopes.Phone))
+        {
+            claims[OpenIddictConstants.Claims.PhoneNumber] = user.PhoneNumber ?? string.Empty;
+            claims[OpenIddictConstants.Claims.PhoneNumberVerified] = user.PhoneNumberConfirmed;
+        }
+
+        if (User.HasScope(OpenIddictConstants.Scopes.Roles))
+        {
+            claims[OpenIddictConstants.Claims.Role] = await _userManager.GetRolesAsync(user);
+        }
+
+        // Add custom claims
+        claims["tenant_id"] = user.TenantId.ToString();
+        claims["user_id"] = user.Id.ToString();
+
+        return Ok(claims);
+    }
+
+    [HttpGet("logout"), HttpPost("logout")]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Logout()
     {
-        // For JWT, "logging out" client side means deleting the token, but server side
-        // we can optionally revoke the refresh token (if using token revocation feature in OpenIddict).
-        // Since we are strictly using bare JWT + refresh token here via SignOut:
-        await HttpContext.SignOutAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        return Ok(new { message = "Logged out successfully." });
+        // 1. Sign out from ASP.NET Core Identity (deletes the application cookie).
+        await _signInManager.SignOutAsync();
+
+        // 2. Return a SignOutResult which instructs OpenIddict to handle the 
+        // OIDC post-logout redirection logic.
+        return SignOut(
+            authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+            properties: new AuthenticationProperties
+            {
+                RedirectUri = "/"
+            });
     }
 }

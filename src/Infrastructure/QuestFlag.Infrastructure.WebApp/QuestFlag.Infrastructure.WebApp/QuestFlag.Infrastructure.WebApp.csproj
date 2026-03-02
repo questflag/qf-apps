@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
     <ProjectReference Include="..\QuestFlag.Infrastructure.WebApp.Client\QuestFlag.Infrastructure.WebApp.Client.csproj" />
     <ProjectReference Include="..\..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
+    <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
     <Exec Command="npx -y @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/app.css" />
