@@ -8,7 +8,7 @@ using QuestFlag.Passport.Domain.Interfaces;
 
 namespace QuestFlag.Passport.Application.Features.Tenants.Commands;
 
-public record CreateTenantCommand(string Name, string Slug) : IRequest<Guid>;
+public record CreateTenantCommand(string Name, string Slug, string? CustomDomain = null, string? SubdomainSlug = null) : IRequest<Guid>;
 
 public class CreateTenantCommandValidator : AbstractValidator<CreateTenantCommand>
 {
@@ -40,6 +40,8 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, G
         {
             Name = request.Name,
             Slug = request.Slug,
+            CustomDomain = request.CustomDomain,
+            SubdomainSlug = request.SubdomainSlug,
             IsActive = true
         };
 

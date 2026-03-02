@@ -1,44 +1,42 @@
 ﻿<div class="px-6 py-6 border-b border-gray-50 mb-6">
-    <a class="text-xl font-black text-gray-900 tracking-tighter" href="">
+    <a class="text-xl font-black text-gray-900 tracking-tighter" href="/">
         QUEST<span class="text-primary">FLAG</span>
     </a>
 </div>
 
 <nav class="mt-2 flex-1 px-4 space-y-1 bg-white" aria-label="Sidebar">
     <div class="space-y-1">
-        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50" href="" Match="NavLinkMatch.All" ActiveClass="bg-primary/5 text-primary shadow-premium-sm" @onclick="() => {}">
+        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50" href="/" Match="NavLinkMatch.All" ActiveClass="bg-primary/5 text-primary shadow-premium-sm" @onclick="() => {}">
             <span class="bi bi-house mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
             <span>Dashboard</span>
         </NavLink>
 
-        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="tenants" ActiveClass="bg-primary/5 text-primary">
+        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="/admin/tenants" ActiveClass="bg-primary/5 text-primary">
             <span class="bi bi-building mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
             <span>Tenants</span>
         </NavLink>
 
-        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="users" ActiveClass="bg-primary/5 text-primary">
-            <span class="bi bi-people mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-            <span>Users</span>
+        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="/admin/roles" ActiveClass="bg-primary/5 text-primary">
+            <span class="bi bi-shield-lock mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+            <span>Roles</span>
         </NavLink>
 
-        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="devices" ActiveClass="bg-primary/5 text-primary">
-            <span class="bi bi-laptop mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-            <span>Devices</span>
-        </NavLink>
+        @* Users and Devices are linked from the Tenants/Users pages as they require IDs *@
     </div>
 
     <div class="pt-6 mt-6 border-t border-gray-50">
+        <div class="px-4 mb-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Account</span>
+        </div>
         <AuthorizeView>
             <Authorized>
-                <div class="mt-4">
-                    <form action="/account/logout" method="post">
-                        <AntiforgeryToken />
-                        <button type="submit" class="group flex w-full items-center px-4 py-3 text-sm font-semibold rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
-                            <span class="bi bi-power mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-                            <span>Sign out</span>
-                        </button>
-                    </form>
-                </div>
+                <form action="/account/logout" method="post">
+                    <AntiforgeryToken />
+                    <button type="submit" class="group flex w-full items-center px-4 py-3 text-sm font-semibold rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+                        <span class="bi bi-power mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                        <span>Sign out</span>
+                    </button>
+                </form>
             </Authorized>
             <NotAuthorized>
                 <div class="mt-4">

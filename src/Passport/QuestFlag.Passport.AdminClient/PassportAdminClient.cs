@@ -40,6 +40,18 @@ public class PassportAdminClient
         return result!.Id;
     }
 
+    public async Task UpdateTenantAsync(Guid id, string name, string slug, bool isActive, string? customDomain = null, string? subdomainSlug = null, CancellationToken ct = default)
+    {
+        var r = await _http.PutAsJsonAsync($"/api/tenants/{id}", new { id, name, slug, isActive, customDomain, subdomainSlug }, ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteTenantAsync(Guid id, CancellationToken ct = default)
+    {
+        var r = await _http.DeleteAsync($"/api/tenants/{id}", ct);
+        r.EnsureSuccessStatusCode();
+    }
+
     // ── Users ──────────────────────────────────────────────────────────────────
 
     public async Task<IReadOnlyList<UserAdminDto>> GetUsersAsync(Guid tenantId, CancellationToken ct = default)
@@ -66,12 +78,44 @@ public class PassportAdminClient
         return result!.Id;
     }
 
+    public async Task UpdateUserAsync(Guid tenantId, Guid userId, string username, string email, string displayName, bool isActive, string roleName, CancellationToken ct = default)
+    {
+        var r = await _http.PutAsJsonAsync($"/api/tenants/{tenantId}/users/{userId}", new { id = userId, username, email, displayName, isActive, roleName }, ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteUserAsync(Guid tenantId, Guid userId, CancellationToken ct = default)
+    {
+        var r = await _http.DeleteAsync($"/api/tenants/{tenantId}/users/{userId}", ct);
+        r.EnsureSuccessStatusCode();
+    }
+
     // ── Roles ──────────────────────────────────────────────────────────────────
 
     public async Task<IReadOnlyList<RoleDto>> GetRolesAsync(CancellationToken ct = default)
     {
         var result = await _http.GetFromJsonAsync<List<RoleDto>>("/api/roles", ct);
         return result ?? [];
+    }
+
+    public async Task<Guid> CreateRoleAsync(string name, CancellationToken ct = default)
+    {
+        var r = await _http.PostAsJsonAsync("/api/roles", new { name }, ct);
+        r.EnsureSuccessStatusCode();
+        var result = await r.Content.ReadFromJsonAsync<IdResponse>(cancellationToken: ct);
+        return result!.Id;
+    }
+
+    public async Task UpdateRoleAsync(Guid id, string name, CancellationToken ct = default)
+    {
+        var r = await _http.PutAsJsonAsync($"/api/roles/{id}", new { id, name }, ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteRoleAsync(Guid id, CancellationToken ct = default)
+    {
+        var r = await _http.DeleteAsync($"/api/roles/{id}", ct);
+        r.EnsureSuccessStatusCode();
     }
 
     // ── Sessions / Force Logout ────────────────────────────────────────────────

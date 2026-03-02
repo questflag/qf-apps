@@ -32,4 +32,19 @@ public class RolesController : ControllerBase
         var id = await _mediator.Send(command);
         return Ok(new { id });
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRole(System.Guid id, [FromBody] UpdateRoleCommand command)
+    {
+        if (id != command.Id) return BadRequest();
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteRole(System.Guid id)
+    {
+        await _mediator.Send(new DeleteRoleCommand(id));
+        return NoContent();
+    }
 }

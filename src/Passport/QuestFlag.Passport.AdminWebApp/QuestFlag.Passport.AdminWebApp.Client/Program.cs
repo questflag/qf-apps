@@ -11,4 +11,11 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
 
+builder.Services.AddTransient<AuthenticatedHttpHandler>();
+builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+})
+.AddHttpMessageHandler<AuthenticatedHttpHandler>();
+
 await builder.Build().RunAsync();

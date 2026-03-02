@@ -57,6 +57,23 @@ public class TenantsController : ControllerBase
         return Ok(new { id });
     }
 
+    [HttpPut("{id}")]
+    [Authorize(Policy = "PassportAdmin")]
+    public async Task<IActionResult> UpdateTenant(System.Guid id, [FromBody] UpdateTenantCommand command)
+    {
+        if (id != command.Id) return BadRequest();
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "PassportAdmin")]
+    public async Task<IActionResult> DeleteTenant(System.Guid id)
+    {
+        await _mediator.Send(new DeleteTenantCommand(id));
+        return NoContent();
+    }
+
     [HttpGet("{tenantId}/users")]
     [Authorize]
     public async Task<IActionResult> GetUsers(System.Guid tenantId)
@@ -99,6 +116,23 @@ public class TenantsController : ControllerBase
             baseUrl));
 
         return Ok(new { id });
+    }
+
+    [HttpPut("{tenantId}/users/{userId}")]
+    [Authorize(Policy = "PassportAdmin")]
+    public async Task<IActionResult> UpdateUser(System.Guid tenantId, System.Guid userId, [FromBody] UpdateUserCommand command)
+    {
+        if (userId != command.Id) return BadRequest();
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete("{tenantId}/users/{userId}")]
+    [Authorize(Policy = "PassportAdmin")]
+    public async Task<IActionResult> DeleteUser(System.Guid tenantId, System.Guid userId)
+    {
+        await _mediator.Send(new DeleteUserCommand(userId));
+        return NoContent();
     }
 }
 
