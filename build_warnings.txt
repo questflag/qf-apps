@@ -1,0 +1,7 @@
+D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Core\DependencyInjection\CoreServiceExtensions.cs(44,30): warning CS0618: 'GoogleCredential.FromJson(string)' is obsolete: 'This method is being deprecated because of a potential security risk. Use the methods in the CredentialFactory class instead. A GoogleCredential object can then be created by calling the .ToGoogleCredential() method on the returned specific credential. ' [D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj]
+
+Build succeeded.
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.68
