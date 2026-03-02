@@ -45,8 +45,8 @@ public class TokenProvider : IAccessTokenProvider
 
     public Task HandleUnauthorizedAsync()
     {
-        // Token is expired or invalid. Redirect to login.
-        _navigation.NavigateTo("/login", forceLoad: true);
+        // Token is expired or invalid. Redirect to logout.
+        _navigation.NavigateTo("/Logout", forceLoad: true);
         return Task.CompletedTask;
     }
 }
