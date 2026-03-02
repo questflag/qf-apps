@@ -29,11 +29,9 @@ public record VerifyPhoneRequest(string OtpCode);
 /// Consumed by Passport.WebApp (SSO portal) and Infrastructure.WebApp (profile pages).
 /// Does NOT expose any admin-only APIs.
 /// </summary>
-public class PassportUserClient
+public class PassportUserClient(HttpClient http)
 {
-    private readonly HttpClient _http;
-
-    public PassportUserClient(HttpClient http) => _http = http;
+    private readonly HttpClient _http = http;
 
     // ── Anonymous APIs ─────────────────────────────────────────────────────────
 

@@ -31,6 +31,9 @@ var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
 var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
     ?? throw new InvalidOperationException("ServiceUrls:InfraServices is required in configuration.");
 
+builder.Services.AddScoped<IAccessTokenProvider, ServerTokenProvider>();
+builder.Services.AddTransient<AuthenticatedHttpHandler>();
+
 // Register Client APIs for server-side rendering/pre-rendering
 builder.Services.AddHttpClient<PassportApiClient>(client =>
 {
@@ -40,12 +43,12 @@ builder.Services.AddHttpClient<PassportApiClient>(client =>
 builder.Services.AddHttpClient<UploadApiService>(client =>
 {
     client.BaseAddress = new Uri(infraServicesUrl);
-});
+}).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
 builder.Services.AddHttpClient<PassportUserClient>(client =>
 {
     client.BaseAddress = new Uri(passportServicesUrl);
-});
+}).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
 builder.Services.AddAuthentication(options =>
 {

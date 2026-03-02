@@ -35,4 +35,7 @@
     <Project Path="Passport/QuestFlag.Passport.Services/QuestFlag.Passport.Services.csproj" />
     <Project Path="Passport/QuestFlag.Passport.UserClient/QuestFlag.Passport.UserClient.csproj" />
   </Folder>
+  <Project Path="AI/PythonClassifierApplication1/PythonClassifierApplication1.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="d22bc6ce-7662-4a9c-bb48-85031404af25">
+    <Build Project="false" />
+  </Project>
 </Solution>

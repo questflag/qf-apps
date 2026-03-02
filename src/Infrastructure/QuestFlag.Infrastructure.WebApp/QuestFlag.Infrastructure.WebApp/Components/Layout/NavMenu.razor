@@ -23,34 +23,12 @@
     </div>
 
     <div class="pt-6 mt-6 border-t border-gray-50">
-        <AuthorizeView>
-            <Authorized>
-                <div class="px-4 mb-2">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Account</span>
-                </div>
-                <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="profile" ActiveClass="bg-primary/5 text-primary">
-                    <span class="bi bi-shield-lock mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-                    <span>Security Settings</span>
-                </NavLink>
-
-                <div class="mt-4">
-                    <form action="/account/logout" method="post">
-                        <AntiforgeryToken />
-                        <button type="submit" class="group flex w-full items-center px-4 py-3 text-sm font-semibold rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
-                            <span class="bi bi-power mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-                            <span>Disconnect</span>
-                        </button>
-                    </form>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="mt-4">
-                    <a class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-primary bg-primary/5 hover:bg-primary/10 transition-all duration-200" href="/login">
-                        <span class="bi bi-fingerprint mr-3 text-lg" aria-hidden="true"></span>
-                        <span>Secure Access</span>
-                    </a>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
+        <div class="px-4 mb-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Account</span>
+        </div>
+        <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="profile" ActiveClass="bg-primary/5 text-primary">
+            <span class="bi bi-shield-lock mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+            <span>Security Settings</span>
+        </NavLink>
     </div>
 </nav>

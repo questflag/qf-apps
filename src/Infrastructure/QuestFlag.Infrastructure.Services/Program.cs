@@ -85,7 +85,7 @@ public class Program
         app.UseCors();
 
         // 7. Standard API pipeline (Swagger, HTTPS, Auth, Controllers)
-        app.UseQuestFlagApiPipeline();
+        app.UseQuestFlagApiPipeline(requireAuthorization: true);
 
         app.Run();
     }

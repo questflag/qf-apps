@@ -24,7 +24,7 @@ builder.Services.AddHttpClient<PassportApiClient>(client =>
 builder.Services.AddHttpClient<PassportUserClient>(client =>
 {
     client.BaseAddress = new Uri(passportServicesUrl);
-});
+}).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
 builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
 builder.Services.AddTransient<AuthenticatedHttpHandler>();

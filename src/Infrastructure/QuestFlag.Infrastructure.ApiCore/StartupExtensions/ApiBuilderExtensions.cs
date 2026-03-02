@@ -23,7 +23,7 @@ public static class ApiBuilderExtensions
     /// Configures the standard QuestFlag API middleware pipeline:
     /// Swagger UI (dev only), HTTPS redirection, authentication, authorization, and controller mapping.
     /// </summary>
-    public static WebApplication UseQuestFlagApiPipeline(this WebApplication app)
+    public static WebApplication UseQuestFlagApiPipeline(this WebApplication app, bool requireAuthorization = false)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -42,7 +42,12 @@ public static class ApiBuilderExtensions
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapControllers();
+
+        var endpoints = app.MapControllers();
+        if (requireAuthorization)
+        {
+            endpoints.RequireAuthorization();
+        }
 
         return app;
     }

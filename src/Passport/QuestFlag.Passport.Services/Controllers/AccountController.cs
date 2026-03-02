@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using QuestFlag.Infrastructure.ApiCore.Extensions;
 using QuestFlag.Passport.Application.Features.Users.Commands;
+using QuestFlag.Passport.Application.Features.Users.Queries;
 
 namespace QuestFlag.Passport.Services.Controllers;
 
@@ -109,6 +110,18 @@ public class AccountController : ControllerBase
     {
         var valid = await _mediator.Send(new VerifyLoginOtpCommand(request.UserId, request.Otp));
         return valid ? Ok(new { verified = true }) : BadRequest(new { error = "Invalid or expired OTP." });
+    }
+
+    /// <summary>Returns the current user's profile information.</summary>
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var profile = await _mediator.Send(new GetUserProfileQuery(userId.Value));
+        return profile != null ? Ok(profile) : NotFound();
     }
 
     // ─────────────────────────────────────────────────────────
