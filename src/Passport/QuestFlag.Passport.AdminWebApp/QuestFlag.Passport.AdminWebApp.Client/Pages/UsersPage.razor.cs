@@ -9,6 +9,19 @@ public partial class UsersPage
     [Parameter] public Guid TenantId { get; set; }
     private IReadOnlyList<UserAdminDto>? _users;
     private string _searchQuery = "";
+    private string SearchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            if (_searchQuery != value)
+            {
+                _searchQuery = value;
+                _ = LoadUsersAsync();
+            }
+        }
+    }
+
     private bool _showInvite;
     private string _invUsername = "", _invEmail = "", _invDisplayName = "", _invRole = "member";
     private bool _inviting;
@@ -21,13 +34,13 @@ public partial class UsersPage
     private bool _updating;
     private string? _editError;
 
-    private IEnumerable<UserAdminDto>? FilteredUsers => 
-        string.IsNullOrWhiteSpace(_searchQuery) 
-            ? _users 
-            : _users?.Where(u => u.DisplayName.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) || u.Username.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) || u.Email.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
+    private IEnumerable<UserAdminDto>? FilteredUsers => _users;
 
     protected override async Task OnInitializedAsync()
-        => _users = await AdminClient.GetUsersAsync(TenantId);
+        => await LoadUsersAsync();
+
+    private async Task LoadUsersAsync()
+        => _users = await AdminClient.GetUsersAsync(TenantId, _searchQuery);
 
     private async Task InviteUser()
     {
@@ -87,7 +100,7 @@ public partial class UsersPage
             await AdminClient.DeleteUserAsync(TenantId, userId);
             _users = await AdminClient.GetUsersAsync(TenantId);
         }
-        catch (Exception ex) { /* Log error */ }
+        catch (Exception) { /* Log error */ }
     }
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

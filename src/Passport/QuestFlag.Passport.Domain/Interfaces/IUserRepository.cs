@@ -8,6 +8,7 @@ namespace QuestFlag.Passport.Domain.Interfaces;
 public interface IUserRepository
 {
     Task<IReadOnlyList<ApplicationUser>> GetByTenantIdAsync(System.Guid tenantId, CancellationToken ct = default);
+    Task<IReadOnlyList<ApplicationUser>> SearchAsync(System.Guid tenantId, string query, CancellationToken ct = default);
     Task<ApplicationUser?> GetByIdAsync(System.Guid id, CancellationToken ct = default);
     Task<ApplicationUser?> GetByUsernameAsync(string username, CancellationToken ct = default);
     Task<ApplicationUser> AddAsync(ApplicationUser user, string password, string role, CancellationToken ct = default);

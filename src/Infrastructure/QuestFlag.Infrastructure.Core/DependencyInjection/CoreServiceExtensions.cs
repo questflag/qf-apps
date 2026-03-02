@@ -1,3 +1,5 @@
+using System.IO;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +41,8 @@ public static class CoreServiceExtensions
         // Register GCP
         if (!string.IsNullOrEmpty(minioSettings.GcpCredentialsJson))
         {
-            var credential = GoogleCredential.FromJson(minioSettings.GcpCredentialsJson)
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(minioSettings.GcpCredentialsJson));
+            var credential = GoogleCredential.FromStream(stream)
                 .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
             services.AddSingleton(StorageClient.Create(credential));
             services.AddSingleton(UrlSigner.FromCredential(credential));

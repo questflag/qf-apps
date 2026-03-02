@@ -82,7 +82,7 @@ public partial class TenantsPage
             await AdminClient.DeleteTenantAsync(id);
             _tenants = await AdminClient.GetTenantsAsync();
         }
-        catch (Exception ex) { /* Log error or show toast */ }
+        catch (Exception) { /* Log error or show toast */ }
     }
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

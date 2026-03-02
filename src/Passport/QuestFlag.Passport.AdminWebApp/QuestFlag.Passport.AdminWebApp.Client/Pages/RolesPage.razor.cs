@@ -73,7 +73,7 @@ public partial class RolesPage
             await AdminClient.DeleteRoleAsync(id);
             _roles = await AdminClient.GetRolesAsync();
         }
-        catch (Exception ex) { /* Log error */ }
+        catch (Exception) { /* Log error */ }
     }
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

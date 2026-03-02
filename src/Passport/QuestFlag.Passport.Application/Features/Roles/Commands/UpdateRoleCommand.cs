@@ -36,7 +36,7 @@ public class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Unit>
         }
 
         role.Name = request.Name;
-        await _roleRepository.UpdateAsync(role, cancellationToken);
+        await _roleRepository.UpdateAsync(request.Id, request.Name, cancellationToken);
         return Unit.Value;
     }
 }

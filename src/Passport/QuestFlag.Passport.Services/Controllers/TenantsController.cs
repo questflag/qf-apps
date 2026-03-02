@@ -76,9 +76,9 @@ public class TenantsController : ControllerBase
 
     [HttpGet("{tenantId}/users")]
     [Authorize]
-    public async Task<IActionResult> GetUsers(System.Guid tenantId)
+    public async Task<IActionResult> GetUsers(System.Guid tenantId, [FromQuery] string? searchTerm = null)
     {
-        var result = await _mediator.Send(new GetUsersByTenantQuery(tenantId));
+        var result = await _mediator.Send(new GetUsersByTenantQuery(tenantId, searchTerm));
         return Ok(result);
     }
 

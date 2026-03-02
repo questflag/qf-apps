@@ -22,9 +22,16 @@ builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenti
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAccessTokenProvider, ServerTokenProvider>();
+builder.Services.AddTransient<AuthenticatedHttpHandler>();
 
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
     ?? "https://localhost:7004";
+
+builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
+{
+    client.BaseAddress = new Uri(passportServicesUrl);
+})
+.AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
 builder.Services.AddAuthentication(options =>
 {

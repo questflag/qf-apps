@@ -12,6 +12,9 @@ public record TenantAdminDto(Guid Id, string Name, string Slug, bool IsActive, s
 public record UserAdminDto(Guid Id, string Username, string DisplayName, string Email, bool IsActive, bool TwoFactorEnabled, bool EmailConfirmed);
 public record RoleDto(Guid Id, string Name);
 public record DeviceAdminDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
+public record AgentDto(string ClientId, string DisplayName, string Type, HashSet<string> Permissions, HashSet<Uri> RedirectUris, HashSet<Uri> PostLogoutRedirectUris);
+public record CreateAgentRequest(string ClientId, string DisplayName, string? ClientSecret, string Type, HashSet<string> Permissions, HashSet<Uri> RedirectUris, HashSet<Uri> PostLogoutRedirectUris);
+public record UpdateAgentRequest(string ClientId, string DisplayName, string? ClientSecret, string Type, HashSet<string> Permissions, HashSet<Uri> RedirectUris, HashSet<Uri> PostLogoutRedirectUris);
 
 /// <summary>
 /// Client SDK for privileged Passport admin endpoints.
@@ -54,9 +57,14 @@ public class PassportAdminClient
 
     // ── Users ──────────────────────────────────────────────────────────────────
 
-    public async Task<IReadOnlyList<UserAdminDto>> GetUsersAsync(Guid tenantId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<UserAdminDto>> GetUsersAsync(Guid tenantId, string? searchTerm = null, CancellationToken ct = default)
     {
-        var result = await _http.GetFromJsonAsync<List<UserAdminDto>>($"/api/tenants/{tenantId}/users", ct);
+        var url = $"/api/tenants/{tenantId}/users";
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            url += $"?searchTerm={Uri.EscapeDataString(searchTerm)}";
+        }
+        var result = await _http.GetFromJsonAsync<List<UserAdminDto>>(url, ct);
         return result ?? [];
     }
 
@@ -138,6 +146,32 @@ public class PassportAdminClient
     public async Task RevokeUserDeviceAsync(Guid deviceId, CancellationToken ct = default)
     {
         var r = await _http.DeleteAsync($"/api/usersessions/devices/{deviceId}", ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    // ── Agents ──────────────────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<AgentDto>> GetAgentsAsync(CancellationToken ct = default)
+    {
+        var result = await _http.GetFromJsonAsync<List<AgentDto>>("/api/agents", ct);
+        return result ?? [];
+    }
+
+    public async Task CreateAgentAsync(CreateAgentRequest request, CancellationToken ct = default)
+    {
+        var r = await _http.PostAsJsonAsync("/api/agents", request, ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    public async Task UpdateAgentAsync(string clientId, UpdateAgentRequest request, CancellationToken ct = default)
+    {
+        var r = await _http.PutAsJsonAsync($"/api/agents/{clientId}", request, ct);
+        r.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteAgentAsync(string clientId, CancellationToken ct = default)
+    {
+        var r = await _http.DeleteAsync($"/api/agents/{clientId}", ct);
         r.EnsureSuccessStatusCode();
     }
 }

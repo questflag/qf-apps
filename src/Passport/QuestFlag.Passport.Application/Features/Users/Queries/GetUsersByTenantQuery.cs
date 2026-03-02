@@ -8,7 +8,7 @@ using QuestFlag.Passport.Domain.Interfaces;
 
 namespace QuestFlag.Passport.Application.Features.Users.Queries;
 
-public record GetUsersByTenantQuery(Guid TenantId) : IRequest<IReadOnlyList<UserSummaryDto>>;
+public record GetUsersByTenantQuery(Guid TenantId, string? SearchTerm = null) : IRequest<IReadOnlyList<UserSummaryDto>>;
 
 public class GetUsersByTenantQueryHandler : IRequestHandler<GetUsersByTenantQuery, IReadOnlyList<UserSummaryDto>>
 {
@@ -21,7 +21,9 @@ public class GetUsersByTenantQueryHandler : IRequestHandler<GetUsersByTenantQuer
 
     public async Task<IReadOnlyList<UserSummaryDto>> Handle(GetUsersByTenantQuery request, CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetByTenantIdAsync(request.TenantId, cancellationToken);
+        var users = string.IsNullOrWhiteSpace(request.SearchTerm)
+            ? await _userRepository.GetByTenantIdAsync(request.TenantId, cancellationToken)
+            : await _userRepository.SearchAsync(request.TenantId, request.SearchTerm, cancellationToken);
         
         var dtos = new List<UserSummaryDto>();
         foreach (var u in users)

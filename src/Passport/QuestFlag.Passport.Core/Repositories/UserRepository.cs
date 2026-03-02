@@ -24,6 +24,17 @@ public class UserRepository : IUserRepository
         return await _userManager.Users.Where(u => u.TenantId == tenantId).ToListAsync(ct);
     }
 
+    public async Task<IReadOnlyList<ApplicationUser>> SearchAsync(Guid tenantId, string query, CancellationToken ct = default)
+    {
+        var normalizedQuery = query.ToUpperInvariant();
+        return await _userManager.Users
+            .Where(u => u.TenantId == tenantId)
+            .Where(u => u.NormalizedUserName!.Contains(normalizedQuery) 
+                     || u.NormalizedEmail!.Contains(normalizedQuery)
+                     || u.DisplayName.ToUpper().Contains(normalizedQuery))
+            .ToListAsync(ct);
+    }
+
     public async Task<ApplicationUser?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await _userManager.FindByIdAsync(id.ToString());
