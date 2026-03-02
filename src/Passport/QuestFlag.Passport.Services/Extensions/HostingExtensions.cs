@@ -31,7 +31,7 @@ public static class HostingExtensions
             await context.Database.MigrateAsync();
 
             // Seed Roles
-            string[] roles = [PassportRole.TenantAdmin, PassportRole.User];
+            string[] roles = [PassportRole.PassportAdmin, PassportRole.TenantAdmin, PassportRole.User];
             foreach (var roleName in roles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
@@ -59,6 +59,7 @@ public static class HostingExtensions
                 var result = await userManager.CreateAsync(adminUser, "Admin123!");
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(adminUser, PassportRole.PassportAdmin);
                     await userManager.AddToRoleAsync(adminUser, PassportRole.TenantAdmin);
                 }
             }

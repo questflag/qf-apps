@@ -35,8 +35,8 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, IReadOnlyLi
                 displayName ?? "",
                 type ?? "",
                 new HashSet<string>(permissions),
-                new HashSet<Uri>(redirectUris),
-                new HashSet<Uri>(postLogoutRedirectUris)
+                new HashSet<Uri>(redirectUris.Select(u => new Uri(u))),
+                new HashSet<Uri>(postLogoutRedirectUris.Select(u => new Uri(u)))
             ));
         }
 

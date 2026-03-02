@@ -32,7 +32,7 @@ public class UpdateAgentCommandHandler : IRequestHandler<UpdateAgentCommand>
         await _manager.PopulateAsync(descriptor, app, cancellationToken);
 
         descriptor.DisplayName = request.DisplayName;
-        descriptor.Type = request.Type;
+        descriptor.ClientType = request.Type;
         if (!string.IsNullOrWhiteSpace(request.ClientSecret))
         {
             descriptor.ClientSecret = request.ClientSecret;

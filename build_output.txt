@@ -1,0 +1,19 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+  QuestFlag.Passport.Domain -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.Domain\bin\Debug\net10.0\QuestFlag.Passport.Domain.dll
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Commands\UpdateAgentCommand.cs(35,20): error CS1061: 'OpenIddictApplicationDescriptor' does not contain a definition for 'Type' and no accessible extension method 'Type' accepting a first argument of type 'OpenIddictApplicationDescriptor' could be found (are you missing a using directive or an assembly reference?) [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Queries\GetAgentsQuery.cs(38,34): error CS1503: Argument 1: cannot convert from 'System.Collections.Immutable.ImmutableArray<string>' to 'System.Collections.Generic.IEnumerable<System.Uri>' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Queries\GetAgentsQuery.cs(39,34): error CS1503: Argument 1: cannot convert from 'System.Collections.Immutable.ImmutableArray<string>' to 'System.Collections.Generic.IEnumerable<System.Uri>' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Commands\CreateAgentCommand.cs(35,13): error CS0117: 'OpenIddictApplicationDescriptor' does not contain a definition for 'Type' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+
+Build FAILED.
+
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Commands\UpdateAgentCommand.cs(35,20): error CS1061: 'OpenIddictApplicationDescriptor' does not contain a definition for 'Type' and no accessible extension method 'Type' accepting a first argument of type 'OpenIddictApplicationDescriptor' could be found (are you missing a using directive or an assembly reference?) [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Queries\GetAgentsQuery.cs(38,34): error CS1503: Argument 1: cannot convert from 'System.Collections.Immutable.ImmutableArray<string>' to 'System.Collections.Generic.IEnumerable<System.Uri>' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Queries\GetAgentsQuery.cs(39,34): error CS1503: Argument 1: cannot convert from 'System.Collections.Immutable.ImmutableArray<string>' to 'System.Collections.Generic.IEnumerable<System.Uri>' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\Features\Agents\Commands\CreateAgentCommand.cs(35,13): error CS0117: 'OpenIddictApplicationDescriptor' does not contain a definition for 'Type' [D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\QuestFlag.Passport.Application.csproj]
+    0 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:02.47

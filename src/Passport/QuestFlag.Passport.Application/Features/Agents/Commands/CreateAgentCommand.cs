@@ -32,12 +32,23 @@ public class CreateAgentCommandHandler : IRequestHandler<CreateAgentCommand, str
             ClientId = request.ClientId,
             DisplayName = request.DisplayName,
             ClientSecret = request.ClientSecret,
-            Type = request.Type
+            ClientType = request.Type
         };
 
-        foreach (var p in request.Permissions) descriptor.Permissions.Add(p);
-        foreach (var u in request.RedirectUris) descriptor.RedirectUris.Add(u);
-        foreach (var u in request.PostLogoutRedirectUris) descriptor.PostLogoutRedirectUris.Add(u);
+        if (request.Permissions != null)
+        {
+            foreach (var p in request.Permissions) descriptor.Permissions.Add(p);
+        }
+
+        if (request.RedirectUris != null)
+        {
+            foreach (var u in request.RedirectUris) descriptor.RedirectUris.Add(u);
+        }
+
+        if (request.PostLogoutRedirectUris != null)
+        {
+            foreach (var u in request.PostLogoutRedirectUris) descriptor.PostLogoutRedirectUris.Add(u);
+        }
 
         await _manager.CreateAsync(descriptor, cancellationToken);
         return request.ClientId;
