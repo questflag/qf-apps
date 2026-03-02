@@ -21,6 +21,7 @@ public partial class LoginPage
     private string? _error;
     private bool _isSubmitting;
     private string _authorizeUrl = "";
+    private Dictionary<string, string> _formParams = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,13 +66,48 @@ public partial class LoginPage
                 ?? Config["ServiceUrls:InfraWebApp"] 
                 ?? "https://localhost:7000";
 
-            _authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize" +
-                           $"?response_type=code" +
-                           $"&client_id={Uri.EscapeDataString(ClientId ?? "infra-webapp")}" +
-                           $"&scope={Uri.EscapeDataString("openid profile roles offline_access")}" +
-                           $"&redirect_uri={Uri.EscapeDataString(ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc")}" +
-                           $"&tenant={Uri.EscapeDataString(_tenantSlug)}" +
-                           $"&login_hint={Uri.EscapeDataString(_username)}";
+            _formParams = new();
+            var uri = new Uri(Nav.Uri);
+            var query = uri.Query.TrimStart('?');
+            if (!string.IsNullOrEmpty(query))
+            {
+                var pairs = query.Split('&');
+                foreach (var pair in pairs)
+                {
+                    var parts = pair.Split('=', 2);
+                    if (parts.Length > 0 && !string.IsNullOrEmpty(parts[0]))
+                    {
+                        var key = Uri.UnescapeDataString(parts[0]);
+                        var value = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
+                        // If multiple values exist for the same key, we just overwrite (standard for OIDC single value params)
+                        // Or we can comma-separate if we wanted, but standard OIDC doesn't need that.
+                        _formParams[key] = value;
+                    }
+                }
+            }
+
+            if (!_formParams.ContainsKey("response_type")) _formParams["response_type"] = "code";
+            if (!_formParams.ContainsKey("client_id")) _formParams["client_id"] = ClientId ?? "infra-webapp";
+            if (!_formParams.ContainsKey("scope")) _formParams["scope"] = "openid profile roles offline_access";
+            if (!_formParams.ContainsKey("redirect_uri")) _formParams["redirect_uri"] = ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc";
+
+            var uriBuilder = new UriBuilder($"{passportServicesBaseUrl}/connect/authorize");
+            var queryList = new List<string>();
+            foreach (var kvp in _formParams)
+            {
+                queryList.Add($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}");
+            }
+            uriBuilder.Query = string.Join("&", queryList);
+
+            // Also add local form values to the query string just in case they are expected there
+            // though they will also be submitted via form post.
+            var tenantSlugExt = _tenantSlug;
+            queryList.Add($"tenant={Uri.EscapeDataString(tenantSlugExt)}");
+            var usernameExt = _username;
+            queryList.Add($"login_hint={Uri.EscapeDataString(usernameExt)}");
+            uriBuilder.Query = string.Join("&", queryList);
+            
+            _authorizeUrl = uriBuilder.ToString();
         }
         catch { /* ignore */ }
     }
