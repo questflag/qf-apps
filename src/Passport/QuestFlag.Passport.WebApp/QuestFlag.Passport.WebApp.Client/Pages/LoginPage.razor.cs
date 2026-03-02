@@ -58,8 +58,12 @@ public partial class LoginPage
     {
         try
         {
-            var passportServicesBaseUrl = Config["Passport:PassportServicesBaseUrl"] ?? "";
-            var infraWebAppBaseUrl = Config["Passport:InfraWebAppBaseUrl"] ?? "";
+            var passportServicesBaseUrl = Config["Passport:PassportServicesBaseUrl"] 
+                ?? Config["ServiceUrls:PassportServices"] 
+                ?? "https://localhost:7004";
+            var infraWebAppBaseUrl = Config["Passport:InfraWebAppBaseUrl"] 
+                ?? Config["ServiceUrls:InfraWebApp"] 
+                ?? "https://localhost:7000";
 
             _authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize" +
                            $"?response_type=code" +
