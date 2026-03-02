@@ -19,6 +19,9 @@ public class PassportDbContext : IdentityDbContext<ApplicationUser, IdentityRole
     {
         base.OnModelCreating(builder);
 
+        // Map OpenIddict entities
+        builder.UseOpenIddict();
+
         // Apply all IEntityTypeConfiguration from the current assembly
         builder.ApplyConfigurationsFromAssembly(typeof(PassportDbContext).Assembly);
     }

@@ -97,6 +97,14 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(QuestFlag.Infrastructure.WebApp.Client._Imports).Assembly);
 
+app.MapGet("/login", async (HttpContext context) =>
+{
+    await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+    {
+        RedirectUri = "/"
+    });
+});
+
 app.MapPost("/account/logout", async (HttpContext context) =>
 {
     await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
