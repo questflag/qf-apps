@@ -1,7 +1,6 @@
 using Microsoft.JSInterop;
 using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Client.Contracts;
-using QuestFlag.Infrastructure.Domain.Models;
 using QuestFlag.Passport.Client;
 using System.Text.Json;
 

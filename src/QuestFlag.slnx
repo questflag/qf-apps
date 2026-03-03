@@ -3,9 +3,9 @@
     <Project Path="Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.Client/QuestFlag.Passport.AdminWebApp.Client.csproj" />
     <Project Path="Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.csproj" />
   </Folder>
-  <Folder Name="/Passport/QuestFlag.Passport.WebApp/">
-    <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.Client/QuestFlag.Passport.WebApp.Client.csproj" />
-    <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.csproj" />
+  <Folder Name="/Demo/QuestFlag.Passport.WebApp/">
+    <Project Path="Demo/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.Client/QuestFlag.Passport.WebApp.Client.csproj" />
+    <Project Path="Demo/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.csproj" />
   </Folder>
   <Folder Name="/Deployment/">
     <Project Path="Deployment/docker-compose.dcproj">
@@ -46,8 +46,8 @@
     <Project Path="Communication/QuestFlag.Communication.Services/QuestFlag.Communication.Services.csproj" />
     <Project Path="Communication/QuestFlag.Communication.Shared/QuestFlag.Communication.Shared.csproj" />
   </Folder>
-  <Folder Name="/Communication/QuestFlag.Communication.WebApp/">
-    <Project Path="Communication/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp.Client/QuestFlag.Communication.WebApp.Client.csproj" />
-    <Project Path="Communication/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp.csproj" />
+  <Folder Name="/Demo/QuestFlag.Communication.WebApp/">
+    <Project Path="Demo/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp.Client/QuestFlag.Communication.WebApp.Client.csproj" />
+    <Project Path="Demo/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp.csproj" />
   </Folder>
 </Solution>

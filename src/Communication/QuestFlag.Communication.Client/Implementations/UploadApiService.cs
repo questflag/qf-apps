@@ -26,7 +26,7 @@ public class UploadApiService : IUploadApiService
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
-    public async Task<PagedResult<UploadRecordDto>> GetUploadsAsync(
+    public async Task<Communication.Shared.DTOs.PagedResult<UploadRecordDto>> GetUploadsAsync(
         string? tenantSlug = null,
         string? userIdFilter = null,
         DateTime? fromDate = null,
@@ -60,7 +60,7 @@ public class UploadApiService : IUploadApiService
         var response = await _httpClient.GetAsync(url, ct);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<PagedResult<UploadRecordDto>>(cancellationToken: ct);
+        var result = await response.Content.ReadFromJsonAsync<Communication.Shared.DTOs.PagedResult<UploadRecordDto>>(cancellationToken: ct);
         return result!;
     }
 

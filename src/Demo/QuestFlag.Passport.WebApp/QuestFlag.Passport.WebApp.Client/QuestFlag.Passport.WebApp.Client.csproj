@@ -12,6 +12,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
+    <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
 </Project>
