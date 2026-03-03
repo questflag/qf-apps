@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructure\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
     <ProjectReference Include="..\..\..\Communication\QuestFlag.Communication.Client\QuestFlag.Communication.Client.csproj" />
     <ProjectReference Include="..\..\..\Communication\QuestFlag.Communication.Shared\QuestFlag.Communication.Shared.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />

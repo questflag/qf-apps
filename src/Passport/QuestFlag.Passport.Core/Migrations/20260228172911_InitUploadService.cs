@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
-using global::QuestFlag.Infrastructure.Application.Data;
+using QuestFlag.Passport.Core.Data;
 
 #nullable disable
 
-namespace QuestFlag.Infrastructure.Application.Migrations
+namespace QuestFlag.Passport.Core.Migrations
 {
     /// <inheritdoc />
     public partial class InitUploadService : Migration

@@ -12,10 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructure\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
     <ProjectReference Include="..\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj" />
-    <ProjectReference Include="..\..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
