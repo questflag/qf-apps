@@ -1,5 +1,5 @@
 <Solution>
-  <Folder Name="/Passport/QuestFlag.Passport.AdminWebApp/">
+  <Folder Name="/Demo/QuestFlag.Passport.AdminWebApp/">
     <Project Path="Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.Client/QuestFlag.Passport.AdminWebApp.Client.csproj" />
     <Project Path="Passport/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp/QuestFlag.Passport.AdminWebApp.csproj" />
   </Folder>
