@@ -11,6 +11,7 @@ using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
+using QuestFlag.Communication.Client.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 

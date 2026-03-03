@@ -1,9 +1,12 @@
 @page "/uploads"
 @rendermode InteractiveAuto
+@using Microsoft.AspNetCore.Components.Web
 @using QuestFlag.Communication.Client.Contracts
 @using QuestFlag.Communication.Shared.DTOs
 @using QuestFlag.Passport.Client
 @using System.Text.Json
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Web
 @implements IDisposable
 @inject IUploadApiService UploadApi
 @inject PassportApiClient PassportApi

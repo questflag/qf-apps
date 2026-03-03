@@ -12,6 +12,7 @@ using QuestFlag.Passport.Domain.Entities;
 using QuestFlag.Passport.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using OpenIddict.Abstractions;
 
 namespace QuestFlag.Passport.Services.Extensions;
 
