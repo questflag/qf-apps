@@ -19,6 +19,6 @@
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npx -y @tailwindcss/cli@latest -i ./Styles/app.css -o ./wwwroot/app.css" />
+    <Exec Command="npx -y --package tailwindcss @tailwindcss/cli@latest -i ./Styles/app.css -o ./wwwroot/app.css" />
   </Target>
 </Project>
