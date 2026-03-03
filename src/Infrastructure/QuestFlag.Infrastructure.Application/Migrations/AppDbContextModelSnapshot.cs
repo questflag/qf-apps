@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using global::QuestFlag.Infrastructure.Application.Data;
+using global::QuestFlag.Infrastructure.Core.Data;
 
 #nullable disable
 
