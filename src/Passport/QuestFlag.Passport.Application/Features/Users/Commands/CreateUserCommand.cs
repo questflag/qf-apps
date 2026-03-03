@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using QuestFlag.Passport.Domain.Entities;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Users.Commands;
 
@@ -53,13 +53,17 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
             IsActive = true
         };
 
-        var createdUser = await _userRepository.AddAsync(user, request.Password, request.Roles, cancellationToken);
+        var result = await _userRepository.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+
+        await _userRepository.SetRolesAsync(user, request.Roles);
         
         if (request.AgentClientIds != null && request.AgentClientIds.Any())
         {
-            await _userRepository.SetAssignedAgentsAsync(createdUser, request.AgentClientIds);
+            await _userRepository.SetAssignedAgentsAsync(user, request.AgentClientIds);
         }
 
-        return createdUser.Id;
+        return user.Id;
     }
 }

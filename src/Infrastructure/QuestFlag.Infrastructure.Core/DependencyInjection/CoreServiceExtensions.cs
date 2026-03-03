@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,8 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Minio;
 using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
-using QuestFlag.Infrastructure.Core.Storage;
-using QuestFlag.Infrastructure.Domain.Interfaces;
+using QuestFlag.Infrastructure.Core.Implementations.Storage;
+using QuestFlag.Infrastructure.Domain.Contracts;
 
 namespace QuestFlag.Infrastructure.Core.DependencyInjection;
 

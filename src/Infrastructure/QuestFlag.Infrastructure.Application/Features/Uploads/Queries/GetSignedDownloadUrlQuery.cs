@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using QuestFlag.Infrastructure.Domain.Interfaces;
+using QuestFlag.Infrastructure.Domain.Contracts;
 
 namespace QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
 

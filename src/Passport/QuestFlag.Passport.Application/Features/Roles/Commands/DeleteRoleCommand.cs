@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Roles.Commands;
 

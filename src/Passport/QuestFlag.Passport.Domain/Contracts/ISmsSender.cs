@@ -1,0 +1,10 @@
+namespace QuestFlag.Passport.Domain.Contracts;
+
+/// <summary>
+/// Abstraction over an SMS provider (Twilio, AWS SNS, etc.).
+/// Used for phone-based 2FA OTP delivery.
+/// </summary>
+public interface ISmsSender
+{
+    Task SendAsync(string toPhoneNumber, string messageBody, CancellationToken ct = default);
+}

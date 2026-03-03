@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Users.Commands;
 
@@ -53,7 +53,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
         user.DisplayName = request.DisplayName;
         user.IsActive = request.IsActive;
 
-        await _userRepository.UpdateAsync(user, cancellationToken);
+        await _userRepository.UpdateAsync(user);
         
         // Update roles
         await _userRepository.SetRolesAsync(user, request.Roles);

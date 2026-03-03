@@ -6,7 +6,7 @@ using QuestFlag.Passport.Application.Features.Tenants.Commands;
 using QuestFlag.Passport.Application.Features.Tenants.Queries;
 using QuestFlag.Passport.Application.Features.Users.Commands;
 using QuestFlag.Passport.Application.Features.Users.Queries;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Services.Controllers;
 

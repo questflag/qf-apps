@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using QuestFlag.Passport.Domain.Entities;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Users.Queries;
 

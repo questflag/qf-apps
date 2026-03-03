@@ -1,7 +1,7 @@
 using MediatR;
-using QuestFlag.Communication.Application.Common.DTOs;
+using QuestFlag.Communication.Application.DTOs;
 using QuestFlag.Communication.Application.Features.Messages.Queries;
-using QuestFlag.Communication.Domain.Interfaces;
+using QuestFlag.Communication.Domain.Contracts;
 
 namespace QuestFlag.Communication.Application.Features.Messages.Handlers;
 

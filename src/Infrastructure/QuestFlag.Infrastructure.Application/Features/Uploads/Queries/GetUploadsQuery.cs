@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using QuestFlag.Infrastructure.Application.Common.DTOs;
-using QuestFlag.Infrastructure.Domain.Interfaces;
+using QuestFlag.Infrastructure.Application.DTOs;
+using QuestFlag.Infrastructure.Domain.Contracts;
 
 namespace QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
 

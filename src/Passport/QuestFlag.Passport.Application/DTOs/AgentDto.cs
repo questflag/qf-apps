@@ -1,0 +1,9 @@
+namespace QuestFlag.Passport.Application.DTOs;
+
+public record AgentDto(
+    string ClientId, 
+    string DisplayName, 
+    string Type, 
+    HashSet<string> Permissions, 
+    HashSet<Uri> RedirectUris, 
+    HashSet<Uri> PostLogoutRedirectUris);

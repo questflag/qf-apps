@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuestFlag.Passport.Application.Features.Agents.Commands;
 using QuestFlag.Passport.Application.Features.Agents.Queries;
-using QuestFlag.Passport.Application.Common.DTOs;
+using QuestFlag.Passport.Application.DTOs;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Services.Controllers;
 

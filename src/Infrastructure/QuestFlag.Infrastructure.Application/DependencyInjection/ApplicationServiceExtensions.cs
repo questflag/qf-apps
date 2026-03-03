@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QuestFlag.Infrastructure.Application.Data;
 using QuestFlag.Infrastructure.Application.Messaging;
-using QuestFlag.Infrastructure.Application.Repositories;
-using QuestFlag.Infrastructure.Domain.Interfaces;
+using QuestFlag.Infrastructure.Application.Implementations.Repositories;
+using QuestFlag.Infrastructure.Domain.Contracts;
 using System.Reflection;
 
 namespace QuestFlag.Infrastructure.Application.DependencyInjection;

@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using QuestFlag.Passport.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Roles.Commands;
 
@@ -28,7 +29,8 @@ public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, Guid>
 
     public async Task<Guid> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
-        var role = await _roleRepository.AddAsync(request.Name, cancellationToken);
+        var role = new IdentityRole<Guid>(request.Name);
+        await _roleRepository.AddAsync(role, cancellationToken);
         return role.Id;
     }
 }

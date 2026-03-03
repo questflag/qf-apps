@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using QuestFlag.Passport.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Roles.Commands;
 
@@ -36,7 +37,7 @@ public class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, Unit>
         }
 
         role.Name = request.Name;
-        await _roleRepository.UpdateAsync(request.Id, request.Name, cancellationToken);
+        await _roleRepository.UpdateAsync(role, cancellationToken);
         return Unit.Value;
     }
 }

@@ -1,13 +1,13 @@
 using System;
+using QuestFlag.Passport.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuestFlag.Passport.Core.Data;
-using QuestFlag.Passport.Core.Repositories;
-using QuestFlag.Passport.Core.Services;
-using QuestFlag.Passport.Domain.Entities;
-using QuestFlag.Passport.Domain.Interfaces;
+using QuestFlag.Passport.Core.Implementations.Repositories;
+using QuestFlag.Passport.Core.Implementations.Messaging;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Core.DependencyInjection;
 

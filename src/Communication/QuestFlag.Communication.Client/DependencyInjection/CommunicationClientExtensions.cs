@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using QuestFlag.Communication.Client.Contracts;
+using QuestFlag.Communication.Client.Implementations;
 
 namespace QuestFlag.Communication.Client.DependencyInjection;
 

@@ -1,12 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using QuestFlag.Communication.Core.Persistence.PostgreSQL;
+using QuestFlag.Communication.Core.VectorDB;
 using QuestFlag.Communication.Application.DependencyInjection;
 using QuestFlag.Communication.Core.Messaging.Kafka;
-using QuestFlag.Communication.Core.Persistence.MongoDB;
-using QuestFlag.Communication.Core.Persistence.PostgreSQL;
-using QuestFlag.Communication.Core.Providers;
-using QuestFlag.Communication.Core.VectorDB;
-using QuestFlag.Communication.Domain.Interfaces;
+using QuestFlag.Communication.Core.Implementations.Persistence.MongoDB;
+using QuestFlag.Communication.Core.Implementations.Providers;
+using QuestFlag.Communication.Domain.Contracts;
 
 namespace QuestFlag.Communication.Services.DependencyInjection;
 

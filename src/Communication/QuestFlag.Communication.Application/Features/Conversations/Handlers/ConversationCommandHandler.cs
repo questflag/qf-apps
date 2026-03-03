@@ -2,7 +2,7 @@ using MediatR;
 using QuestFlag.Communication.Application.Features.Conversations.Commands;
 using QuestFlag.Communication.Domain.Entities;
 using QuestFlag.Communication.Domain.Enums;
-using QuestFlag.Communication.Domain.Interfaces;
+using QuestFlag.Communication.Domain.Contracts;
 using QuestFlag.Communication.Domain.ValueObjects;
 
 namespace QuestFlag.Communication.Application.Features.Conversations.Handlers;

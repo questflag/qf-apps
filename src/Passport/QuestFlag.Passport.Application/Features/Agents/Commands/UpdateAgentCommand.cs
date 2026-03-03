@@ -1,7 +1,7 @@
 using MediatR;
 using OpenIddict.Abstractions;
-using QuestFlag.Passport.Application.Common.DTOs;
-using System.Linq;
+using QuestFlag.Passport.Application.DTOs;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Agents.Commands;
 

@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using QuestFlag.Infrastructure.ApiCore.Extensions;
 using QuestFlag.Infrastructure.ApiCore.Models;
 using QuestFlag.Infrastructure.Core.Common.Models;
-using QuestFlag.Infrastructure.Application.Common.DTOs;
+using QuestFlag.Infrastructure.Application.DTOs;
+using QuestFlag.Infrastructure.Domain.Contracts;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Commands;
 using QuestFlag.Infrastructure.Application.Features.Uploads.Queries;
 

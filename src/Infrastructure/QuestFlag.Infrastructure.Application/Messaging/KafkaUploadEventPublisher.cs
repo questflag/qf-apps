@@ -6,7 +6,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QuestFlag.Infrastructure.Domain.Events;
-using QuestFlag.Infrastructure.Domain.Interfaces;
+using QuestFlag.Infrastructure.Domain.Contracts;
 
 namespace QuestFlag.Infrastructure.Application.Messaging;
 

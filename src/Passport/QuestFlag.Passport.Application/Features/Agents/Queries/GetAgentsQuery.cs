@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using OpenIddict.Abstractions;
-using QuestFlag.Passport.Application.Common.DTOs;
+using QuestFlag.Passport.Application.DTOs;
+using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Agents.Queries;
 
