@@ -8,9 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuestFlag.Infrastructure.ApiCore.Extensions;
-using QuestFlag.Infrastructure.ApiCore.Models;
 using QuestFlag.Infrastructure.Domain.Models;
-using CommPagedResult = QuestFlag.Communication.Shared.DTOs.PagedResult<QuestFlag.Communication.Shared.DTOs.UploadRecordDto>;
 using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Domain.Contracts;
 using QuestFlag.Communication.Application.Features.Uploads.Commands;
@@ -85,7 +83,7 @@ public class UploadController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<CommPagedResult>>> GetUploads(
+    public async Task<ActionResult<ApiResponse<PagedResult<UploadRecordDto>>>> GetUploads(
         [FromQuery] Guid? userId,
         [FromQuery] DateTime? fromDate,
         [FromQuery] DateTime? toDate,
@@ -118,8 +116,8 @@ public class UploadController : ControllerBase
             pageSize);
 
         var result = await _mediator.Send(query);
-        var pagedResult = new CommPagedResult(result.Items.ToList(), result.TotalCount, page, pageSize);
-        return Ok(ApiResponse<CommPagedResult>.Ok(pagedResult));
+        var pagedResult = new PagedResult<UploadRecordDto>(result.Items.ToList(), result.TotalCount, page, pageSize);
+        return Ok(ApiResponse<PagedResult<UploadRecordDto>>.Ok(pagedResult));
     }
 
     [HttpGet("{id}/download")]
