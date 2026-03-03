@@ -1,0 +1,89 @@
+@page "/login"
+@page "/sso"
+@rendermode InteractiveAuto
+@using QuestFlag.Passport.UserClient
+@inject PassportUserClient PassportClient
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Sign In — @(_resolvedTenant?.Name ?? "QuestFlag")</PageTitle>
+
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)] bg-white px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 card p-8">
+        <!-- Brand / Tenant Header -->
+        <div class="text-center">
+            <div class="mx-auto h-12 w-12 bg-primary text-white rounded-lg flex items-center justify-center text-xl font-bold mb-4 shadow-sm">QF</div>
+            @if (_resolvedTenant != null)
+            {
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">@_resolvedTenant.Name</h1>
+                <p class="mt-2 text-sm text-gray-500">Sign in to your account</p>
+            }
+            else
+            {
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">QuestFlag</h1>
+                <p class="mt-2 text-sm text-gray-500">Sign in to continue</p>
+            }
+        </div>
+
+        @if (_error != null)
+        {
+            <div class="rounded-md bg-red-50 p-4 border border-red-200">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Error</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>@_error</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <form method="post" action="@_authorizeUrl" @onsubmit="HandleLogin" class="mt-8 space-y-6">
+            <div class="space-y-4 rounded-md shadow-sm">
+                <!-- Tenant selector (only shown when not auto-resolved from domain) -->
+                @if (_resolvedTenant == null)
+                {
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                        <select name="tenant" @bind="_tenantSlug" @bind:after="OnInputChange" disabled="@(_loadingTenants || _tenants == null)" class="input-field cursor-pointer">
+                            <option value="">— Select your organization —</option>
+                            @foreach (var t in _tenants ?? [])
+                            {
+                                <option value="@t.Slug">@t.Name</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input name="username" @bind="_username" @oninput="OnInputChange" type="text" placeholder="username" autocomplete="username" required class="input-field" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input name="password" @bind="_password" type="password" placeholder="••••••••" autocomplete="current-password" required class="input-field" />
+                </div>
+
+                @foreach (var kvp in _formParams)
+                {
+                    if (kvp.Key != "tenant" && kvp.Key != "username" && kvp.Key != "password" && kvp.Key != "login_hint" && kvp.Key != "returnUrl")
+                    {
+                        <input type="hidden" name="@kvp.Key" value="@kvp.Value" />
+                    }
+                }
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" disabled="@_isSubmitting" class="btn btn-primary w-full shadow-sm text-base py-3 h-12">
+                    @(_isSubmitting ? "Signing in…" : "Continue")
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="/forgot-password" class="text-sm font-medium text-primary hover:text-primary-hover transition-colors">Forgot password?</a>
+        </div>
+    </div>
+</div>

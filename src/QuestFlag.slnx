@@ -27,7 +27,6 @@
   <Folder Name="/Passport/">
     <Project Path="Passport/QuestFlag.Passport.AdminClient/QuestFlag.Passport.AdminClient.csproj" />
     <Project Path="Passport/QuestFlag.Passport.Application/QuestFlag.Passport.Application.csproj" />
-    <Project Path="Passport/QuestFlag.Passport.Client/QuestFlag.Passport.Client.csproj" />
     <Project Path="Passport/QuestFlag.Passport.Core/QuestFlag.Passport.Core.csproj" />
     <Project Path="Passport/QuestFlag.Passport.Domain/QuestFlag.Passport.Domain.csproj" />
     <Project Path="Passport/QuestFlag.Passport.Services/QuestFlag.Passport.Services.csproj" />

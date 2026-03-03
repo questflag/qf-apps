@@ -22,6 +22,30 @@
         </NavLink>
     </div>
 
+    <AuthorizeView Roles="passport_admin,tenant_admin">
+        <div class="pt-6 mt-6 border-t border-gray-50">
+            <div class="px-4 mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Administration</span>
+            </div>
+            <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="admin/tenants" ActiveClass="bg-primary/5 text-primary">
+                <span class="bi bi-building mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                <span>Tenants</span>
+            </NavLink>
+            <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="admin/roles" ActiveClass="bg-primary/5 text-primary">
+                <span class="bi bi-people mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                <span>Portal Roles</span>
+            </NavLink>
+            <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="admin/agents" ActiveClass="bg-primary/5 text-primary">
+                <span class="bi bi-cpu mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                <span>Service Agents</span>
+            </NavLink>
+            <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" href="admin/users" ActiveClass="bg-primary/5 text-primary">
+                <span class="bi bi-person-badge mr-3 text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                <span>Global Users</span>
+            </NavLink>
+        </div>
+    </AuthorizeView>
+
     <div class="pt-6 mt-6 border-t border-gray-50">
         <div class="px-4 mb-2">
             <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Account</span>

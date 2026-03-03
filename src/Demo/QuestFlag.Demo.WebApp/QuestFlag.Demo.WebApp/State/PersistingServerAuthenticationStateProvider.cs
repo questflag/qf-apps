@@ -54,7 +54,12 @@ internal sealed class PersistingServerAuthenticationStateProvider : ServerAuthen
                 {
                     UserId = userId,
                     Name = name,
-                    Email = email
+                    Email = email,
+                    Roles = principal.FindAll(ClaimTypes.Role)
+                        .Concat(principal.FindAll("role"))
+                        .Select(c => c.Value)
+                        .Distinct()
+                        .ToArray()
                 });
 
                 // Also persist the access token if available

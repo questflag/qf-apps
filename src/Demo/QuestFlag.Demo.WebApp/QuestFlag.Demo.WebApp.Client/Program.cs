@@ -33,6 +33,11 @@ builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
     client.BaseAddress = new Uri(communicationServicesUrl);
 }).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
+builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
+{
+    client.BaseAddress = new Uri(passportServicesUrl);
+}).AddHttpMessageHandler<AuthenticatedHttpHandler>();
+
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();

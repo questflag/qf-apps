@@ -45,6 +45,9 @@ builder.Services.AddHttpClient<PassportUserClient>(client =>
     client.BaseAddress = new Uri(passportServicesUrl);
 }).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
+var oidcSettings = builder.Configuration.GetSection(QuestFlag.Passport.Domain.Models.OidcSettings.SectionName).Get<QuestFlag.Passport.Domain.Models.OidcSettings>()
+    ?? throw new InvalidOperationException($"'{QuestFlag.Passport.Domain.Models.OidcSettings.SectionName}' configuration section is required.");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -53,8 +56,8 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = passportServicesUrl; // Passport.Services — configured via ServiceUrls:PassportServices
-    options.ClientId = "infra-webapp";
+    options.Authority = oidcSettings.Authority;
+    options.ClientId = oidcSettings.ClientId;
     options.ResponseType = OpenIdConnectResponseType.Code;
     options.SaveTokens = true;
     options.RequireHttpsMetadata = false; // Valid for local dev only
@@ -64,6 +67,7 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("openid");
     options.Scope.Add("profile");
     options.Scope.Add("email");
+    options.Scope.Add("roles");
     options.Scope.Add("offline_access");
 
     options.TokenValidationParameters.NameClaimType = "name";

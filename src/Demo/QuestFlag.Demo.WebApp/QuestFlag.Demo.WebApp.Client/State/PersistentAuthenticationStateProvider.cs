@@ -25,6 +25,14 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         };
         if (!string.IsNullOrEmpty(userInfo.Email)) claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
 
+        if (userInfo.Roles != null)
+        {
+            foreach (var role in userInfo.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+        }
+
         authenticationStateTask = Task.FromResult(
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Cookies"))));
     }
