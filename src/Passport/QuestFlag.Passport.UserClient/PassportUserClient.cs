@@ -20,6 +20,7 @@ public record TokenResponse(
 );
 
 public record UserProfileDto(Guid Id, string Email, string Name, bool EmailConfirmed, string? PhoneNumber, bool TwoFactorEnabled);
+public record UserSummaryDto(Guid Id, string DisplayName, string Username);
 public record DeviceDto(Guid Id, string DeviceName, string IpAddress, DateTime TrustedAtUtc, DateTime ExpiresAtUtc);
 public record SetupPhoneRequest(string PhoneNumber);
 public record VerifyPhoneRequest(string OtpCode);
@@ -39,6 +40,51 @@ public class PassportUserClient(HttpClient http)
     public async Task<IReadOnlyList<TenantDto>> GetTenantsAsync(CancellationToken ct = default)
     {
         var result = await _http.GetFromJsonAsync<List<TenantDto>>("/api/tenants", ct);
+        return result ?? [];
+    }
+
+    /// <summary>Authenticates a user and returns tokens. tenantSlug is appended to username per convention.</summary>
+    public async Task<TokenResponse?> LoginAsync(string tenantSlug, string username, string password, CancellationToken ct = default)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/connect/token");
+        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "password",
+            ["username"] = username + "@" + tenantSlug,
+            ["password"] = password,
+            ["scope"] = "openid offline_access roles"
+        });
+        var response = await _http.SendAsync(request, ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync(ct);
+            throw new Exception($"Login failed: {error}");
+        }
+        return await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: ct);
+    }
+
+    /// <summary>Exchanges a refresh token for a new token set.</summary>
+    public async Task<TokenResponse?> RefreshTokenAsync(string refreshToken, CancellationToken ct = default)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/connect/token");
+        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "refresh_token",
+            ["refresh_token"] = refreshToken,
+            ["scope"] = "openid offline_access roles"
+        });
+        var response = await _http.SendAsync(request, ct);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception("Token refresh failed.");
+        return await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: ct);
+    }
+
+    /// <summary>Lists summary of users belonging to the given tenant (for filter dropdowns).</summary>
+    public async Task<IReadOnlyList<UserSummaryDto>> GetUsersByTenantAsync(Guid tenantId, CancellationToken ct = default)
+    {
+        var response = await _http.GetAsync($"/api/passport/tenants/{tenantId}/users", ct);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<List<UserSummaryDto>>(cancellationToken: ct);
         return result ?? [];
     }
 

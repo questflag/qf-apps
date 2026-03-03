@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using QuestFlag.Communication.Client.Contracts;
 using QuestFlag.Communication.Client.Implementations;
-using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
@@ -17,11 +16,6 @@ var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
 
 var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
     ?? "https://localhost:7002";
-
-builder.Services.AddHttpClient<PassportApiClient>(client =>
-{
-    client.BaseAddress = new Uri(passportServicesUrl);
-});
 
 builder.Services.AddHttpClient<PassportUserClient>(client =>
 {

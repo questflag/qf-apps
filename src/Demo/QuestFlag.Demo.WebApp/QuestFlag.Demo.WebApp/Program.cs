@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Demo.WebApp.State;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
-using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Communication.Client.Implementations;
@@ -35,12 +34,6 @@ var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
 
 builder.Services.AddScoped<IAccessTokenProvider, ServerTokenProvider>();
 builder.Services.AddTransient<AuthenticatedHttpHandler>();
-
-// Register Client APIs for server-side rendering/pre-rendering
-builder.Services.AddHttpClient<PassportApiClient>(client =>
-{
-    client.BaseAddress = new Uri(passportServicesUrl);
-});
 
 builder.Services.AddHttpClient<UploadApiService>(client =>
 {

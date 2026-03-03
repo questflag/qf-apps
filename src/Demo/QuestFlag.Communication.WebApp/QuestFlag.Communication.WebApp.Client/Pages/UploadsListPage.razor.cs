@@ -1,7 +1,7 @@
 using Microsoft.JSInterop;
 using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Client.Contracts;
-using QuestFlag.Passport.Client;
+using QuestFlag.Passport.UserClient;
 using System.Text.Json;
 
 namespace QuestFlag.Communication.WebApp.Client.Pages;
