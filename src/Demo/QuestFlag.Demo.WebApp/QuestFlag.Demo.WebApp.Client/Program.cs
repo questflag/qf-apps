@@ -9,37 +9,45 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Demo.WebApp.Client.State;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
+namespace QuestFlag.Demo.WebApp.Client;
 
-var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
-    ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
-
-var communicationServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
-    ?? throw new InvalidOperationException("ServiceUrls:InfraServices is required in configuration.");
-
-
-// Register PassportUserClient pointing to Passport API Host — configured via ServiceUrls:PassportServices
-builder.Services.AddHttpClient<PassportUserClient>(client =>
+public class Program
 {
-    client.BaseAddress = new Uri(passportServicesUrl);
-}).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
-builder.Services.AddTransient<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+        var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
+            ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
 
-// Register IUploadApiService pointing to Communication API Host — configured via ServiceUrls:InfraServices
-builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
-{
-    client.BaseAddress = new Uri(communicationServicesUrl);
-}).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+        var communicationServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
+            ?? throw new InvalidOperationException("ServiceUrls:InfraServices is required in configuration.");
 
-builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
-{
-    client.BaseAddress = new Uri(passportServicesUrl);
-}).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
 
-builder.Services.AddAuthorizationCore();
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
+        // Register PassportUserClient pointing to Passport API Host — configured via ServiceUrls:PassportServices
+        builder.Services.AddHttpClient<PassportUserClient>(client =>
+        {
+            client.BaseAddress = new Uri(passportServicesUrl);
+        }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
 
-await builder.Build().RunAsync();
+        builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
+        builder.Services.AddTransient<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+
+        // Register IUploadApiService pointing to Communication API Host — configured via ServiceUrls:InfraServices
+        builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
+        {
+            client.BaseAddress = new Uri(communicationServicesUrl);
+        }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+
+        builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
+        {
+            client.BaseAddress = new Uri(passportServicesUrl);
+        }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+
+        builder.Services.AddAuthorizationCore();
+        builder.Services.AddCascadingAuthenticationState();
+        builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
+
+        await builder.Build().RunAsync();
+    }
+}

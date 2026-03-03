@@ -4,7 +4,7 @@ using QuestFlag.Communication.Application.DTOs;
 using QuestFlag.Communication.Application.Features.Messages.Commands;
 using QuestFlag.Communication.Application.Features.Messages.Queries;
 
-namespace QuestFlag.Communication.ApiCore.Controllers;
+namespace QuestFlag.Communication.Services.Controllers;
 
 [ApiController]
 [Route("api/comm/messages")]

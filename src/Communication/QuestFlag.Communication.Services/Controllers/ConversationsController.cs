@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QuestFlag.Communication.Application.Features.Conversations.Commands;
 
-namespace QuestFlag.Communication.ApiCore.Controllers;
+namespace QuestFlag.Communication.Services.Controllers;
 
 [ApiController]
 [Route("api/comm/conversations")]

@@ -8,129 +8,137 @@ using QuestFlag.Passport.Core.DependencyInjection;
 using QuestFlag.Passport.Domain.Enums;
 using QuestFlag.Passport.Services.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace QuestFlag.Passport.Services;
 
-builder.AddServiceDefaults();
-
-// 1. Layer DI
-builder.Services.AddPassportApplication();
-builder.Services.AddPassportCore(builder.Configuration);
-
-// 2. Common API services, authentication defaults and CORS policy registration.
-builder.AddQuestFlagApi(
-    corsPolicyName: "PassportClients",
-    corsConfigKeys: new[]
-    {
-        "ServiceUrls:InfraWebApp",
-        "ServiceUrls:InfraWebAppHttp",
-        "ServiceUrls:PassportWebApp",
-        "ServiceUrls:PassportAdminWebApp"
-    },
-    configureAuthorization: options =>
-    {
-        options.AddPolicy("PassportAdmin", policy =>
-            policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
-
-        options.AddPolicy("TenantAdmin", policy =>
-            policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
-    });
-
-// 3. OpenIddict Server — Full SSO Provider
-builder.Services.AddOpenIddict()
-    .AddServer(options =>
-    {
-        // Enable all required endpoints
-        options.SetAuthorizationEndpointUris("/connect/authorize")
-               .SetTokenEndpointUris("/connect/token")
-               .SetUserInfoEndpointUris("/connect/userinfo")
-               .SetEndSessionEndpointUris("/connect/logout")
-               .SetIntrospectionEndpointUris("/connect/introspect");
-
-        // Allow Authorization Code + PKCE (primary SSO flow)
-        options.AllowAuthorizationCodeFlow()
-               .RequireProofKeyForCodeExchange();
-
-        // Keep refresh token flow
-        options.AllowRefreshTokenFlow();
-
-        // Register scopes
-        options.RegisterScopes(
-            OpenIddictConstants.Scopes.OpenId,
-            OpenIddictConstants.Scopes.Profile,
-            OpenIddictConstants.Scopes.Email,
-            OpenIddictConstants.Scopes.Phone,
-            OpenIddictConstants.Scopes.Roles,
-            OpenIddictConstants.Scopes.OfflineAccess);
-
-        // Encryption and Signing credentials (swap for real certs in production)
-        options.AddDevelopmentEncryptionCertificate()
-               .AddDevelopmentSigningCertificate();
-
-        // Disable access token encryption for external validation compatibility
-        options.DisableAccessTokenEncryption();
-
-        // ASP.NET Core integration + passthrough so controllers handle the endpoints
-        options.UseAspNetCore()
-               .EnableAuthorizationEndpointPassthrough()
-               .EnableTokenEndpointPassthrough()
-               .EnableUserInfoEndpointPassthrough()
-               .EnableEndSessionEndpointPassthrough();
-    })
-    .AddValidation(options =>
-    {
-        options.UseLocalServer();
-        options.UseAspNetCore();
-    });
-
-// 4. Authentication & Authorization
-builder.Services.AddAuthentication(options =>
+public class Program
 {
-    options.DefaultAuthenticateScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-});
+    public static async Task Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("PassportAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
+        builder.AddServiceDefaults();
 
-    options.AddPolicy("TenantAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
-});
+        // 1. Layer DI
+        builder.Services.AddPassportApplication();
+        builder.Services.AddPassportCore(builder.Configuration);
 
-// 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json
-var infraWebApp          = builder.Configuration["ServiceUrls:InfraWebApp"]         ?? throw new InvalidOperationException("ServiceUrls:InfraWebApp is required.");
-var infraWebAppHttp      = builder.Configuration["ServiceUrls:InfraWebAppHttp"]     ?? throw new InvalidOperationException("ServiceUrls:InfraWebAppHttp is required.");
-var passportWebApp       = builder.Configuration["ServiceUrls:PassportWebApp"]      ?? throw new InvalidOperationException("ServiceUrls:PassportWebApp is required.");
-var passportAdminWebApp  = builder.Configuration["ServiceUrls:PassportAdminWebApp"] ?? throw new InvalidOperationException("ServiceUrls:PassportAdminWebApp is required.");
+        // 2. Common API services, authentication defaults and CORS policy registration.
+        builder.AddQuestFlagApi(
+            corsPolicyName: "PassportClients",
+            corsConfigKeys: new[]
+            {
+                "ServiceUrls:InfraWebApp",
+                "ServiceUrls:InfraWebAppHttp",
+                "ServiceUrls:PassportWebApp",
+                "ServiceUrls:PassportAdminWebApp"
+            },
+            configureAuthorization: options =>
+            {
+                options.AddPolicy("PassportAdmin", policy =>
+                    policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("PassportClients",
-        b => b.WithOrigins(
-                infraWebApp,          // Infrastructure.WebApp
-                infraWebAppHttp,
-                passportWebApp,       // Passport.WebApp (SSO portal)
-                passportAdminWebApp   // Passport.AdminWebApp
-              )
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials()
-              .WithExposedHeaders("Token-Expired"));
-});
+                options.AddPolicy("TenantAdmin", policy =>
+                    policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
+            });
 
-var app = builder.Build();
+        // 3. OpenIddict Server — Full SSO Provider
+        builder.Services.AddOpenIddict()
+            .AddServer(options =>
+            {
+                // Enable all required endpoints
+                options.SetAuthorizationEndpointUris("/connect/authorize")
+                       .SetTokenEndpointUris("/connect/token")
+                       .SetUserInfoEndpointUris("/connect/userinfo")
+                       .SetEndSessionEndpointUris("/connect/logout")
+                       .SetIntrospectionEndpointUris("/connect/introspect");
 
-app.MapDefaultEndpoints();
+                // Allow Authorization Code + PKCE (primary SSO flow)
+                options.AllowAuthorizationCodeFlow()
+                       .RequireProofKeyForCodeExchange();
 
-app.UseCors("PassportClients");
+                // Keep refresh token flow
+                options.AllowRefreshTokenFlow();
 
-if (app.Environment.IsDevelopment())
-{
-    await app.InitializeDatabaseAsync();
+                // Register scopes
+                options.RegisterScopes(
+                    OpenIddictConstants.Scopes.OpenId,
+                    OpenIddictConstants.Scopes.Profile,
+                    OpenIddictConstants.Scopes.Email,
+                    OpenIddictConstants.Scopes.Phone,
+                    OpenIddictConstants.Scopes.Roles,
+                    OpenIddictConstants.Scopes.OfflineAccess);
+
+                // Encryption and Signing credentials (swap for real certs in production)
+                options.AddDevelopmentEncryptionCertificate()
+                       .AddDevelopmentSigningCertificate();
+
+                // Disable access token encryption for external validation compatibility
+                options.DisableAccessTokenEncryption();
+
+                // ASP.NET Core integration + passthrough so controllers handle the endpoints
+                options.UseAspNetCore()
+                       .EnableAuthorizationEndpointPassthrough()
+                       .EnableTokenEndpointPassthrough()
+                       .EnableUserInfoEndpointPassthrough()
+                       .EnableEndSessionEndpointPassthrough();
+            })
+            .AddValidation(options =>
+            {
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
+
+        // 4. Authentication & Authorization
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+        });
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("PassportAdmin", policy =>
+                policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
+
+            options.AddPolicy("TenantAdmin", policy =>
+                policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
+        });
+
+        // 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json
+        var infraWebApp          = builder.Configuration["ServiceUrls:InfraWebApp"]         ?? throw new InvalidOperationException("ServiceUrls:InfraWebApp is required.");
+        var infraWebAppHttp      = builder.Configuration["ServiceUrls:InfraWebAppHttp"]     ?? throw new InvalidOperationException("ServiceUrls:InfraWebAppHttp is required.");
+        var passportWebApp       = builder.Configuration["ServiceUrls:PassportWebApp"]      ?? throw new InvalidOperationException("ServiceUrls:PassportWebApp is required.");
+        var passportAdminWebApp  = builder.Configuration["ServiceUrls:PassportAdminWebApp"] ?? throw new InvalidOperationException("ServiceUrls:PassportAdminWebApp is required.");
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("PassportClients",
+                b => b.WithOrigins(
+                        infraWebApp,          // Infrastructure.WebApp
+                        infraWebAppHttp,
+                        passportWebApp,       // Passport.WebApp (SSO portal)
+                        passportAdminWebApp   // Passport.AdminWebApp
+                      )
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                      .WithExposedHeaders("Token-Expired"));
+        });
+
+        var app = builder.Build();
+
+        app.MapDefaultEndpoints();
+
+        app.UseCors("PassportClients");
+
+        if (app.Environment.IsDevelopment())
+        {
+            await app.InitializeDatabaseAsync();
+        }
+
+        // 6. Standard API pipeline (Swagger, HTTPS, Auth, Controllers)
+        app.UseQuestFlagApiPipeline();
+
+        app.Run();
+    }
 }
-
-// 6. Standard API pipeline (Swagger, HTTPS, Auth, Controllers)
-app.UseQuestFlagApiPipeline();
-
-app.Run();

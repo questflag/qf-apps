@@ -1,22 +1,30 @@
 using QuestFlag.Communication.Services.DependencyInjection;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace QuestFlag.Communication.Services;
 
-// Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddCommunicationServices(builder.Configuration);
+        // Add service defaults & Aspire client integrations.
+        builder.AddServiceDefaults();
 
-// Use common API services and authentication defaults
-builder.AddQuestFlagApi();
+        // Add services to the container.
+        builder.Services.AddCommunicationServices(builder.Configuration);
 
-var app = builder.Build();
+        // Use common API services and authentication defaults
+        builder.AddQuestFlagApi();
 
-app.MapDefaultEndpoints();
+        var app = builder.Build();
 
-// Configure the standard QuestFlag API middleware pipeline
-app.UseQuestFlagApiPipeline(requireAuthorization: false);
+        app.MapDefaultEndpoints();
 
-app.Run();
+        // Configure the standard QuestFlag API middleware pipeline
+        app.UseQuestFlagApiPipeline(requireAuthorization: false);
+
+        app.Run();
+    }
+}
