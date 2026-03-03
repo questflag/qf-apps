@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using QuestFlag.Passport.Domain.Entities;
+using QuestFlag.Passport.Domain.Contracts;
+using QuestFlag.Infrastructure.ApiCore.Constants;
 
 namespace QuestFlag.Passport.Services.Controllers;
 
@@ -19,16 +21,16 @@ namespace QuestFlag.Passport.Services.Controllers;
 public class AuthorizationController : ControllerBase
 {
     private readonly IConfiguration _config;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserRepository _userRepository;
     private readonly SignInManager<ApplicationUser> _signInManager;
 
     public AuthorizationController(
         IConfiguration config,
-        UserManager<ApplicationUser> userManager,
+        IUserRepository userRepository,
         SignInManager<ApplicationUser> signInManager)
     {
         _config = config;
-        _userManager = userManager;
+        _userRepository = userRepository;
         _signInManager = signInManager;
     }
 
@@ -43,8 +45,8 @@ public class AuthorizationController : ControllerBase
         // 1. If it's a POST and we have credentials, try to sign the user in
         if (Request.Method == "POST" && !string.IsNullOrEmpty(Request.Form["username"]) && !string.IsNullOrEmpty(Request.Form["password"]))
         {
-            var user = await _userManager.FindByNameAsync(Request.Form["username"]!);
-            if (user != null && await _userManager.CheckPasswordAsync(user, Request.Form["password"]!))
+            var user = await _userRepository.GetByUsernameAsync(Request.Form["username"]!);
+            if (user != null && await _userRepository.CheckPasswordAsync(user, Request.Form["password"]!))
             {
                 await _signInManager.SignInAsync(user, isPersistent: true);
                 
@@ -71,13 +73,12 @@ public class AuthorizationController : ControllerBase
         }
 
         // 4. Create a new claims principal for OpenIddict
-        var userId = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
         {
             return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        var loggedInUser = await _userManager.FindByIdAsync(userId);
+        var loggedInUser = await _userRepository.GetByIdAsync(Guid.Parse(userId));
         if (loggedInUser == null)
         {
             return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -91,13 +92,13 @@ public class AuthorizationController : ControllerBase
         identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, loggedInUser.UserName ?? string.Empty)
             .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
-        identity.AddClaim(new Claim("tenant_id", loggedInUser.TenantId.ToString())
+        identity.AddClaim(new Claim(QuestFlagClaimTypes.TenantId, loggedInUser.TenantId.ToString())
             .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
-        identity.AddClaim(new Claim("user_id", loggedInUser.Id.ToString())
+        identity.AddClaim(new Claim(QuestFlagClaimTypes.UserId, loggedInUser.Id.ToString())
             .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
-        var roles = await _userManager.GetRolesAsync(loggedInUser);
+        var roles = await _userRepository.GetRolesAsync(loggedInUser);
         foreach (var role in roles)
         {
             identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)

@@ -11,6 +11,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 using QuestFlag.Passport.Domain.Entities;
+using QuestFlag.Passport.Domain.Contracts;
 using QuestFlag.Infrastructure.ApiCore.Constants;
 
 namespace QuestFlag.Passport.Services.Controllers;
@@ -19,14 +20,14 @@ namespace QuestFlag.Passport.Services.Controllers;
 [Route("connect")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserRepository _userRepository;
     private readonly SignInManager<ApplicationUser> _signInManager;
 
     public AuthController(
-        UserManager<ApplicationUser> userManager,
+        IUserRepository userRepository,
         SignInManager<ApplicationUser> signInManager)
     {
-        _userManager = userManager;
+        _userRepository = userRepository;
         _signInManager = signInManager;
     }
 
@@ -40,11 +41,11 @@ public class AuthController : ControllerBase
 
         if (request.IsPasswordGrantType())
         {
-            var user = await _userManager.FindByNameAsync(request.Username ?? string.Empty);
+            var user = await _userRepository.GetByUsernameAsync(request.Username ?? string.Empty);
             if (user == null || !user.IsActive)
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-            var result = await _userManager.CheckPasswordAsync(user, request.Password ?? string.Empty);
+            var result = await _userRepository.CheckPasswordAsync(user, request.Password ?? string.Empty);
             if (!result)
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
@@ -64,7 +65,7 @@ public class AuthController : ControllerBase
             identity.AddClaim(new Claim(QuestFlagClaimTypes.UserId, user.Id.ToString())
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userRepository.GetRolesAsync(user);
             foreach (var role in roles)
             {
                 identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
@@ -92,7 +93,7 @@ public class AuthController : ControllerBase
             if (authResult.Principal == null)
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-            var user = await _userManager.FindByIdAsync(authResult.Principal.GetClaim(OpenIddictConstants.Claims.Subject) ?? string.Empty);
+            var user = await _userRepository.GetByIdAsync(Guid.Parse(authResult.Principal.GetClaim(OpenIddictConstants.Claims.Subject) ?? Guid.Empty.ToString()));
             if (user == null || !user.IsActive)
                 return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
@@ -125,7 +126,7 @@ public class AuthController : ControllerBase
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> UserInfo()
     {
-        var user = await _userManager.FindByIdAsync(User.GetClaim(OpenIddictConstants.Claims.Subject) ?? string.Empty);
+        var user = await _userRepository.GetByIdAsync(Guid.Parse(User.GetClaim(OpenIddictConstants.Claims.Subject) ?? Guid.Empty.ToString()));
         if (user == null)
         {
             return Challenge(
@@ -157,7 +158,7 @@ public class AuthController : ControllerBase
 
         if (User.HasScope(OpenIddictConstants.Scopes.Roles))
         {
-            claims[OpenIddictConstants.Claims.Role] = await _userManager.GetRolesAsync(user);
+            claims[OpenIddictConstants.Claims.Role] = await _userRepository.GetRolesAsync(user);
         }
 
         // Add custom claims
