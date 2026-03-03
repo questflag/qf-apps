@@ -10,7 +10,6 @@ using QuestFlag.Passport.Core.Data;
 using QuestFlag.Passport.Core.DependencyInjection;
 using QuestFlag.Passport.Domain.Entities;
 using QuestFlag.Passport.Domain.Enums;
-using QuestFlag.Passport.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 

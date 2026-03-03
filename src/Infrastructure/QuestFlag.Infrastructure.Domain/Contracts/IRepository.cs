@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace QuestFlag.Infrastructure.Core.Contracts;
+namespace QuestFlag.Infrastructure.Domain.Contracts;
 
 public interface IRepository<TEntity> where TEntity : class
 {

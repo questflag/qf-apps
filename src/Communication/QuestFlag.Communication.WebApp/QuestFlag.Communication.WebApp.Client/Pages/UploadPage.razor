@@ -1,7 +1,9 @@
 @page "/upload"
 @rendermode InteractiveAuto
+@using Microsoft.AspNetCore.Authorization
 @using QuestFlag.Communication.Client.Contracts
 @using QuestFlag.Communication.Shared.DTOs
+@attribute [Authorize]
 @inject IUploadApiService UploadApi
 @inject IJSRuntime JS
 @inject NavigationManager Nav

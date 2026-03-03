@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using QuestFlag.Infrastructure.Application.Data;
+using QuestFlag.Infrastructure.Core.Data;
 using QuestFlag.Communication.Shared.Messaging;
 using System.Reflection;
 
-namespace QuestFlag.Infrastructure.Application.DependencyInjection;
+namespace QuestFlag.Infrastructure.Core.DependencyInjection;
 
 public static class ApplicationServiceExtensions
 {
