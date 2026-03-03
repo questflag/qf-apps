@@ -15,14 +15,12 @@ graph TD
 
     subgraph "Infrastructure Service Set"
         ID[QuestFlag.Infrastructure.Domain]
-        IA[QuestFlag.Infrastructure.Application]
         IC[QuestFlag.Infrastructure.Core]
         IS[QuestFlag.Infrastructure.Services]
         ICL[QuestFlag.Infrastructure.Client]
         IAC[QuestFlag.Infrastructure.ApiCore]
         
-        IA --> ID
-        IC --> IA
+        IC --> ID
         IS --> IC
         IS --> IAC
         ICL --> IS
@@ -93,11 +91,6 @@ graph TD
 - `Entities/UploadRecord.cs`: Represents a file upload record.
 - `Interfaces/IUploadRepository.cs`: Data access interface for uploads.
 
-#### QuestFlag.Infrastructure.Application
-*Business rules and use cases.*
-- `Commands/`: Logic for creating or modifying data (e.g., `UploadFileCommand`).
-- `Queries/`: Logic for retrieving data.
-- `Repositories/`: Implementation of repository interfaces (recently moved from Core).
 
 #### QuestFlag.Infrastructure.Core
 *Data access and external service implementations.*

@@ -4,4 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
+  </ItemGroup>
 </Project>

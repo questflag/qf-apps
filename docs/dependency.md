@@ -14,14 +14,7 @@ This document maps NuGet package dependencies to each project in the QuestFlag s
 _Core domain entities and repository interfaces._
 - *(no NuGet packages)*
 
-### 2. QuestFlag.Infrastructure.Application (BLL)
-_Business rules, use cases, and repository implementations._
-- `MediatR` 14.x ✅
-- `FluentValidation.DependencyInjectionExtensions` 12.x ✅
-- `Microsoft.EntityFrameworkCore` 10.x ✅
-- `Confluent.Kafka` 2.x ✅
-
-### 3. QuestFlag.Infrastructure.Core (DAL)
+### 2. QuestFlag.Infrastructure.Core (DAL)
 _Infrastructure-specific implementations (Storage, Messaging)._
 - `Microsoft.EntityFrameworkCore` 10.x ✅
 - `Npgsql.EntityFrameworkCore.PostgreSQL` 10.x ✅

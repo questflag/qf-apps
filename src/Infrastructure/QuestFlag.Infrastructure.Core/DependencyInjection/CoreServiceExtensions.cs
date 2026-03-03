@@ -10,6 +10,7 @@ using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
 using QuestFlag.Infrastructure.Domain.Models;
 using QuestFlag.Infrastructure.Domain.Contracts;
+using QuestFlag.Infrastructure.Core.Implementations.Storage;
 
 namespace QuestFlag.Infrastructure.Core.DependencyInjection;
 

@@ -19,4 +19,7 @@
     <ProjectReference Include="..\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
     <ProjectReference Include="..\..\Communication\QuestFlag.Communication.Shared\QuestFlag.Communication.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
 </Project>
