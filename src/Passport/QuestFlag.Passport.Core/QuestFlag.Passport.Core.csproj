@@ -20,4 +20,7 @@
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
     <ProjectReference Include="..\..\Communication\QuestFlag.Communication.Client\QuestFlag.Communication.Client.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Implementations\Messaging\" />
+  </ItemGroup>
 </Project>

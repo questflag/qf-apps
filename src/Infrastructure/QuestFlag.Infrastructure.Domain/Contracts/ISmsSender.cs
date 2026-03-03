@@ -1,4 +1,4 @@
-namespace QuestFlag.Passport.Domain.Contracts;
+namespace QuestFlag.Infrastructure.Domain.Contracts;
 
 /// <summary>
 /// Abstraction over an SMS provider (Twilio, AWS SNS, etc.).

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using QuestFlag.Passport.Domain.Contracts;
+using QuestFlag.Infrastructure.Domain.Contracts;
 
-namespace QuestFlag.Passport.Core.Implementations.Messaging;
+namespace QuestFlag.Infrastructure.Core.Implementations.Messaging;
 
 public class StubSmsSender : ISmsSender
 {

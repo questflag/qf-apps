@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
-using QuestFlag.Passport.Domain.Contracts;
-using QuestFlag.Passport.Domain.Models;
+using QuestFlag.Infrastructure.Domain.Contracts;
+using QuestFlag.Infrastructure.Domain.Models;
 
-namespace QuestFlag.Passport.Core.Implementations.Messaging;
+namespace QuestFlag.Infrastructure.Core.Implementations.Messaging;
 
 public class SmtpEmailSender : IEmailSender
 {

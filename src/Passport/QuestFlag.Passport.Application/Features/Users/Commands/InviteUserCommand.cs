@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using QuestFlag.Passport.Domain.Entities;
+using QuestFlag.Infrastructure.Domain.Contracts;
 using QuestFlag.Passport.Domain.Contracts;
 
 namespace QuestFlag.Passport.Application.Features.Users.Commands;
