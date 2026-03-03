@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenIddict.Validation.AspNetCore;
 
 namespace QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
@@ -50,5 +53,60 @@ public static class ApiBuilderExtensions
         }
 
         return app;
+    }
+
+    /// <summary>
+    /// Registers the common QuestFlag API surface including controllers, Swagger and the
+    /// OpenIddict validation-based authentication defaults. Optionally registers a CORS
+    /// policy by reading origin URLs from configuration keys and allows the caller to
+    /// configure authorization policies.
+    /// </summary>
+    public static WebApplicationBuilder AddQuestFlagApi(this WebApplicationBuilder builder,
+        string corsPolicyName = "DefaultClients",
+        string[]? corsConfigKeys = null,
+        Action<AuthorizationOptions>? configureAuthorization = null)
+    {
+        // Controllers + Swagger + API explorer
+        builder.Services.AddQuestFlagApiServices();
+
+        // Authentication defaults: use OpenIddict validation scheme so services don't need
+        // to repeat these few lines in each Program.cs.
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+        });
+
+        // Authorization - allow the caller to add policies specific to the service.
+        builder.Services.AddAuthorization(options =>
+        {
+            configureAuthorization?.Invoke(options);
+        });
+
+        // Optional CORS registration - read origins from provided configuration keys
+        // (e.g. "ServiceUrls:InfraWebApp"). If no keys provided, skip CORS registration.
+        if (corsConfigKeys != null && corsConfigKeys.Length > 0)
+        {
+            var origins = new List<string>();
+            foreach (var key in corsConfigKeys)
+            {
+                var val = builder.Configuration[key];
+                if (!string.IsNullOrWhiteSpace(val)) origins.Add(val!);
+            }
+
+            if (origins.Count > 0)
+            {
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy(corsPolicyName, b => b.WithOrigins(origins.ToArray())
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .WithExposedHeaders("Token-Expired"));
+                });
+            }
+        }
+
+        return builder;
     }
 }

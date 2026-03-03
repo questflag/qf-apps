@@ -1,4 +1,4 @@
-namespace QuestFlag.Communication.Shared.Messaging;
+namespace QuestFlag.Infrastructure.Core.Messaging;
 
 public class KafkaSettings
 {

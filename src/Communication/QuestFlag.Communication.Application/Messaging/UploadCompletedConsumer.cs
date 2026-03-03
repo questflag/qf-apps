@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QuestFlag.Communication.Domain.Events;
-using QuestFlag.Communication.Shared.Messaging;
+using QuestFlag.Infrastructure.Core.Messaging;
 
 namespace QuestFlag.Communication.Application.Messaging;
 

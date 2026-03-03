@@ -16,8 +16,24 @@ builder.AddServiceDefaults();
 builder.Services.AddPassportApplication();
 builder.Services.AddPassportCore(builder.Configuration);
 
-// 2. Common API services (controllers, endpoint explorer, Swagger)
-builder.Services.AddQuestFlagApiServices();
+// 2. Common API services, authentication defaults and CORS policy registration.
+builder.AddQuestFlagApi(
+    corsPolicyName: "PassportClients",
+    corsConfigKeys: new[]
+    {
+        "ServiceUrls:InfraWebApp",
+        "ServiceUrls:InfraWebAppHttp",
+        "ServiceUrls:PassportWebApp",
+        "ServiceUrls:PassportAdminWebApp"
+    },
+    configureAuthorization: options =>
+    {
+        options.AddPolicy("PassportAdmin", policy =>
+            policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
+
+        options.AddPolicy("TenantAdmin", policy =>
+            policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
+    });
 
 // 3. OpenIddict Server — Full SSO Provider
 builder.Services.AddOpenIddict()

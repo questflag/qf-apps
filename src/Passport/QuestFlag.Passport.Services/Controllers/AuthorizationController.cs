@@ -73,6 +73,8 @@ public class AuthorizationController : ControllerBase
         }
 
         // 4. Create a new claims principal for OpenIddict
+        var userId = result.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (string.IsNullOrEmpty(userId))
         {
             return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -104,7 +106,7 @@ public class AuthorizationController : ControllerBase
             identity.AddClaim(new Claim(OpenIddictConstants.Claims.Role, role)
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
                 
-            identity.AddClaim(new Claim(ClaimTypes.Role, role)
+            identity.AddClaim(new Claim(System.Security.Claims.ClaimTypes.Role, role)
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
         }
 

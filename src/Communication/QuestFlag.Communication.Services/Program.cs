@@ -9,8 +9,8 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddCommunicationServices(builder.Configuration);
 
-// Use common API services (controllers, endpoint explorer, Swagger)
-builder.Services.AddQuestFlagApiServices();
+// Use common API services and authentication defaults
+builder.AddQuestFlagApi();
 
 var app = builder.Build();
 

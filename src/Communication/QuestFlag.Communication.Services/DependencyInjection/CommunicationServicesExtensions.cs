@@ -1,6 +1,6 @@
 using QuestFlag.Communication.Application.Implementations.Repositories;
 using QuestFlag.Communication.Domain.Events;
-using QuestFlag.Communication.Shared.Messaging;
+using QuestFlag.Infrastructure.Core.Messaging;
 using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Core.Persistence.PostgreSQL;
 using QuestFlag.Communication.Application.DependencyInjection;

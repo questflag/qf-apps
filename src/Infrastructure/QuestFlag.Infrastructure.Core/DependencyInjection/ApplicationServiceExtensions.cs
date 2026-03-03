@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QuestFlag.Infrastructure.Core.Data;
-using QuestFlag.Communication.Shared.Messaging;
+using QuestFlag.Infrastructure.Core.Messaging;
 using System.Reflection;
 
 namespace QuestFlag.Infrastructure.Application.DependencyInjection;
