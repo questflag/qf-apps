@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
+    <ProjectReference Include="..\QuestFlag.Communication.Domain\QuestFlag.Communication.Domain.csproj" />
   </ItemGroup>
 </Project>

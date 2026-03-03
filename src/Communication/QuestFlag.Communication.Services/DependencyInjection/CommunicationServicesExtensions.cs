@@ -14,6 +14,7 @@ using QuestFlag.Communication.Application.Messaging;
 using QuestFlag.Communication.Core.Implementations.Persistence.MongoDB;
 using QuestFlag.Communication.Core.Implementations.Providers;
 using QuestFlag.Communication.Core.VectorDB;
+using QuestFlag.Infrastructure.Core.DependencyInjection;
 
 
 namespace QuestFlag.Communication.Services.DependencyInjection;
@@ -47,7 +48,10 @@ public static class CommunicationServicesExtensions
         services.AddScoped<IProviderResolver, ProviderResolver>();
         services.AddSingleton<QdrantConversationVectorStore>();
 
-        // 5. Application Layer
+        // 5. Infrastructure Layer
+        services.AddInfrastructureCore(configuration);
+
+        // 6. Application Layer
         services.AddCommunicationApplication();
 
         return services;

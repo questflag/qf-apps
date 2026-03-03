@@ -26,7 +26,7 @@ public class UploadApiService : IUploadApiService
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
-    public async Task<Communication.Shared.DTOs.PagedResult<UploadRecordDto>> GetUploadsAsync(
+    public async Task<PagedResult<UploadRecordDto>> GetUploadsAsync(
         string? tenantSlug = null,
         string? userIdFilter = null,
         DateTime? fromDate = null,
@@ -60,7 +60,7 @@ public class UploadApiService : IUploadApiService
         var response = await _httpClient.GetAsync(url, ct);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<Communication.Shared.DTOs.PagedResult<UploadRecordDto>>(cancellationToken: ct);
+        var result = await response.Content.ReadFromJsonAsync<PagedResult<UploadRecordDto>>(cancellationToken: ct);
         return result!;
     }
 
@@ -114,7 +114,7 @@ public class UploadApiService : IUploadApiService
             throw new Exception($"Upload failed: {response.StatusCode} {err}");
         }
 
-        var json = await response.Content.ReadFromJsonAsync<ApiResponse<List<Guid>>>(cancellationToken: ct);
+        var json = await response.Content.ReadFromJsonAsync<QuestFlag.Infrastructure.Domain.Models.ApiResponse<List<Guid>>>(cancellationToken: ct);
         return json?.Data?.FirstOrDefault() ?? Guid.Empty;
     }
 
@@ -141,7 +141,7 @@ public class UploadApiService : IUploadApiService
         var response = await _httpClient.GetAsync($"/api/upload/{id}/download", ct);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(cancellationToken: ct);
+        var result = await response.Content.ReadFromJsonAsync<QuestFlag.Infrastructure.Domain.Models.ApiResponse<string>>(cancellationToken: ct);
         return result?.Data ?? throw new Exception("URL missing from response");
     }
 }

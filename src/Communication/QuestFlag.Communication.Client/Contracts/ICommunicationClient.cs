@@ -1,4 +1,4 @@
-using QuestFlag.Communication.Application.DTOs;
+using QuestFlag.Communication.Shared.DTOs;
 
 namespace QuestFlag.Communication.Client.Contracts;
 

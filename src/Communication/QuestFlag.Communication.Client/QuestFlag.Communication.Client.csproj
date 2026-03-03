@@ -13,8 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuestFlag.Communication.Application\QuestFlag.Communication.Application.csproj" />
-    <ProjectReference Include="..\QuestFlag.Communication.Domain\QuestFlag.Communication.Domain.csproj" />
     <ProjectReference Include="..\QuestFlag.Communication.Shared\QuestFlag.Communication.Shared.csproj" />
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Domain\QuestFlag.Infrastructure.Domain.csproj" />
   </ItemGroup>
