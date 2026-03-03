@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using QuestFlag.Infrastructure.Domain.Contracts;
+using QuestFlag.Infrastructure.Domain.Models;
 
 namespace QuestFlag.Infrastructure.Core.Implementations.Storage;
 

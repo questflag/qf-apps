@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Minio;
 using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
-using QuestFlag.Infrastructure.Core.Implementations.Storage;
+using QuestFlag.Infrastructure.Domain.Models;
 using QuestFlag.Infrastructure.Domain.Contracts;
 
 namespace QuestFlag.Infrastructure.Core.DependencyInjection;
@@ -20,10 +20,11 @@ public static class CoreServiceExtensions
 
 
         // 2. Storage Setup
-        services.Configure<StorageSettings>(configuration.GetSection(StorageSettings.SectionName));
+        var storageSection = configuration.GetSection(StorageSettings.SectionName);
+        services.Configure<StorageSettings>(storageSection);
         
         // Register Minio
-        var minioSettings = configuration.GetSection(StorageSettings.SectionName).Get<StorageSettings>() ?? new StorageSettings();
+        var minioSettings = storageSection.Get<StorageSettings>() ?? throw new InvalidOperationException("Storage settings are not configured.");
         services.AddMinio(opt => opt
             .WithEndpoint(minioSettings.MinioEndpoint)
             .WithCredentials(minioSettings.MinioAccessKey, minioSettings.MinioSecretKey)
