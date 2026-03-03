@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.WebApp\QuestFlag.Infrastructure.WebApp\QuestFlag.Infrastructure.WebApp.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Services\QuestFlag.Infrastructure.Services.csproj" />
+    <ProjectReference Include="..\..\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.csproj" />
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp\QuestFlag.Passport.AdminWebApp.csproj" />
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.Services\QuestFlag.Passport.Services.csproj" />
     <ProjectReference Include="..\..\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.csproj" />

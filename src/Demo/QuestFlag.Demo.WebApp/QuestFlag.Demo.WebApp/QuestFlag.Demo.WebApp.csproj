@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
+    <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
+    <ProjectReference Include="..\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj" />
+    <ProjectReference Include="..\..\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
+    <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
+  </ItemGroup>
+  <Target Name="Tailwind" BeforeTargets="Build">
+    <Exec Command="npx -y @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/app.css" />
+  </Target>
+</Project>
