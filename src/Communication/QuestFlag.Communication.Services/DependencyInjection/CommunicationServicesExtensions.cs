@@ -2,6 +2,25 @@ using QuestFlag.Communication.Application.Implementations.Repositories;
 using QuestFlag.Communication.Domain.Events;
 using QuestFlag.Communication.Shared.Messaging;
 using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Communication.Core.Persistence.PostgreSQL;
+using QuestFlag.Communication.Application.DependencyInjection;
+using QuestFlag.Communication.Application.Implementations.Repositories;
+using QuestFlag.Communication.Domain.Contracts;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using QuestFlag.Communication.Core.Messaging.Kafka;
+using QuestFlag.Communication.Application.Messaging;
+using QuestFlag.Communication.Core.Implementations.Persistence.MongoDB;
+using QuestFlag.Communication.Domain.Contracts;
+using QuestFlag.Communication.Application.Contracts.Messaging; 
+using QuestFlag.Communication.Application.Contracts.Repositories;
+using QuestFlag.Communication.Application.Common.Interfaces; 
+using QuestFlag.Communication.Core.VectorDB; 
+using QuestFlag.Communication.Application.Implementations.Services; 
+using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 
 namespace QuestFlag.Communication.Services.DependencyInjection;
 

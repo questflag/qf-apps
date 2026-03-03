@@ -3,7 +3,7 @@ using QuestFlag.Communication.Core.Persistence.PostgreSQL;
 using QuestFlag.Communication.Domain.Entities;
 using QuestFlag.Communication.Domain.Enums;
 using QuestFlag.Communication.Domain.Contracts;
-using QuestFlag.Infrastructure.Domain.Enums;
+using QuestFlag.Passport.Domain.Enums;
 
 namespace QuestFlag.Communication.Application.Implementations.Repositories;
 

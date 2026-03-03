@@ -5,7 +5,7 @@ using MediatR;
 using QuestFlag.Communication.Domain.Enums;
 using QuestFlag.Communication.Domain.Contracts;
 using QuestFlag.Infrastructure.Domain.Contracts;
-using QuestFlag.Infrastructure.Domain.Enums;
+using QuestFlag.Passport.Domain.Enums;
 
 namespace QuestFlag.Communication.Application.Features.Uploads.Commands;
 

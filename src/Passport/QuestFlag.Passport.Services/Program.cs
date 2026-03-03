@@ -76,10 +76,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("PassportAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, PassportRole.PassportAdmin));
+        policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
 
     options.AddPolicy("TenantAdmin", policy =>
-        policy.RequireClaim(OpenIddictConstants.Claims.Role, PassportRole.TenantAdmin, PassportRole.PassportAdmin));
+        policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
 });
 
 // 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json

@@ -10,7 +10,7 @@ using QuestFlag.Passport.Core.Data;
 using QuestFlag.Passport.Core.DependencyInjection;
 using QuestFlag.Passport.Domain.Entities;
 using QuestFlag.Passport.Domain.Enums;
-using OpenIddict.Abstractions;
+using QuestFlag.Passport.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
@@ -31,7 +31,7 @@ public static class HostingExtensions
             await context.Database.MigrateAsync();
 
             // Seed Roles
-            string[] roles = [PassportRole.PassportAdmin, PassportRole.TenantAdmin, PassportRole.User];
+            string[] roles = [UserRole.PassportAdmin, UserRole.TenantAdmin, UserRole.User];
             foreach (var roleName in roles)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
@@ -59,8 +59,8 @@ public static class HostingExtensions
                 var result = await userManager.CreateAsync(admin, "Admin123!");
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(admin, PassportRole.PassportAdmin);
-                    await userManager.AddToRoleAsync(admin, PassportRole.TenantAdmin);
+                    await userManager.AddToRoleAsync(admin, UserRole.PassportAdmin);
+                    await userManager.AddToRoleAsync(admin, UserRole.TenantAdmin);
                 }
             }
 
@@ -68,13 +68,13 @@ public static class HostingExtensions
             var adminUser = await userManager.FindByNameAsync("admin");
             if (adminUser != null)
             {
-                if (!await userManager.IsInRoleAsync(adminUser, PassportRole.PassportAdmin))
+                if (!await userManager.IsInRoleAsync(adminUser, UserRole.PassportAdmin))
                 {
-                    await userManager.AddToRoleAsync(adminUser, PassportRole.PassportAdmin);
+                    await userManager.AddToRoleAsync(adminUser, UserRole.PassportAdmin);
                 }
-                if (!await userManager.IsInRoleAsync(adminUser, PassportRole.TenantAdmin))
+                if (!await userManager.IsInRoleAsync(adminUser, UserRole.TenantAdmin))
                 {
-                    await userManager.AddToRoleAsync(adminUser, PassportRole.TenantAdmin);
+                    await userManager.AddToRoleAsync(adminUser, UserRole.TenantAdmin);
                 }
             }
 

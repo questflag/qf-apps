@@ -14,6 +14,7 @@ using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Domain.Contracts;
 using QuestFlag.Communication.Application.Features.Uploads.Commands;
 using QuestFlag.Communication.Application.Features.Uploads.Queries;
+using QuestFlag.Passport.Domain.Enums;
 
 namespace QuestFlag.Communication.Services.Controllers;
 
@@ -99,7 +100,7 @@ public class UploadController : ControllerBase
         var role = User.GetRole();
 
         // Determine user filter. A normal user can only filter by their own ID, or sees no one else.
-        var effectiveUserIdFilter = role == "tenant_admin" ? userId : currentUserId;
+        var effectiveUserIdFilter = role == UserRole.TenantAdmin ? userId : currentUserId;
 
         var query = new GetUploadsQuery(
             tenantId,
@@ -116,7 +117,7 @@ public class UploadController : ControllerBase
             pageSize);
 
         var result = await _mediator.Send(query);
-        var pagedResult = new QuestFlag.Communication.Shared.DTOs.PagedResult<UploadRecordDto>(result.Items, result.TotalCount, page, pageSize);
+        var pagedResult = new QuestFlag.Communication.Shared.DTOs.PagedResult<UploadRecordDto>(result.Items.ToList(), result.TotalCount, page, pageSize);
         return Ok(ApiResponse<QuestFlag.Communication.Shared.DTOs.PagedResult<UploadRecordDto>>.Ok(pagedResult));
     }
 
