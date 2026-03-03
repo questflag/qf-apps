@@ -1,5 +1,7 @@
 using QuestFlag.Communication.Application.Implementations.Repositories;
-using QuestFlag.Communication.Application.Messaging;
+using QuestFlag.Communication.Domain.Events;
+using QuestFlag.Communication.Shared.Messaging;
+using QuestFlag.Communication.Shared.DTOs;
 
 namespace QuestFlag.Communication.Services.DependencyInjection;
 

@@ -30,6 +30,7 @@
     <ProjectReference Include="..\QuestFlag.Communication.ApiCore\QuestFlag.Communication.ApiCore.csproj" />
     <ProjectReference Include="..\QuestFlag.Communication.Application\QuestFlag.Communication.Application.csproj" />
     <ProjectReference Include="..\QuestFlag.Communication.Core\QuestFlag.Communication.Core.csproj" />
+    <ProjectReference Include="..\QuestFlag.Communication.Shared\QuestFlag.Communication.Shared.csproj" />
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
     <ProjectReference Include="..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />

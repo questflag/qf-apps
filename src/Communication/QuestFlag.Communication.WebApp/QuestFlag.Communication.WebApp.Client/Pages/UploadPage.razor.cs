@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Client.Contracts;
 
 namespace QuestFlag.Communication.WebApp.Client.Pages;

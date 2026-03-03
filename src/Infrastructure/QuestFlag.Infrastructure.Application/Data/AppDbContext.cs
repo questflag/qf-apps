@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace QuestFlag.Infrastructure.Application.Data;
 
 public class AppDbContext : DbContext

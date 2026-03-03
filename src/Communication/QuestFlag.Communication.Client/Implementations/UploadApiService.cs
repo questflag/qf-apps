@@ -7,7 +7,7 @@ using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using QuestFlag.Communication.Client.Contracts;
-using QuestFlag.Communication.Client.DTOs;
+using QuestFlag.Communication.Shared.DTOs;
 
 namespace QuestFlag.Communication.Client.Implementations;
 

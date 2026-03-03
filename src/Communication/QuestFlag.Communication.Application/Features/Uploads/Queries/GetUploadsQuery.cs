@@ -3,8 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using QuestFlag.Communication.Application.DTOs;
+using QuestFlag.Communication.Shared.DTOs;
 using QuestFlag.Communication.Domain.Contracts;
+using System.Collections.Generic;
 
 namespace QuestFlag.Communication.Application.Features.Uploads.Queries;
 
@@ -61,7 +62,7 @@ public class GetUploadsQueryHandler : IRequestHandler<GetUploadsQuery, (IReadOnl
             r.SizeInBytes,
             r.Tags,
             r.ExtraData,
-            r.Status,
+            (int)r.Status,
             r.ErrorMessage,
             r.CreatedAtUtc,
             r.CompletedAtUtc

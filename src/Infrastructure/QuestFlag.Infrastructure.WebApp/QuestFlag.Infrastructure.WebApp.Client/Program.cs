@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using QuestFlag.Infrastructure.Client;
+using QuestFlag.Communication.Client.Contracts;
+using QuestFlag.Communication.Client.Implementations;
 using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
 using System.Net.Http;
@@ -12,7 +13,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
     ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required in configuration.");
 
-var infraServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
+var communicationServicesUrl = builder.Configuration["ServiceUrls:InfraServices"]
     ?? throw new InvalidOperationException("ServiceUrls:InfraServices is required in configuration.");
 
 // Register PassportApiClient pointing to Passport API Host — configured via ServiceUrls:PassportServices
@@ -29,10 +30,10 @@ builder.Services.AddHttpClient<PassportUserClient>(client =>
 builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
 builder.Services.AddTransient<AuthenticatedHttpHandler>();
 
-// Register UploadApiService pointing to Infrastructure API Host — configured via ServiceUrls:InfraServices
-builder.Services.AddHttpClient<UploadApiService>(client =>
+// Register IUploadApiService pointing to Communication API Host — configured via ServiceUrls:InfraServices
+builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
 {
-    client.BaseAddress = new Uri(infraServicesUrl);
+    client.BaseAddress = new Uri(communicationServicesUrl);
 }).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
 builder.Services.AddAuthorizationCore();

@@ -15,6 +15,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj" />
+    <ProjectReference Include="..\..\..\Communication\QuestFlag.Communication.Client\QuestFlag.Communication.Client.csproj" />
+    <ProjectReference Include="..\..\..\Communication\QuestFlag.Communication.Shared\QuestFlag.Communication.Shared.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>

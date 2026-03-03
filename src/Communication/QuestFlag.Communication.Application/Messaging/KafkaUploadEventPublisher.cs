@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QuestFlag.Communication.Domain.Events;
 using QuestFlag.Communication.Domain.Contracts;
-using QuestFlag.Infrastructure.Application.Messaging;
+using QuestFlag.Communication.Shared.Messaging;
 
 namespace QuestFlag.Communication.Application.Messaging;
 

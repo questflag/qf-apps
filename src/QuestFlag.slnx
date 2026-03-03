@@ -45,6 +45,7 @@
     <Project Path="Communication/QuestFlag.Communication.Core/QuestFlag.Communication.Core.csproj" />
     <Project Path="Communication/QuestFlag.Communication.Domain/QuestFlag.Communication.Domain.csproj" />
     <Project Path="Communication/QuestFlag.Communication.Services/QuestFlag.Communication.Services.csproj" />
+    <Project Path="Communication/QuestFlag.Communication.Shared/QuestFlag.Communication.Shared.csproj" />
   </Folder>
   <Folder Name="/Communication/QuestFlag.Communication.WebApp/">
     <Project Path="Communication/QuestFlag.Communication.WebApp/QuestFlag.Communication.WebApp.Client/QuestFlag.Communication.WebApp.Client.csproj" />

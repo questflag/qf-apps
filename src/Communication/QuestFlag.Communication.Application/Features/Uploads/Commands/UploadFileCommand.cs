@@ -3,10 +3,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using QuestFlag.Communication.Domain.Contracts;
+using QuestFlag.Infrastructure.Domain.Contracts;
 using QuestFlag.Communication.Domain.Entities;
 using QuestFlag.Communication.Domain.Enums;
 using QuestFlag.Communication.Domain.Events;
-using QuestFlag.Communication.Domain.Contracts;
 
 namespace QuestFlag.Communication.Application.Features.Uploads.Commands;
 
