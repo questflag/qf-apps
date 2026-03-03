@@ -10,7 +10,7 @@ public interface IUploadApiService
 {
     void SetBearerToken(string token);
 
-    Task<PagedResult<UploadRecordDto>> GetUploadsAsync(
+    Task<QuestFlag.Communication.Domain.DTOs.PagedResult<UploadRecordDto>> GetUploadsAsync(
         string? tenantSlug = null,
         string? userIdFilter = null,
         DateTime? fromDate = null,
