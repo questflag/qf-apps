@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.Client\QuestFlag.Passport.Client.csproj" />
     <ProjectReference Include="..\QuestFlag.Communication.WebApp.Client\QuestFlag.Communication.WebApp.Client.csproj" />
     <ProjectReference Include="..\..\QuestFlag.Communication.ApiCore\QuestFlag.Communication.ApiCore.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
 </Project>

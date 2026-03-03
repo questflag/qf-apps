@@ -9,7 +9,7 @@ using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
-using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
+using global::QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Communication.Client.Implementations;
 using QuestFlag.Communication.Client.Contracts;
 
