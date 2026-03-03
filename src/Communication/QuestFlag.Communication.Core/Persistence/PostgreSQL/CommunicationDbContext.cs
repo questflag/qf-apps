@@ -8,9 +8,13 @@ public class CommunicationDbContext : DbContext
     public CommunicationDbContext(DbContextOptions<CommunicationDbContext> options) : base(options) { }
 
     public DbSet<ProviderConfig> ProviderConfigs => Set<ProviderConfig>();
+    public DbSet<UploadRecord> UploadRecords => Set<UploadRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CommunicationDbContext).Assembly);
+
         modelBuilder.Entity<ProviderConfig>(entity =>
         {
             entity.ToTable("PROVIDER_CONFIG");

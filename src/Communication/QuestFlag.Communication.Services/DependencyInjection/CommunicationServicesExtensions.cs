@@ -1,14 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
-using QuestFlag.Communication.Core.Persistence.PostgreSQL;
-using QuestFlag.Communication.Core.VectorDB;
-using QuestFlag.Communication.Application.DependencyInjection;
-using QuestFlag.Communication.Core.Messaging.Kafka;
-using QuestFlag.Communication.Core.Implementations.Persistence.MongoDB;
-using QuestFlag.Communication.Core.Implementations.Providers;
-using QuestFlag.Communication.Domain.Contracts;
+using QuestFlag.Communication.Application.Implementations.Repositories;
+using QuestFlag.Communication.Application.Messaging;
 
 namespace QuestFlag.Communication.Services.DependencyInjection;
 
@@ -27,6 +18,13 @@ public static class CommunicationServicesExtensions
         // 3. Kafka
         services.AddSingleton<KafkaProducer>();
         services.AddHostedService<KafkaConsumer>();
+        
+        // --- Upload Support ---
+        services.Configure<KafkaSettings>(configuration.GetSection("Kafka"));
+        services.AddScoped<IUploadRepository, UploadRepository>();
+        services.AddSingleton<IUploadEventPublisher, KafkaUploadEventPublisher>();
+        services.AddHostedService<UploadCompletedConsumer>();
+        // ----------------------
 
         // 4. Repositories & Services
         services.AddScoped<ICommunicationLogRepository, CommunicationLogRepository>();

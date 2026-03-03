@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\QuestFlag.Communication.Application\QuestFlag.Communication.Application.csproj" />
     <ProjectReference Include="..\QuestFlag.Communication.Domain\QuestFlag.Communication.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj" />
   </ItemGroup>
 
 </Project>
