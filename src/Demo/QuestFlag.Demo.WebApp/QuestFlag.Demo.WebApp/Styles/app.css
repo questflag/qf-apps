@@ -1,7 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@source "../../QuestFlag.Infrastructure.WebApp.Client/**/*.razor";
+@import "tailwindcss";
+@source "../../../Infrastructure/QuestFlag.Infrastructure.WebApp/QuestFlag.Infrastructure.WebApp.Client/**/*.razor";
 
 @theme {
   --color-primary: hsl(221 83% 53%);

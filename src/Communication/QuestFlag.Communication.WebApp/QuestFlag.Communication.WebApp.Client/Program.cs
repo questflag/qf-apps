@@ -8,6 +8,7 @@ using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components.Authorization;
+using QuestFlag.Communication.WebApp.Client.State;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -27,7 +28,7 @@ builder.Services.AddHttpClient<PassportUserClient>(client =>
     client.BaseAddress = new Uri(passportServicesUrl);
 }).AddHttpMessageHandler<AuthenticatedHttpHandler>();
 
-builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
+builder.Services.AddScoped<IAccessTokenProvider, QuestFlag.Communication.WebApp.Client.State.TokenProvider>();
 builder.Services.AddTransient<AuthenticatedHttpHandler>();
 
 builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
@@ -37,5 +38,6 @@ builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 
 await builder.Build().RunAsync();
