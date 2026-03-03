@@ -1,4 +1,4 @@
-namespace QuestFlag.Passport.Domain.Models;
+namespace QuestFlag.Infrastructure.Domain.Models;
 
 public class SmsSettings
 {

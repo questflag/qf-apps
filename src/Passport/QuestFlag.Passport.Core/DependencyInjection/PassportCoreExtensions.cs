@@ -9,6 +9,7 @@ using QuestFlag.Passport.Core.Implementations.Repositories;
 using QuestFlag.Infrastructure.Core.Implementations.Messaging;
 using QuestFlag.Passport.Domain.Contracts;
 using QuestFlag.Passport.Domain.Models;
+using QuestFlag.Infrastructure.Domain.Models;
 
 namespace QuestFlag.Passport.Core.DependencyInjection;
 

@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="Models\EmailSettings.cs" />
+    <Compile Include="Models\SmsSettings.cs" />
+  </ItemGroup>
+
 </Project>
