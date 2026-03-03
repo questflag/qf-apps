@@ -82,7 +82,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./Configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   infra-redis:
     image: ${REDIS_IMAGE}
@@ -183,7 +183,7 @@ services:
     container_name: infra-otel-collector
     command: [ "--config=/etc/otel-collector.yml" ]
     volumes:
-      - ../Configs/otel-collector.yml:/etc/otel-collector.yml
+      - ./Configs/otel-collector.yml:/etc/otel-collector.yml
     ports:
       - "${OTEL_COLLECTOR_GRPC_PORT}:4317"
       - "${OTEL_COLLECTOR_HTTP_PORT}:4318"
@@ -200,7 +200,7 @@ services:
     ports:
       - "${PROMETHEUS_PORT}:9090"
     volumes:
-      - ../Configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./Configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
   infra-grafana:
@@ -221,7 +221,7 @@ services:
       - "${LOKI_PORT}:3100"
     command: -config.file=/etc/loki/local-config.yml
     volumes:
-      - ../Configs/loki.yml:/etc/loki/local-config.yml
+      - ./Configs/loki.yml:/etc/loki/local-config.yml
       - loki_data:/loki
 
   infra-tempo:
@@ -232,7 +232,7 @@ services:
       - "${TEMPO_PORT}:3200"
       - "${TEMPO_OTLP_GRPC_PORT}:${TEMPO_OTLP_GRPC_CONTAINER_PORT}" # otlp grpc
     volumes:
-      - ../Configs/tempo.yaml:/etc/tempo.yaml
+      - ./Configs/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
   # questflag.passport.services:
   #   depends_on:
