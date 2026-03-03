@@ -1,4 +1,5 @@
 using QuestFlag.Communication.Services.DependencyInjection;
+using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,23 +9,14 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddCommunicationServices(builder.Configuration);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Use common API services (controllers, endpoint explorer, Swagger)
+builder.Services.AddQuestFlagApiServices();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+// Configure the standard QuestFlag API middleware pipeline
+app.UseQuestFlagApiPipeline(requireAuthorization: false);
 
 app.Run();
