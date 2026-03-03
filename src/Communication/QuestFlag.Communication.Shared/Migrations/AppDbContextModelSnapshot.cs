@@ -9,7 +9,7 @@ using global::QuestFlag.Infrastructure.Core.Data;
 
 #nullable disable
 
-namespace QuestFlag.Communication.Shared.Migrations
+namespace QuestFlag.Communication.Domain.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot

@@ -1,7 +1,7 @@
 using QuestFlag.Communication.Domain.Enums;
 using QuestFlag.Communication.Domain.ValueObjects;
 
-namespace QuestFlag.Communication.Shared.DTOs;
+namespace QuestFlag.Communication.Domain.DTOs;
 
 public record ConversationThreadDto(
     Guid Id,

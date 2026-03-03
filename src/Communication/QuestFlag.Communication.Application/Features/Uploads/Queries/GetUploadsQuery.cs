@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Communication.Domain.DTOs;
 using QuestFlag.Communication.Domain.Contracts;
 using System.Collections.Generic;
 

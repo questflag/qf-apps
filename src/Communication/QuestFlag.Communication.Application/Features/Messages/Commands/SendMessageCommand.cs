@@ -1,5 +1,5 @@
 using MediatR;
-using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Communication.Domain.DTOs;
 
 namespace QuestFlag.Communication.Application.Features.Messages.Commands;
 

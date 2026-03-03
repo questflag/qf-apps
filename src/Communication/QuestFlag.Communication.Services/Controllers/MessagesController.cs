@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using QuestFlag.Communication.Application.DTOs;
+using QuestFlag.Communication.Domain.DTOs;
 using QuestFlag.Communication.Application.Features.Messages.Commands;
 using QuestFlag.Communication.Application.Features.Messages.Queries;
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Domain\QuestFlag.Infrastructure.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\QuestFlag.Infrastructure.Core\QuestFlag.Infrastructure.Core.csproj" />
   </ItemGroup>
 
 </Project>

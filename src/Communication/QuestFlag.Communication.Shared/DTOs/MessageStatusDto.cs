@@ -1,6 +1,6 @@
 using QuestFlag.Communication.Domain.Enums;
 
-namespace QuestFlag.Communication.Shared.DTOs;
+namespace QuestFlag.Communication.Domain.DTOs;
 
 public record MessageStatusDto(
     string TransactionId,

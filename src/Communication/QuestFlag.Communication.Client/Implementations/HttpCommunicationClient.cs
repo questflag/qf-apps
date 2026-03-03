@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Communication.Domain.DTOs;
 using QuestFlag.Communication.Client.Contracts;
 
 namespace QuestFlag.Communication.Client.Implementations;
