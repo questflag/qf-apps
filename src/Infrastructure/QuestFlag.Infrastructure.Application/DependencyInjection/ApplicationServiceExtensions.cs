@@ -7,7 +7,7 @@ using QuestFlag.Infrastructure.Core.Data;
 using QuestFlag.Communication.Shared.Messaging;
 using System.Reflection;
 
-namespace QuestFlag.Infrastructure.Core.DependencyInjection;
+namespace QuestFlag.Infrastructure.Application.DependencyInjection;
 
 public static class ApplicationServiceExtensions
 {

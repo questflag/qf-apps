@@ -11,6 +11,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 using QuestFlag.Passport.Domain.Entities;
+using QuestFlag.Infrastructure.ApiCore.Constants;
 
 namespace QuestFlag.Passport.Services.Controllers;
 
@@ -57,10 +58,10 @@ public class AuthController : ControllerBase
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
             
             // Custom Claims for QF
-            identity.AddClaim(new Claim("tenant_id", user.TenantId.ToString())
+            identity.AddClaim(new Claim(QuestFlagClaimTypes.TenantId, user.TenantId.ToString())
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
             
-            identity.AddClaim(new Claim("user_id", user.Id.ToString())
+            identity.AddClaim(new Claim(QuestFlagClaimTypes.UserId, user.Id.ToString())
                 .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -103,8 +104,8 @@ public class AuthController : ControllerBase
                 // Core claims
                 if (claim.Type == OpenIddictConstants.Claims.Subject ||
                     claim.Type == OpenIddictConstants.Claims.Username ||
-                    claim.Type == "tenant_id" ||
-                    claim.Type == "user_id" ||
+                    claim.Type == QuestFlagClaimTypes.TenantId ||
+                    claim.Type == QuestFlagClaimTypes.UserId ||
                     claim.Type == OpenIddictConstants.Claims.Role ||
                     claim.Type == ClaimTypes.Role)
                 {
@@ -160,8 +161,8 @@ public class AuthController : ControllerBase
         }
 
         // Add custom claims
-        claims["tenant_id"] = user.TenantId.ToString();
-        claims["user_id"] = user.Id.ToString();
+        claims[QuestFlagClaimTypes.TenantId] = user.TenantId.ToString();
+        claims[QuestFlagClaimTypes.UserId] = user.Id.ToString();
 
         return Ok(claims);
     }

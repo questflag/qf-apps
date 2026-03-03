@@ -1,6 +1,7 @@
 using System;
 using System.Security.Claims;
 using OpenIddict.Abstractions;
+using QuestFlag.Infrastructure.ApiCore.Constants;
 
 namespace QuestFlag.Infrastructure.ApiCore.Extensions;
 
@@ -8,24 +9,24 @@ public static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal principal)
     {
-        var claim = principal.FindFirst("user_id");
+        var claim = principal.FindFirst(QuestFlagClaimTypes.UserId);
         return claim != null && Guid.TryParse(claim.Value, out var id) ? id : Guid.Empty;
     }
 
     public static Guid GetTenantId(this ClaimsPrincipal principal)
     {
-        var claim = principal.FindFirst("tenant_id");
+        var claim = principal.FindFirst(QuestFlagClaimTypes.TenantId);
         return claim != null && Guid.TryParse(claim.Value, out var id) ? id : Guid.Empty;
     }
 
     public static string GetTenantSlug(this ClaimsPrincipal principal)
     {
-        return principal.FindFirst("tenant_slug")?.Value ?? string.Empty;
+        return principal.FindFirst(QuestFlagClaimTypes.TenantSlug)?.Value ?? string.Empty;
     }
 
     public static string GetRole(this ClaimsPrincipal principal)
     {
-        return principal.FindFirst("role")?.Value ?? string.Empty;
+        return principal.FindFirst(QuestFlagClaimTypes.Role)?.Value ?? string.Empty;
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static Guid? GetCurrentUserId(this ClaimsPrincipal principal)
     {
-        var value = principal.FindFirst("user_id")?.Value
+        var value = principal.FindFirst(QuestFlagClaimTypes.UserId)?.Value
                  ?? principal.FindFirst(OpenIddictConstants.Claims.Subject)?.Value
                  ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(value, out var id) ? id : null;
