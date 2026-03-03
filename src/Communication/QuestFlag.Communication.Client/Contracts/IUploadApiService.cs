@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using QuestFlag.Communication.Client.DTOs;
+using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Infrastructure.Domain.Models;
 
 namespace QuestFlag.Communication.Client.Contracts;
 

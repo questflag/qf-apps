@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Demo.WebApp.State;
 using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;

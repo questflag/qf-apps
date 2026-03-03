@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using QuestFlag.Communication.Core.Messaging.Kafka;
 using QuestFlag.Communication.Application.Messaging;
 using QuestFlag.Communication.Core.Implementations.Persistence.MongoDB;
+using QuestFlag.Communication.Core.Implementations.Providers;
 using QuestFlag.Communication.Core.VectorDB;
 
 

@@ -4,6 +4,8 @@ using QuestFlag.Communication.Client.Contracts;
 using QuestFlag.Communication.Client.Implementations;
 using QuestFlag.Passport.Client;
 using QuestFlag.Passport.UserClient;
+using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Demo.WebApp.Client.State;

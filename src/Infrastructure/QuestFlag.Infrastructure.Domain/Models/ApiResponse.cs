@@ -1,4 +1,4 @@
-namespace QuestFlag.Infrastructure.ApiCore.Models;
+namespace QuestFlag.Infrastructure.Domain.Models;
 
 public class ApiResponse<T>
 {

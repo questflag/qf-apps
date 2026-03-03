@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 

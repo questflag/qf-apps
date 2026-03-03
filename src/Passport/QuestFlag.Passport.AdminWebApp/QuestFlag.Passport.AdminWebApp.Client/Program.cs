@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Passport.AdminWebApp.Client.State;
 using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

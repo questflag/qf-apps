@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 using Microsoft.AspNetCore.Components;
 
 namespace QuestFlag.Demo.WebApp.Client.State;

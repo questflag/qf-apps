@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using QuestFlag.Communication.Client.Contracts;
 using QuestFlag.Communication.Shared.DTOs;
+using QuestFlag.Infrastructure.Domain.Models;
 
 namespace QuestFlag.Communication.Client.Implementations;
 
@@ -113,7 +114,7 @@ public class UploadApiService : IUploadApiService
             throw new Exception($"Upload failed: {response.StatusCode} {err}");
         }
 
-        var json = await response.Content.ReadFromJsonAsync<QuestFlag.Infrastructure.ApiCore.Models.ApiResponse<List<Guid>>>(cancellationToken: ct);
+        var json = await response.Content.ReadFromJsonAsync<ApiResponse<List<Guid>>>(cancellationToken: ct);
         return json?.Data?.FirstOrDefault() ?? Guid.Empty;
     }
 
@@ -140,7 +141,7 @@ public class UploadApiService : IUploadApiService
         var response = await _httpClient.GetAsync($"/api/upload/{id}/download", ct);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<QuestFlag.Infrastructure.ApiCore.Models.ApiResponse<string>>(cancellationToken: ct);
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>(cancellationToken: ct);
         return result?.Data ?? throw new Exception("URL missing from response");
     }
 }

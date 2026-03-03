@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Passport.AdminWebApp.State;
 using QuestFlag.Passport.AdminWebApp.Components;
 using QuestFlag.Infrastructure.Client;
+using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
