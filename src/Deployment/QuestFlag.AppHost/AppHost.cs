@@ -67,6 +67,8 @@ var commServices = builder.AddProject<Projects.QuestFlag_Communication_Services>
     .WithEnvironment("ConnectionStrings__Postgres", Compose("COMM_POSTGRES_CONNECTION_STRING", "Host=localhost;Port=15432;Database=QuestFlag_Comm;Username=postgres;Password=P@ssw0rd!Qf2026!"))
     .WithEnvironment("ConnectionStrings__Mongo", Compose("COMM_MONGO_CONNECTION_STRING", "mongodb://localhost:27017"))
     .WithEnvironment("Kafka__BootstrapServers", Compose("KAFKA_BOOTSTRAP_SERVERS", "localhost:19092"))
+    .WithEnvironment("Kafka__TopicName", Compose("KAFKA_TOPIC_NAME", "qf-communication-tasks"))
+    .WithEnvironment("Kafka__GroupId", Compose("KAFKA_GROUP_ID", "qf-orchestrator-group"))
     .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
     .WithReference(passportServices);
 

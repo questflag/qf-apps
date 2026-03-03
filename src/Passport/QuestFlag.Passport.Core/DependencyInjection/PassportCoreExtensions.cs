@@ -8,6 +8,7 @@ using QuestFlag.Passport.Core.Data;
 using QuestFlag.Passport.Core.Implementations.Repositories;
 using QuestFlag.Passport.Core.Implementations.Messaging;
 using QuestFlag.Passport.Domain.Contracts;
+using QuestFlag.Passport.Domain.Models;
 
 namespace QuestFlag.Passport.Core.DependencyInjection;
 
@@ -52,6 +53,11 @@ public static class PassportCoreExtensions
             });
 
         // 5. Messaging services
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.Configure<SmsSettings>(configuration.GetSection(SmsSettings.SectionName));
+        services.Configure<TrustedDeviceSettings>(configuration.GetSection(TrustedDeviceSettings.SectionName));
+        services.Configure<PassportDbSettings>(configuration.GetSection(PassportDbSettings.SectionName));
+
         services.AddSingleton<IEmailSender, SmtpEmailSender>();
         services.AddSingleton<ISmsSender, StubSmsSender>();    // swap for TwilioSmsSender in production
 

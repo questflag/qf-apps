@@ -1,37 +1,30 @@
 using System.Net;
 using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using QuestFlag.Passport.Domain.Contracts;
+using QuestFlag.Passport.Domain.Models;
 
 namespace QuestFlag.Passport.Core.Implementations.Messaging;
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly string _host;
-    private readonly int _port;
-    private readonly string? _user;
-    private readonly string? _password;
-    private readonly string _from;
+    private readonly EmailSettings _settings;
 
-    public SmtpEmailSender(IConfiguration config)
+    public SmtpEmailSender(IOptions<EmailSettings> options)
     {
-        _host = config["Email:SmtpHost"] ?? "localhost";
-        _port = int.TryParse(config["Email:SmtpPort"], out var p) ? p : 587;
-        _user = config["Email:SmtpUser"];
-        _password = config["Email:SmtpPassword"];
-        _from = config["Email:From"] ?? "noreply@questflag.com";
+        _settings = options.Value;
     }
 
     public async Task SendAsync(string toEmail, string subject, string htmlBody, CancellationToken ct = default)
     {
-        using var client = new SmtpClient(_host, _port);
+        using var client = new SmtpClient(_settings.SmtpHost, _settings.SmtpPort);
 
-        if (!string.IsNullOrEmpty(_user))
-            client.Credentials = new NetworkCredential(_user, _password);
+        if (!string.IsNullOrEmpty(_settings.SmtpUser))
+            client.Credentials = new NetworkCredential(_settings.SmtpUser, _settings.SmtpPassword);
 
-        client.EnableSsl = _port != 25;
+        client.EnableSsl = _settings.SmtpPort != 25;
 
-        var mail = new MailMessage(_from, toEmail, subject, htmlBody) { IsBodyHtml = true };
+        var mail = new MailMessage(_settings.From, toEmail, subject, htmlBody) { IsBodyHtml = true };
         await client.SendMailAsync(mail, ct);
     }
 }
