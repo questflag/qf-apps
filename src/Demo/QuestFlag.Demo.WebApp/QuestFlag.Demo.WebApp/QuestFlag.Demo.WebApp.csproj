@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\..\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj" />
   </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npx -y tailwindcss@latest --input Styles/app.css --output wwwroot/app.css --content &quot;./**/*.razor&quot;" />
+    <Exec Command="npm install" />
+    <Exec Command="node_modules\.bin\tailwindcss --input Styles/app.css --output wwwroot/app.css" />
   </Target>
 </Project>
