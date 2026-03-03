@@ -30,17 +30,19 @@ public static class PassportCoreExtensions
         services.AddScoped<ITrustedDeviceRepository, TrustedDeviceRepository>();
 
         // 3. ASP.NET Core Identity
+        var identitySettings = configuration.GetSection(IdentitySettings.SectionName).Get<IdentitySettings>()
+                               ?? new IdentitySettings();
+        services.Configure<IdentitySettings>(configuration.GetSection(IdentitySettings.SectionName));
+
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
-            options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 6;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireLowercase = false;
-            options.User.RequireUniqueEmail = false;
-
-            // Required for email-based confirmation tokens
-            options.SignIn.RequireConfirmedEmail = false; // enforce in app logic, not middleware
+            options.Password.RequireDigit           = identitySettings.RequireDigit;
+            options.Password.RequiredLength         = identitySettings.RequiredLength;
+            options.Password.RequireNonAlphanumeric = identitySettings.RequireNonAlphanumeric;
+            options.Password.RequireUppercase       = identitySettings.RequireUppercase;
+            options.Password.RequireLowercase       = identitySettings.RequireLowercase;
+            options.User.RequireUniqueEmail         = identitySettings.RequireUniqueEmail;
+            options.SignIn.RequireConfirmedEmail     = identitySettings.RequireConfirmedEmail;
         })
         .AddEntityFrameworkStores<PassportDbContext>()
         .AddDefaultTokenProviders();

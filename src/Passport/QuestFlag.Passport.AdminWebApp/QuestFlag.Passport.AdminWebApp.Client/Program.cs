@@ -14,7 +14,7 @@ builder.Services.AddScoped<IAccessTokenProvider, TokenProvider>();
 
 builder.Services.AddTransient<AuthenticatedHttpHandler>();
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
-    ?? "https://localhost:7004";
+    ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required.");
 
 builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
 {

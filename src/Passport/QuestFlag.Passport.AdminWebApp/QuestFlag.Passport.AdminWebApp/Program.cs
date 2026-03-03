@@ -8,6 +8,7 @@ using QuestFlag.Passport.AdminWebApp.Components;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
+using QuestFlag.Passport.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAccessTokenProvider, ServerTokenProvider>();
 builder.Services.AddTransient<AuthenticatedHttpHandler>();
 
+var oidcSettings = builder.Configuration.GetSection(OidcSettings.SectionName).Get<OidcSettings>()
+    ?? throw new InvalidOperationException($"'{OidcSettings.SectionName}' configuration section is required.");
+
 var passportServicesUrl = builder.Configuration["ServiceUrls:PassportServices"]
-    ?? "https://localhost:7004";
+    ?? throw new InvalidOperationException("ServiceUrls:PassportServices is required.");
 
 builder.Services.AddHttpClient<QuestFlag.Passport.AdminClient.PassportAdminClient>(client =>
 {
@@ -42,8 +46,8 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = passportServicesUrl;
-    options.ClientId = "passport-admin";
+    options.Authority = oidcSettings.Authority;
+    options.ClientId = oidcSettings.ClientId;
     options.ResponseType = OpenIdConnectResponseType.Code;
     options.SaveTokens = true;
     options.RequireHttpsMetadata = false; // Valid for local dev only
