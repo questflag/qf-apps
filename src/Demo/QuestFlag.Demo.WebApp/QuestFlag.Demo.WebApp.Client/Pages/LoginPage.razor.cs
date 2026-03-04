@@ -19,7 +19,6 @@ public partial class LoginPage
     private string _username = "";
     private string _password = "";
     private string? _error;
-    private bool _isSubmitting;
     private string _authorizeUrl = "";
     private Dictionary<string, string> _formParams = new();
 
@@ -108,8 +107,4 @@ public partial class LoginPage
         catch { /* ignore */ }
     }
 
-    private void HandleLogin()
-    {
-        _isSubmitting = true;
-    }
 }
