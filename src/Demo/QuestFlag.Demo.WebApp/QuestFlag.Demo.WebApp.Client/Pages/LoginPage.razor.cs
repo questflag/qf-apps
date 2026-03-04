@@ -24,7 +24,7 @@ public partial class LoginPage
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Try to resolve tenant from the Host header
+        // 1. Try to resolve tenant from the Host header (only on browser side)
         try
         {
             var host = await JS.InvokeAsync<string>("eval", "window.location.host");
@@ -40,7 +40,7 @@ public partial class LoginPage
             try
             {
                 _tenants = await PassportClient.GetTenantsAsync();
-                if (_tenants.Count == 1)
+                if (_tenants?.Count == 1)
                 {
                     _tenantSlug = _tenants[0].Slug;
                 }
@@ -88,21 +88,7 @@ public partial class LoginPage
             if (!_formParams.ContainsKey("scope")) _formParams["scope"] = "openid profile roles offline_access";
             if (!_formParams.ContainsKey("redirect_uri")) _formParams["redirect_uri"] = ReturnUrl ?? $"{infraWebAppBaseUrl}/signin-oidc";
 
-            var uriBuilder = new UriBuilder($"{passportServicesBaseUrl}/connect/authorize");
-            var queryList = new List<string>();
-            foreach (var kvp in _formParams)
-            {
-                queryList.Add($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}");
-            }
-            uriBuilder.Query = string.Join("&", queryList);
-
-            var tenantSlugExt = _tenantSlug;
-            queryList.Add($"tenant={Uri.EscapeDataString(tenantSlugExt)}");
-            var usernameExt = _username;
-            queryList.Add($"login_hint={Uri.EscapeDataString(usernameExt)}");
-            uriBuilder.Query = string.Join("&", queryList);
-            
-            _authorizeUrl = uriBuilder.ToString();
+            _authorizeUrl = $"{passportServicesBaseUrl}/connect/authorize";
         }
         catch { /* ignore */ }
     }

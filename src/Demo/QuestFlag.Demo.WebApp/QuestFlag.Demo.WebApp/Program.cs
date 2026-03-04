@@ -116,6 +116,12 @@ public class Program
             await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }).RequireAuthorization();
 
+        app.MapGet("/account/login", (string? returnUrl, HttpContext context) =>
+        {
+            var properties = new AuthenticationProperties { RedirectUri = returnUrl ?? "/" };
+            return Results.Challenge(properties, new[] { OpenIdConnectDefaults.AuthenticationScheme });
+        });
+
         app.Run();
     }
 }

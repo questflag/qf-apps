@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <div class="min-h-screen flex flex-col justify-center items-center bg-white">
     <div class="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-premium border border-gray-100">
@@ -8,12 +9,20 @@
         </div>
         
         <div class="mt-8 space-y-6">
-            <div class="text-center">
-                <p class="text-gray-600 mb-8">Welcome! Please sign in to access the infrastructure dashboard.</p>
-                <a href="login" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-xl text-white bg-primary hover:bg-primary-dark transition-all transform hover:scale-105 shadow-premium">
-                    Login to Continue
-                </a>
-            </div>
+            @if (NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/login") || 
+                 NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/sso"))
+            {
+                @Body
+            }
+            else
+            {
+                <div class="text-center">
+                    <p class="text-gray-600 mb-8">Welcome! Please sign in to access the infrastructure dashboard.</p>
+                    <a href="account/login" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-xl text-white bg-primary hover:bg-primary-dark transition-all transform hover:scale-105 shadow-premium">
+                        Login to Continue
+                    </a>
+                </div>
+            }
         </div>
         
         <div class="mt-8 pt-8 border-t border-gray-100 text-center text-xs text-gray-400 font-bold uppercase tracking-widest">
