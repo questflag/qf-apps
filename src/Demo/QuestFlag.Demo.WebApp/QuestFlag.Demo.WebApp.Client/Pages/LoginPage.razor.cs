@@ -14,11 +14,7 @@ public partial class LoginPage
 
     private IReadOnlyList<TenantDto>? _tenants;
     private ResolvedTenantDto? _resolvedTenant;
-    private bool _loadingTenants = true;
     private string _tenantSlug = "";
-    private string _username = "";
-    private string _password = "";
-    private string? _error;
     private string _authorizeUrl = "";
     private Dictionary<string, string> _formParams = new();
 
@@ -45,10 +41,10 @@ public partial class LoginPage
                     _tenantSlug = _tenants[0].Slug;
                 }
             }
-            catch { _error = "Could not load organizations. The auth service may be offline."; }
+            catch { /* ignore */ }
         }
 
-        _loadingTenants = false;
+
         UpdateAuthorizeUrl();
     }
 

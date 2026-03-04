@@ -41,17 +41,6 @@ var passportWebApp = builder.AddProject<Projects.QuestFlag_Passport_WebApp>("app
     .WithReference(passportServices);
 
 
-// 2. Demo Web Application
-var infraWebApp = builder.AddProject<Projects.QuestFlag_Demo_WebApp>("app-demo", launchProfileName: null)
-    .WithHttpEndpoint(port: infraWebAppHttpPort, targetPort: infraWebAppHttpPort, name: "http", isProxied: false)
-    .WithHttpsEndpoint(port: infraWebAppHttpsPort, targetPort: infraWebAppHttpsPort, name: "https", isProxied: false)
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", aspnetCoreEnvironment)
-    .WithEnvironment("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true")
-    .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
-    .WithReference(passportServices);
-
-
-
 // 4. Communication Services
 var commServices = builder.AddProject<Projects.QuestFlag_Communication_Services>("services-comm", launchProfileName: null)
     .WithHttpEndpoint(port: commServicesHttpPort, targetPort: commServicesHttpPort, name: "http", isProxied: false)
@@ -65,5 +54,17 @@ var commServices = builder.AddProject<Projects.QuestFlag_Communication_Services>
     .WithEnvironment("Kafka__GroupId", Compose("KAFKA_GROUP_ID", "qf-orchestrator-group"))
     .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
     .WithReference(passportServices);
+
+
+// 2. Demo Web Application
+var infraWebApp = builder.AddProject<Projects.QuestFlag_Demo_WebApp>("app-demo", launchProfileName: null)
+    .WithHttpEndpoint(port: infraWebAppHttpPort, targetPort: infraWebAppHttpPort, name: "http", isProxied: false)
+    .WithHttpsEndpoint(port: infraWebAppHttpsPort, targetPort: infraWebAppHttpsPort, name: "https", isProxied: false)
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", aspnetCoreEnvironment)
+    .WithEnvironment("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true")
+    .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
+    .WithEnvironment("ServiceUrls__InfraServices", commServices.GetEndpoint("http").Property(EndpointProperty.Url))
+    .WithReference(passportServices)
+    .WithReference(commServices);
 
 builder.Build().Run();

@@ -33,11 +33,24 @@
             }
 
             <form method="post" action="@SubmitUrl" class="space-y-6">
+                <!-- OIDC Parameters -->
+                <input type="hidden" name="client_id" value="@ClientId" />
+                <input type="hidden" name="redirect_uri" value="@RedirectUri" />
+                <input type="hidden" name="response_type" value="@ResponseType" />
+                <input type="hidden" name="scope" value="@Scope" />
+                <input type="hidden" name="response_mode" value="@ResponseMode" />
+                <input type="hidden" name="nonce" value="@Nonce" />
+                <input type="hidden" name="state" value="@State" />
+                <input type="hidden" name="code_challenge" value="@CodeChallenge" />
+                <input type="hidden" name="code_challenge_method" value="@CodeChallengeMethod" />
                 <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
                 
-                @foreach (var (key, value) in QueryParameters)
+                @if (ExtraParameters.Any())
                 {
-                    <input type="hidden" name="@key" value="@value" />
+                    @foreach (var (key, value) in ExtraParameters)
+                    {
+                        <input type="hidden" name="@key" value="@value" />
+                    }
                 }
 
                 <div>
@@ -94,27 +107,45 @@
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "client_id")] public string? ClientId { get; set; }
+    [SupplyParameterFromQuery(Name = "redirect_uri")] public string? RedirectUri { get; set; }
+    [SupplyParameterFromQuery(Name = "response_type")] public string? ResponseType { get; set; }
+    [SupplyParameterFromQuery(Name = "scope")] public string? Scope { get; set; }
+    [SupplyParameterFromQuery(Name = "response_mode")] public string? ResponseMode { get; set; }
+    [SupplyParameterFromQuery(Name = "nonce")] public string? Nonce { get; set; }
+    [SupplyParameterFromQuery(Name = "state")] public string? State { get; set; }
+    [SupplyParameterFromQuery(Name = "code_challenge")] public string? CodeChallenge { get; set; }
+    [SupplyParameterFromQuery(Name = "code_challenge_method")] public string? CodeChallengeMethod { get; set; }
+    [SupplyParameterFromQuery(Name = "returnUrl")] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "ErrorMessage")] public string? ErrorMessage { get; set; }
 
-    [SupplyParameterFromQuery]
-    public string? ErrorMessage { get; set; }
+    private string SubmitUrl
+    {
+        get
+        {
+            var baseUrl = $"{Configuration["ServiceUrls:PassportServices"]}/connect/authorize";
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            return string.IsNullOrEmpty(uri.Query) ? baseUrl : $"{baseUrl}{uri.Query}";
+        }
+    }
 
-    private string SubmitUrl => $"{Configuration["ServiceUrls:PassportServices"]}/connect/authorize";
-
-    private Dictionary<string, string> QueryParameters = new();
+    private Dictionary<string, string> ExtraParameters = new();
 
     protected override void OnInitialized()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
 
+        var handledKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "client_id", "redirect_uri", "response_type", "scope", "response_mode",
+            "nonce", "state", "code_challenge", "code_challenge_method", "returnUrl", "ErrorMessage"
+        };
+
         foreach (var param in query)
         {
-            // Skip the returnUrl as we handle it separately
-            if (param.Key.Equals("returnUrl", StringComparison.OrdinalIgnoreCase)) continue;
-            
-            QueryParameters[param.Key] = param.Value.ToString();
+            if (handledKeys.Contains(param.Key)) continue;
+            ExtraParameters[param.Key] = param.Value.ToString();
         }
     }
 }

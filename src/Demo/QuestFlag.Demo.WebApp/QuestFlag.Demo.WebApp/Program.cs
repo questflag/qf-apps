@@ -11,6 +11,7 @@ using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Passport.UserClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Communication.Client.Implementations;
+using QuestFlag.Communication.Client.Contracts;
 
 namespace QuestFlag.Demo.WebApp;
 
@@ -41,7 +42,7 @@ public class Program
         builder.Services.AddScoped<IAccessTokenProvider, ServerTokenProvider>();
         builder.Services.AddTransient<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
 
-        builder.Services.AddHttpClient<UploadApiService>(client =>
+        builder.Services.AddHttpClient<IUploadApiService, UploadApiService>(client =>
         {
             client.BaseAddress = new Uri(infraServicesUrl);
         }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
