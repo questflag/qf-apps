@@ -1,0 +1,171 @@
+@page "/sso"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Mvc
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+
+<PageTitle>SSO Login - QuestFlag</PageTitle>
+
+<div class="sso-container">
+    <div class="sso-card">
+        <div class="sso-logo">
+            <h1>QuestFlag</h1>
+            <p>Single Sign-On</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @ErrorMessage
+            </div>
+        }
+
+        <form method="post" action="@SubmitUrl">
+            <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+            
+            @foreach (var (key, value) in QueryParameters)
+            {
+                <input type="hidden" name="@key" value="@value" />
+            }
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required autofocus />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .sso-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #f8f9fa;
+    }
+
+    .sso-card {
+        width: 100%;
+        max-width: 400px;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .sso-logo {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .sso-logo h1 {
+        margin: 0;
+        color: #007bff;
+        font-weight: 700;
+    }
+
+    .sso-logo p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+    }
+
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .alert {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+</style>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? ErrorMessage { get; set; }
+
+    private string SubmitUrl => $"{Configuration["ServiceUrls:PassportServices"]}/connect/authorize";
+
+    private Dictionary<string, string> QueryParameters = new();
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+        foreach (var param in query)
+        {
+            // Skip the returnUrl as we handle it separately
+            if (param.Key.Equals("returnUrl", StringComparison.OrdinalIgnoreCase)) continue;
+            
+            QueryParameters[param.Key] = param.Value.ToString();
+        }
+    }
+}

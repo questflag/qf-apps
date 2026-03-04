@@ -15,6 +15,8 @@ var passportServicesHttpPort = int.Parse(Compose("PASSPORT_SERVICES_HTTP_PORT", 
 var passportServicesHttpsPort = int.Parse(Compose("PASSPORT_SERVICES_HTTPS_PORT", "7004"));
 var commServicesHttpPort = int.Parse(Compose("COMM_SERVICES_HTTP_PORT", "8005"));
 var commServicesHttpsPort = int.Parse(Compose("COMM_SERVICES_HTTPS_PORT", "7005"));
+var passportWebAppHttpPort = int.Parse(Compose("PASSPORT_WEBAPP_HTTP_PORT", "8002"));
+var passportWebAppHttpsPort = int.Parse(Compose("PASSPORT_WEBAPP_HTTPS_PORT", "7002"));
 
 // 1. Passport Services (Identity Provider)
 var passportServices = builder.AddProject<Projects.QuestFlag_Passport_Services>("services-passport", launchProfileName: null)
@@ -25,7 +27,18 @@ var passportServices = builder.AddProject<Projects.QuestFlag_Passport_Services>(
     .WithEnvironment("ConnectionStrings__PassportConnection", Compose("PASSPORT_CONNECTION_STRING", "Host=localhost;Port=15432;Database=QuestFlag_Passport;Username=postgres;Password=P@ssw0rd!Qf2026!"))
     .WithEnvironment("ServiceUrls__InfraWebApp", $"https://localhost:{infraWebAppHttpsPort.ToString()}")
     .WithEnvironment("ServiceUrls__InfraWebAppHttp", $"http://localhost:{infraWebAppHttpPort.ToString()}")
+    .WithEnvironment("ServiceUrls__PassportWebApp", $"https://localhost:{passportWebAppHttpsPort.ToString()}")
     .WithEnvironment("OpenIddictApplications__infra-webapp", $"https://localhost:{infraWebAppHttpsPort.ToString()}");
+
+
+// 1.1 Passport Web App (SSO Portal)
+var passportWebApp = builder.AddProject<Projects.QuestFlag_Passport_WebApp>("app-passport", launchProfileName: null)
+    .WithHttpEndpoint(port: passportWebAppHttpPort, targetPort: passportWebAppHttpPort, name: "http", isProxied: false)
+    .WithHttpsEndpoint(port: passportWebAppHttpsPort, targetPort: passportWebAppHttpsPort, name: "https", isProxied: false)
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", aspnetCoreEnvironment)
+    .WithEnvironment("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true")
+    .WithEnvironment("ServiceUrls__PassportServices", passportServices.GetEndpoint("https").Property(EndpointProperty.Url))
+    .WithReference(passportServices);
 
 
 // 2. Demo Web Application

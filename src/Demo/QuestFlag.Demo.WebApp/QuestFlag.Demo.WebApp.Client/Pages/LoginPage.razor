@@ -39,7 +39,7 @@
             </div>
         }
 
-        <form method="post" action="@_authorizeUrl" @onsubmit="HandleLogin" class="mt-8 space-y-6">
+        <form method="post" action="@_authorizeUrl" class="mt-8 space-y-6">
             <div class="space-y-4 rounded-md shadow-sm">
                 <!-- Tenant selector (only shown when not auto-resolved from domain) -->
                 @if (_resolvedTenant == null)
@@ -76,8 +76,8 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit" disabled="@_isSubmitting" class="btn btn-primary w-full shadow-sm text-base py-3 h-12">
-                    @(_isSubmitting ? "Signing in…" : "Continue")
+                <button type="submit" class="btn btn-primary w-full shadow-sm text-base py-3 h-12">
+                    Continue
                 </button>
             </div>
         </form>

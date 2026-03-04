@@ -1448,6 +1448,30 @@
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
   }
+  .\[d\:\\github\\qf-apps\\src\\Communication\\QuestFlag\.Communication\.Client\\QuestFlag\.Communication\.Client\.csproj\] {
+    d: \github\qf-apps\src\Communication\QuestFlag.Communication.Client\QuestFlag.Communication.Client.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Communication\\QuestFlag\.Communication\.Domain\\QuestFlag\.Communication\.Domain\.csproj\] {
+    d: \github\qf-apps\src\Communication\QuestFlag.Communication.Domain\QuestFlag.Communication.Domain.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Demo\\QuestFlag\.Demo\.WebApp\\QuestFlag\.Demo\.WebApp\.Client\\QuestFlag\.Demo\.WebApp\.Client\.csproj\] {
+    d: \github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Demo\\QuestFlag\.Demo\.WebApp\\QuestFlag\.Demo\.WebApp\\QuestFlag\.Demo\.WebApp\.csproj\] {
+    d: \github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Deployment\\QuestFlag\.ServiceDefaults\\QuestFlag\.ServiceDefaults\.csproj\] {
+    d: \github\qf-apps\src\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Infrastructure\\QuestFlag\.Infrastructure\.ApiCore\\QuestFlag\.Infrastructure\.ApiCore\.csproj\] {
+    d: \github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.ApiCore\QuestFlag.Infrastructure.ApiCore.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Infrastructure\\QuestFlag\.Infrastructure\.Client\\QuestFlag\.Infrastructure\.Client\.csproj\] {
+    d: \github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Client\QuestFlag.Infrastructure.Client.csproj;
+  }
+  .\[d\:\\github\\qf-apps\\src\\Passport\\QuestFlag\.Passport\.UserClient\\QuestFlag\.Passport\.UserClient\.csproj\] {
+    d: \github\qf-apps\src\Passport\QuestFlag.Passport.UserClient\QuestFlag.Passport.UserClient.csproj;
+  }
   .group-hover\:opacity-100 {
     &:is(:where(.group):hover *) {
       @media (hover: hover) {

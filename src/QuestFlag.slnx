@@ -23,6 +23,8 @@
     <Project Path="Passport/QuestFlag.Passport.Domain/QuestFlag.Passport.Domain.csproj" />
     <Project Path="Passport/QuestFlag.Passport.Services/QuestFlag.Passport.Services.csproj" />
     <Project Path="Passport/QuestFlag.Passport.UserClient/QuestFlag.Passport.UserClient.csproj" />
+    <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.csproj" />
+    <Project Path="Passport/QuestFlag.Passport.WebApp/QuestFlag.Passport.WebApp.Client/QuestFlag.Passport.WebApp.Client.csproj" />
   </Folder>
   <Folder Name="/AI/">
     <Project Path="AI/QuestFlag.AI.Services/QuestFlag.AI.Services.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="621a1bd0-79a0-43b6-9abb-74789c101e96" />
