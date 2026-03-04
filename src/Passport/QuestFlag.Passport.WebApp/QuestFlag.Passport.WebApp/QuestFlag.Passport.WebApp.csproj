@@ -25,4 +25,9 @@
     <ProjectReference Include="..\..\..\Deployment\QuestFlag.ServiceDefaults\QuestFlag.ServiceDefaults.csproj" />
   </ItemGroup>
 
+  <Target Name="Tailwind" BeforeTargets="Build">
+    <Exec Command="npm install" />
+    <Exec Command="node_modules\.bin\tailwindcss --input Styles/app.css --output wwwroot/app.css" />
+  </Target>
+
 </Project>

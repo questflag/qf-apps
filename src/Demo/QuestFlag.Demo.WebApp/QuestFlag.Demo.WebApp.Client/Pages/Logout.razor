@@ -1,0 +1,28 @@
+@page "/logout"
+@rendermode InteractiveWebAssembly
+@inject TokenProvider TokenProvider
+@inject NavigationManager Nav
+
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold mb-4">Logging out...</h1>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+    </div>
+</div>
+
+@inject IJSRuntime JS
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await TokenProvider.ClearTokenAsync();
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.removeItem", "user_info");
+        }
+        catch { /* Ignore */ }
+        
+        // Redirect to server-side logout to clear cookies as well
+        Nav.NavigateTo("account/logout", forceLoad: true);
+    }
+}

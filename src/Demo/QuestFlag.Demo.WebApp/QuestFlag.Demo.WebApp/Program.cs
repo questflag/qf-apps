@@ -55,6 +55,9 @@ public class Program
         var oidcSettings = builder.Configuration.GetSection(QuestFlag.Passport.Domain.Models.OidcSettings.SectionName).Get<QuestFlag.Passport.Domain.Models.OidcSettings>()
             ?? throw new InvalidOperationException($"'{QuestFlag.Passport.Domain.Models.OidcSettings.SectionName}' configuration section is required.");
 
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<ITicketStore, MemoryCacheTicketStore>();
+
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -80,6 +83,9 @@ public class Program
             options.TokenValidationParameters.NameClaimType = "name";
             options.TokenValidationParameters.RoleClaimType = "role";
         });
+
+        builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+            .Configure<ITicketStore>((options, store) => options.SessionStore = store);
 
         builder.Services.AddAuthorization();
 

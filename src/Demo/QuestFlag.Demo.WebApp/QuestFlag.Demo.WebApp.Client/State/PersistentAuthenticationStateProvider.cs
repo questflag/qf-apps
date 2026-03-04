@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
+using System.Text.Json;
+using System.Linq;
 
 namespace QuestFlag.Demo.WebApp.Client.State;
 
@@ -9,15 +12,76 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
     private static readonly Task<AuthenticationState> defaultUnauthenticatedTask =
         Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
 
-    private readonly Task<AuthenticationState> authenticationStateTask = defaultUnauthenticatedTask;
+    private Task<AuthenticationState> _authenticationStateTask = defaultUnauthenticatedTask;
+    private readonly IJSRuntime _js;
+    private readonly PersistentComponentState _state;
+    private bool _initialized;
 
-    public PersistentAuthenticationStateProvider(PersistentComponentState state)
+    public PersistentAuthenticationStateProvider(PersistentComponentState state, IJSRuntime js)
     {
-        if (!state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) || userInfo is null)
+        _state = state;
+        _js = js;
+
+        if (_state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) && userInfo is not null)
         {
-            return;
+            _authenticationStateTask = Task.FromResult(CreateState(userInfo));
+        }
+    }
+
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        if (!_initialized && _authenticationStateTask == defaultUnauthenticatedTask)
+        {
+            try
+            {
+                var userInfoJson = await _js.InvokeAsync<string?>("localStorage.getItem", "user_info");
+                if (!string.IsNullOrEmpty(userInfoJson))
+                {
+                    var userInfo = JsonSerializer.Deserialize<UserInfo>(userInfoJson);
+                    if (userInfo != null)
+                    {
+                        _authenticationStateTask = Task.FromResult(CreateState(userInfo));
+                    }
+                }
+            }
+            catch { /* Ignore JS errors during prerendering */ }
+            _initialized = true;
         }
 
+        // If we just got userInfo from server, persist it
+        if (!_initialized && _authenticationStateTask != defaultUnauthenticatedTask)
+        {
+            try
+            {
+                var info = await GetUserInfo();
+                if (info != null)
+                {
+                    await _js.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(info));
+                }
+                _initialized = true;
+            }
+            catch { /* Ignore */ }
+        }
+
+        return await _authenticationStateTask;
+    }
+
+    private async Task<UserInfo?> GetUserInfo()
+    {
+        var state = await _authenticationStateTask;
+        if (!state.User.Identity?.IsAuthenticated == true) return null;
+
+        return new UserInfo
+        {
+            UserId = state.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+            Name = state.User.Identity.Name,
+            Email = state.User.FindFirst(ClaimTypes.Email)?.Value,
+            Roles = state.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray()
+        };
+    }
+
+    private AuthenticationState CreateState(UserInfo userInfo)
+    {
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, userInfo.UserId ?? ""),
@@ -33,9 +97,6 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
             }
         }
 
-        authenticationStateTask = Task.FromResult(
-            new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Cookies"))));
+        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Bearer")));
     }
-
-    public override Task<AuthenticationState> GetAuthenticationStateAsync() => authenticationStateTask;
 }
