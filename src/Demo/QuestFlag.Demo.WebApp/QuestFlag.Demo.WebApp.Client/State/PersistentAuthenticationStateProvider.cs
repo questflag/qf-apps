@@ -22,15 +22,18 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         _state = state;
         _js = js;
 
+        // Try server-persisted state first (prerender)
         if (_state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) && userInfo is not null)
         {
             _authenticationStateTask = Task.FromResult(CreateState(userInfo));
+            _initialized = true;
         }
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (!_initialized && _authenticationStateTask == defaultUnauthenticatedTask)
+        // On first client-side call (after WASM init), read from localStorage
+        if (!_initialized)
         {
             try
             {
@@ -44,40 +47,49 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
                     }
                 }
             }
-            catch { /* Ignore JS errors during prerendering */ }
+            catch { /* JS not available during prerendering */ }
             _initialized = true;
-        }
-
-        // If we just got userInfo from server, persist it
-        if (!_initialized && _authenticationStateTask != defaultUnauthenticatedTask)
-        {
-            try
-            {
-                var info = await GetUserInfo();
-                if (info != null)
-                {
-                    await _js.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(info));
-                }
-                _initialized = true;
-            }
-            catch { /* Ignore */ }
         }
 
         return await _authenticationStateTask;
     }
 
-    private async Task<UserInfo?> GetUserInfo()
+    /// <summary>
+    /// Called after successful SSO token exchange. Stores user info and notifies Blazor.
+    /// Does NOT require a page reload.
+    /// </summary>
+    public async Task SignInAsync(UserInfo userInfo, string accessToken)
     {
-        var state = await _authenticationStateTask;
-        if (!state.User.Identity?.IsAuthenticated == true) return null;
-
-        return new UserInfo
+        try
         {
-            UserId = state.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-            Name = state.User.Identity?.Name,
-            Email = state.User.FindFirst(ClaimTypes.Email)?.Value,
-            Roles = state.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray()
-        };
+            await _js.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(userInfo));
+            await _js.InvokeVoidAsync("localStorage.setItem", "access_token", accessToken);
+        }
+        catch { /* Ignore */ }
+
+        _authenticationStateTask = Task.FromResult(CreateState(userInfo));
+        _initialized = true;
+        NotifyAuthenticationStateChanged(_authenticationStateTask);
+    }
+
+    /// <summary>
+    /// Called on logout. Clears all auth state from memory and localStorage.
+    /// Does NOT require a page reload.
+    /// </summary>
+    public async Task SignOutAsync()
+    {
+        try
+        {
+            // Clear all known auth keys
+            await _js.InvokeVoidAsync("localStorage.removeItem", "user_info");
+            await _js.InvokeVoidAsync("localStorage.removeItem", "access_token");
+            await _js.InvokeVoidAsync("localStorage.removeItem", "code_verifier");
+        }
+        catch { /* Ignore */ }
+
+        _authenticationStateTask = defaultUnauthenticatedTask;
+        _initialized = true;
+        NotifyAuthenticationStateChanged(_authenticationStateTask);
     }
 
     private AuthenticationState CreateState(UserInfo userInfo)
@@ -87,7 +99,8 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
             new Claim(ClaimTypes.NameIdentifier, userInfo.UserId ?? ""),
             new Claim(ClaimTypes.Name, userInfo.Name ?? ""),
         };
-        if (!string.IsNullOrEmpty(userInfo.Email)) claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
+        if (!string.IsNullOrEmpty(userInfo.Email))
+            claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
 
         if (userInfo.Roles != null)
         {

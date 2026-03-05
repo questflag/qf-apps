@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Include client project razor files so Tailwind v4 generates their utility classes */
+@source "../../QuestFlag.Demo.WebApp.Client/**/*.{razor,html,cshtml}";
+@source "../Components/**/*.{razor,html,cshtml}";
+
+
 @theme {
   --color-primary: hsl(221 83% 53%);
   --color-primary-foreground: hsl(210 40% 98%);

@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./**/*.{razor,html,cshtml}",
-    "../QuestFlag.Infrastructure.WebApp.Client/**/*.{razor,html,cshtml}"
+    "../QuestFlag.Demo.WebApp.Client/**/*.{razor,html,cshtml}"
   ],
   theme: {
     extend: {

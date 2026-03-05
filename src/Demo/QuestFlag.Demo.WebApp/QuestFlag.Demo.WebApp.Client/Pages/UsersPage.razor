@@ -1,5 +1,4 @@
 @page "/admin/tenants/{TenantId:guid}/users"
-@rendermode InteractiveWebAssembly
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "passport_admin,tenant_admin")]
 
 @using QuestFlag.Passport.AdminClient

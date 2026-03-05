@@ -1,15 +1,11 @@
 @page "/logout"
-@rendermode InteractiveWebAssembly
-@rendermode InteractiveWebAssembly
-@inject TokenProvider TokenProvider
-@inject NavigationManager Nav
 
-<div class="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+<div class="flex items-center justify-center min-h-screen bg-white">
     <div class="text-center">
-        <h1 class="text-2xl font-bold mb-4">Logging out...</h1>
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-white text-3xl font-black shadow-premium animate-pulse mb-8">
+            QF
+        </div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tighter mb-2">Signing out...</h1>
+        <p class="text-slate-400 font-semibold uppercase tracking-widest text-[10px]">Clearing your session</p>
     </div>
 </div>
-
-@inject IJSRuntime JS
-

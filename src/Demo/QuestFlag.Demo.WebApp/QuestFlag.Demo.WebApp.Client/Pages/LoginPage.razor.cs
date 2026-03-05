@@ -25,6 +25,15 @@ public partial class LoginPage
         var ssoBaseUrl = Configuration["ServiceUrls:PassportWebApp"] ?? "https://localhost:7002";
         var ssoUrl = $"{ssoBaseUrl.TrimEnd('/')}/sso";
 
+        // Clear any stale auth state before starting a fresh login
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.removeItem", "user_info");
+            await JS.InvokeVoidAsync("localStorage.removeItem", "access_token");
+            await JS.InvokeVoidAsync("localStorage.removeItem", "code_verifier");
+        }
+        catch { /* Ignore */ }
+
         // PKCE
         var codeVerifier = PkceHelper.GenerateCodeVerifier();
         var codeChallenge = PkceHelper.GenerateCodeChallenge(codeVerifier);
