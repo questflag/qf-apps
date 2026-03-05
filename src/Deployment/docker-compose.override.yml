@@ -1,76 +1,6 @@
 name: qf-app-infra
 
 services:
-  # service-qf-infra:
-  #   extra_hosts:
-  #     - "localhost:host-gateway"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-  #     - ASPNETCORE_HTTP_PORTS=${INFRASTRUCTURE_SERVICES_HTTP_PORT}
-  #     - ASPNETCORE_HTTPS_PORTS=${INFRASTRUCTURE_SERVICES_HTTPS_PORT}
-  #     - Storage__MinioAccessKey=${STORAGE_MINIO_ACCESS_KEY}
-  #     - Storage__MinioSecretKey=${STORAGE_MINIO_SECRET_KEY}
-  #     - Storage__MinioEndpoint=${STORAGE_MINIO_ENDPOINT}
-  #     - Kafka__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
-  #     - ConnectionStrings__InfrastructureConnection=${INFRASTRUCTURE_CONNECTION_STRING}
-  #     - ServiceUrls__PassportServices=${URL_PASSPORT_SERVICES}
-  #     - ServiceUrls__InfraServices=${URL_INFRA_SERVICES}
-  #     - ServiceUrls__InfraWebApp=${URL_INFRA_WEBAPP}
-  #     - ServiceUrls__InfraWebAppHttp=http://localhost:${INFRA_WEBAPP_HTTP_PORT}
-  #   ports:
-  #     - "${INFRASTRUCTURE_SERVICES_HTTP_PORT}:${INFRASTRUCTURE_SERVICES_HTTP_PORT}"
-  #     - "${INFRASTRUCTURE_SERVICES_HTTPS_PORT}:${INFRASTRUCTURE_SERVICES_HTTPS_PORT}"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-
-  # app-qf-infra:
-  #   extra_hosts:
-  #     - "localhost:host-gateway"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-  #     - ASPNETCORE_HTTP_PORTS=${INFRA_WEBAPP_HTTP_PORT}
-  #     - ASPNETCORE_HTTPS_PORTS=${INFRA_WEBAPP_HTTPS_PORT}
-  #   ports:
-  #     - "${INFRA_WEBAPP_HTTPS_PORT}:${INFRA_WEBAPP_HTTPS_PORT}"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-
-  # app-qf-passport:
-  #   extra_hosts:
-  #     - "localhost:host-gateway"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-  #     - ASPNETCORE_HTTP_PORTS=${PASSPORT_WEBAPP_HTTP_PORT}
-  #     - ASPNETCORE_HTTPS_PORTS=${PASSPORT_WEBAPP_HTTPS_PORT}
-  #   ports:
-  #     - "${PASSPORT_WEBAPP_HTTPS_PORT}:${PASSPORT_WEBAPP_HTTPS_PORT}"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-
-  # app-qf-passport-admin:
-  #   extra_hosts:
-  #     - "localhost:host-gateway"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-  #     - ASPNETCORE_HTTP_PORTS=${PASSPORT_ADMINWEBAPP_HTTP_PORT}
-  #     - ASPNETCORE_HTTPS_PORTS=${PASSPORT_ADMINWEBAPP_HTTPS_PORT}
-  #   ports:
-  #     - "${PASSPORT_ADMINWEBAPP_HTTPS_PORT}:${PASSPORT_ADMINWEBAPP_HTTPS_PORT}"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   infra-postgres:
     image: ${POSTGRES_IMAGE}
@@ -233,32 +163,7 @@ services:
       - "${TEMPO_OTLP_GRPC_PORT}:${TEMPO_OTLP_GRPC_CONTAINER_PORT}" # otlp grpc
     volumes:
       - ./Configs/tempo.yaml:/etc/tempo.yaml
-      - tempo_data:/var/tempo
-  # questflag.passport.services:
-  #   depends_on:
-  #     - infra-postgres
-  #   extra_hosts:
-  #     - "localhost:host-gateway"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-  #     - ASPNETCORE_HTTP_PORTS=${PASSPORT_SERVICES_HTTP_PORT}
-  #     - ASPNETCORE_HTTPS_PORTS=${PASSPORT_SERVICES_HTTPS_PORT}
-  #     - ConnectionStrings__PassportConnection=${PASSPORT_CONNECTION_STRING}
-  #     - ServiceUrls__InfraWebApp=${URL_INFRA_WEBAPP}
-  #     - ServiceUrls__InfraWebAppHttp=http://localhost:${INFRA_WEBAPP_HTTP_PORT}
-  #     - ServiceUrls__PassportWebApp=${URL_PASSPORT_WEBAPP}
-  #     - ServiceUrls__PassportAdminWebApp=${URL_PASSPORT_ADMIN_WEBAPP}
-  #     - OpenIddictApplications__infra-webapp=${URL_INFRA_WEBAPP}
-  #     - OpenIddictApplications__passport-webapp=${URL_PASSPORT_WEBAPP}
-  #     - OpenIddictApplications__passport-admin=${URL_PASSPORT_ADMIN_WEBAPP}
-  #   ports:
-  #     - "${PASSPORT_SERVICES_HTTP_PORT}:${PASSPORT_SERVICES_HTTP_PORT}"
-  #     - "${PASSPORT_SERVICES_HTTPS_PORT}:${PASSPORT_SERVICES_HTTPS_PORT}"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - tempo_data:/var/temp
 volumes:
   postgres_data:
   redis_data:
