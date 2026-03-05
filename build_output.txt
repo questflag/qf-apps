@@ -1,0 +1,72 @@
+D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj : warning NU1503: Skipping restore for project 'D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj'. The project file may be invalid or missing targets required for restore. [D:\github\qf-apps\src\QuestFlag.slnx]
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj(55,3): error MSB4278: The imported file "$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" does not exist and appears to be part of a Visual Studio component. This file may require MSBuild.exe in order to be imported successfully, and so may fail to build in the dotnet CLI. 
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Communication\QuestFlag.Communication.Core\QuestFlag.Communication.Core.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Communication\QuestFlag.Communication.Domain\QuestFlag.Communication.Domain.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Communication\QuestFlag.Communication.Client\QuestFlag.Communication.Client.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Communication\QuestFlag.Communication.Application\QuestFlag.Communication.Application.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Communication\QuestFlag.Communication.Services\QuestFlag.Communication.Services.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-preview.1.26104.118\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(383,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [D:\github\qf-apps\src\Deployment\QuestFlag.AppHost\QuestFlag.AppHost.csproj]
+  QuestFlag.Infrastructure.ApiCore -> D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.ApiCore\bin\Debug\net10.0\QuestFlag.Infrastructure.ApiCore.dll
+  QuestFlag.Infrastructure.Client -> D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Client\bin\Debug\net10.0\QuestFlag.Infrastructure.Client.dll
+  QuestFlag.Infrastructure.Domain -> D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Domain\bin\Debug\net10.0\QuestFlag.Infrastructure.Domain.dll
+  QuestFlag.ServiceDefaults -> D:\github\qf-apps\src\Deployment\QuestFlag.ServiceDefaults\bin\Debug\net10.0\QuestFlag.ServiceDefaults.dll
+  QuestFlag.Passport.AdminClient -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.AdminClient\bin\Debug\net10.0\QuestFlag.Passport.AdminClient.dll
+  QuestFlag.Infrastructure.Core -> D:\github\qf-apps\src\Infrastructure\QuestFlag.Infrastructure.Core\bin\Debug\net10.0\QuestFlag.Infrastructure.Core.dll
+  QuestFlag.Passport.Domain -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.Domain\bin\Debug\net10.0\QuestFlag.Passport.Domain.dll
+  QuestFlag.Passport.UserClient -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.UserClient\bin\Debug\net10.0\QuestFlag.Passport.UserClient.dll
+  QuestFlag.Communication.Domain -> D:\github\qf-apps\src\Communication\QuestFlag.Communication.Domain\bin\Debug\net10.0\QuestFlag.Communication.Domain.dll
+  QuestFlag.Communication.Core -> D:\github\qf-apps\src\Communication\QuestFlag.Communication.Core\bin\Debug\net10.0\QuestFlag.Communication.Core.dll
+  QuestFlag.Communication.Client -> D:\github\qf-apps\src\Communication\QuestFlag.Communication.Client\bin\Debug\net10.0\QuestFlag.Communication.Client.dll
+  QuestFlag.Communication.Application -> D:\github\qf-apps\src\Communication\QuestFlag.Communication.Application\bin\Debug\net10.0\QuestFlag.Communication.Application.dll
+  QuestFlag.Passport.Application -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.Application\bin\Debug\net10.0\QuestFlag.Passport.Application.dll
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,64): warning CS8604: Possible null reference argument for parameter 'authority' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,75): warning CS8604: Possible null reference argument for parameter 'clientId' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,85): warning CS8604: Possible null reference argument for parameter 'code' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\State\PersistentAuthenticationStateProvider.cs(77,20): warning CS8602: Dereference of a possibly null reference. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+  QuestFlag.Passport.WebApp.Client -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\bin\Debug\net10.0\QuestFlag.Passport.WebApp.Client.dll
+  QuestFlag.Passport.WebApp.Client (Blazor output) -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp.Client\bin\Debug\net10.0\wwwroot
+  QuestFlag.Communication.Services -> D:\github\qf-apps\src\Communication\QuestFlag.Communication.Services\bin\Debug\net10.0\QuestFlag.Communication.Services.dll
+  QuestFlag.Demo.WebApp.Client -> D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\bin\Debug\net10.0\QuestFlag.Demo.WebApp.Client.dll
+  QuestFlag.Demo.WebApp.Client (Blazor output) -> D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\bin\Debug\net10.0\wwwroot
+  QuestFlag.Passport.Core -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.Core\bin\Debug\net10.0\QuestFlag.Passport.Core.dll
+  QuestFlag.Passport.Services -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.Services\bin\Debug\net10.0\QuestFlag.Passport.Services.dll
+  QuestFlag.Passport.WebApp -> D:\github\qf-apps\src\Passport\QuestFlag.Passport.WebApp\QuestFlag.Passport.WebApp\bin\Debug\net10.0\QuestFlag.Passport.WebApp.dll
+  
+  up to date, audited 28 packages in 1s
+  
+  6 packages are looking for funding
+    run `npm fund` for details
+  
+  found 0 vulnerabilities
+  [3m[1m[34m╬ô├½├¬[39m[22m[23m tailwindcss [34mv4.2.1[39m
+  
+  Done in [34m138ms[39m
+  QuestFlag.Demo.WebApp -> D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp\bin\Debug\net10.0\QuestFlag.Demo.WebApp.dll
+  
+  up to date, audited 28 packages in 1s
+  
+  6 packages are looking for funding
+    run `npm fund` for details
+  
+  found 0 vulnerabilities
+  [3m[1m[34m╬ô├½├¬[39m[22m[23m tailwindcss [34mv4.2.1[39m
+  
+  Done in [33m425ms[39m
+  QuestFlag.AppHost -> D:\github\qf-apps\src\Deployment\QuestFlag.AppHost\bin\Debug\net10.0\QuestFlag.AppHost.dll
+
+Build FAILED.
+
+D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj : warning NU1503: Skipping restore for project 'D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj'. The project file may be invalid or missing targets required for restore. [D:\github\qf-apps\src\QuestFlag.slnx]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,64): warning CS8604: Possible null reference argument for parameter 'authority' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,75): warning CS8604: Possible null reference argument for parameter 'clientId' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\Pages\SigninOidc.razor(37,85): warning CS8604: Possible null reference argument for parameter 'code' in 'Task<TokenResponse?> SigninOidc.ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)'. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\State\PersistentAuthenticationStateProvider.cs(77,20): warning CS8602: Dereference of a possibly null reference. [D:\github\qf-apps\src\Demo\QuestFlag.Demo.WebApp\QuestFlag.Demo.WebApp.Client\QuestFlag.Demo.WebApp.Client.csproj]
+D:\github\qf-apps\src\AI\QuestFlag.AI.Services\QuestFlag.AI.Services.pyproj(55,3): error MSB4278: The imported file "$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" does not exist and appears to be part of a Visual Studio component. This file may require MSBuild.exe in order to be imported successfully, and so may fail to build in the dotnet CLI. 
+    5 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:01:00.14

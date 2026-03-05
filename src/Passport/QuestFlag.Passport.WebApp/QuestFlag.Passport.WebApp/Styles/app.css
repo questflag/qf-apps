@@ -1,20 +1,21 @@
 @import "tailwindcss";
+@source "../../QuestFlag.Passport.WebApp.Client/**/*.razor";
 
 @theme {
-  --color-primary: #0062ff;
-  --color-primary-hover: #0052d9;
-  --color-primary-dark: #0041a3;
+    --color-primary: #0062ff;
+    --color-primary-hover: #0052d9;
+    --color-primary-dark: #0041a3;
 
-  --font-sans: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-sans: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
-  --shadow-premium-sm: 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+    --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+    --shadow-premium-sm: 0 10px 20px -5px rgba(0, 0, 0, 0.04);
 }
 
 @layer base {
-  body {
-    @apply font-sans;
-  }
+    body {
+        @apply font-sans;
+    }
 }
 
 /* Blazor Error Boundary Styles from original app.css */
@@ -40,19 +41,21 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
     color: var(--bs-secondary-color);
     text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
     text-align: start;
 }

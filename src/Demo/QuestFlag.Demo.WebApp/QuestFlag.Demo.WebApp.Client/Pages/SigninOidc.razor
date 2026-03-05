@@ -1,0 +1,158 @@
+@page "/signin-oidc"
+@using Microsoft.AspNetCore.WebUtilities
+@using QuestFlag.Passport.UserClient
+@using QuestFlag.Demo.WebApp.Client.State
+@using System.Text.Json
+@inject NavigationManager Nav
+@inject IConfiguration Configuration
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IAccessTokenProvider TokenProvider
+
+<div class="flex items-center justify-center min-h-screen bg-white font-sans">
+    <div class="text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-white text-3xl font-black shadow-premium animate-bounce mb-8">
+            QF
+        </div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tighter mb-2">Finalizing Authentication</h1>
+        <p class="text-slate-400 font-semibold uppercase tracking-widest text-[10px]">Please wait while we secure your session...</p>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("code", out var codeValues) && !string.IsNullOrEmpty(codeValues))
+        {
+            var code = codeValues.ToString();
+            try
+            {
+                var authority = Configuration["Oidc:Authority"];
+                var clientId = Configuration["Oidc:ClientId"];
+                var redirectUri = Nav.ToAbsoluteUri("signin-oidc").ToString();
+
+                if (string.IsNullOrEmpty(authority) || string.IsNullOrEmpty(clientId))
+                {
+                    Nav.NavigateTo("/login?ErrorMessage=OIDC configuration is missing");
+                    return;
+                }
+
+                var tokenResponse = await ExchangeCodeForToken(authority, clientId, code, redirectUri);
+                
+                if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.AccessToken))
+                {
+                    // Store token
+                    await JS.InvokeVoidAsync("localStorage.setItem", "access_token", tokenResponse.AccessToken);
+                    
+                    // Decode token to get user info
+                    var userInfo = ParseUserInfoFromToken(tokenResponse.AccessToken);
+                    if (userInfo != null)
+                    {
+                        await JS.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(userInfo));
+                    }
+                    
+                    // Redirect to home
+                    Nav.NavigateTo("/", forceLoad: true);
+                }
+                else
+                {
+                    Nav.NavigateTo("/login?ErrorMessage=Invalid token response");
+                }
+            }
+            catch (Exception ex)
+            {
+                Nav.NavigateTo($"/login?ErrorMessage={Uri.EscapeDataString(ex.Message)}");
+            }
+        }
+    }
+
+    private UserInfo? ParseUserInfoFromToken(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2) return null;
+
+            var payload = parts[1];
+            var jsonBytes = ParseBase64WithoutPadding(payload);
+            var claims = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+
+            if (claims == null) return null;
+
+            var info = new UserInfo
+            {
+                UserId = claims.TryGetValue("sub", out var sub) ? sub.ToString() : null,
+                Name = claims.TryGetValue("name", out var name) ? name.ToString() : null,
+                Email = claims.TryGetValue("email", out var email) ? email.ToString() : null
+            };
+
+            if (claims.TryGetValue("role", out var roles))
+            {
+                if (roles is JsonElement element)
+                {
+                    if (element.ValueKind == JsonValueKind.Array)
+                    {
+                        info.Roles = element.EnumerateArray().Select(x => x.GetString() ?? "").Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                    }
+                    else
+                    {
+                        info.Roles = new[] { element.GetString() ?? "" };
+                    }
+                }
+            }
+
+            return info;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private byte[] ParseBase64WithoutPadding(string base64)
+    {
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Convert.FromBase64String(base64);
+    }
+
+    private async Task<TokenResponse?> ExchangeCodeForToken(string authority, string clientId, string code, string redirectUri)
+    {
+        var tokenEndpoint = $"{authority}/connect/token";
+        
+        var content = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("grant_type", "authorization_code"),
+            new KeyValuePair<string, string>("client_id", clientId),
+            new KeyValuePair<string, string>("code", code),
+            new KeyValuePair<string, string>("redirect_uri", redirectUri),
+        });
+
+        // Use a new HttpClient instance for the exchange to avoid any Auth handlers
+        using var client = new HttpClient();
+        var response = await client.PostAsync(tokenEndpoint, content);
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<TokenResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        
+        return null;
+    }
+
+    public class TokenResponse
+    {
+        public string? AccessToken { get; set; }
+        public string? TokenType { get; set; }
+        public int ExpiresIn { get; set; }
+        public string? RefreshToken { get; set; }
+        public string? IdToken { get; set; }
+    }
+}

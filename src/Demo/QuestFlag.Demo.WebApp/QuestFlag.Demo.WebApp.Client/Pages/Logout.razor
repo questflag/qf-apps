@@ -22,7 +22,7 @@
         }
         catch { /* Ignore */ }
         
-        // Redirect to server-side logout to clear cookies as well
-        Nav.NavigateTo("account/logout", forceLoad: true);
+        // Redirect to home since we are in pure token mode
+        Nav.NavigateTo("/", forceLoad: true);
     }
 }

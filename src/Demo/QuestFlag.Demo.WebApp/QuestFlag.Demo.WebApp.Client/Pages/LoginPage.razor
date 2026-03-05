@@ -1,23 +1,41 @@
 @page "/login"
 @page "/sso"
+@page "/account/login"
 @rendermode InteractiveAuto
-@using QuestFlag.Passport.UserClient
-@inject PassportUserClient PassportClient
 @inject NavigationManager Nav
-@inject IJSRuntime JS
+@inject IConfiguration Configuration
 
-<PageTitle>Sign In — @(_resolvedTenant?.Name ?? "QuestFlag")</PageTitle>
+<PageTitle>Sign In — QuestFlag</PageTitle>
 
-<div class="flex items-center justify-center min-h-[calc(100vh-8rem)] bg-white px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8 card p-8 text-center animate-pulse">
-        <div class="mx-auto h-12 w-12 bg-primary text-white rounded-lg flex items-center justify-center text-xl font-bold mb-4 shadow-sm">QF</div>
-        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Redirecting...</h1>
-        <p class="mt-2 text-sm text-gray-500 font-medium">We're taking you to the secure login portal.</p>
-        
-        <div class="pt-8">
-            <a href="account/login" class="btn btn-primary w-full shadow-sm text-base py-3 h-12">
-                Click here if not redirected
-            </a>
+<div class="flex items-center justify-center min-h-screen bg-white">
+    <!-- Animated background element -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative w-full max-w-md p-10 text-center">
+        <!-- Brand Logo -->
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary text-white text-3xl font-black shadow-premium mb-10 transform hover:scale-105 transition-transform duration-500">
+            QF
+        </div>
+
+        <!-- Content -->
+        <div class="space-y-4">
+            <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Authenticating</h1>
+            <p class="text-slate-400 font-semibold uppercase tracking-[0.2em] text-[10px]">Preparing your secure session</p>
+            
+            <div class="pt-10 flex flex-col items-center">
+                <div class="flex space-x-2 mb-10">
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></div>
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
+                </div>
+
+                <button @onclick="RedirectToSso" class="group relative px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                    Click here if not redirected
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -25,6 +43,29 @@
 @code {
     protected override void OnInitialized()
     {
-        Nav.NavigateTo("account/login", forceLoad: true);
+        RedirectToSso();
+    }
+
+    private void RedirectToSso()
+    {
+        var clientId = Configuration["Oidc:ClientId"] ?? "infra-webapp";
+        var redirectUri = Nav.ToAbsoluteUri("signin-oidc").ToString();
+        
+        var ssoBaseUrl = Configuration["ServiceUrls:PassportWebApp"] ?? "https://localhost:7002";
+        var ssoUrl = $"{ssoBaseUrl.TrimEnd('/')}/sso";
+        
+        var queryParams = new Dictionary<string, string?>
+        {
+            ["client_id"] = clientId,
+            ["redirect_uri"] = redirectUri,
+            ["response_type"] = "code",
+            ["scope"] = "openid profile email roles offline_access",
+            ["response_mode"] = "query",
+            ["state"] = Guid.NewGuid().ToString("N"),
+            ["nonce"] = Guid.NewGuid().ToString("N")
+        };
+
+        var uri = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(ssoUrl, queryParams);
+        Nav.NavigateTo(uri, forceLoad: true);
     }
 }

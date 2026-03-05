@@ -74,7 +74,7 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         return new UserInfo
         {
             UserId = state.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-            Name = state.User.Identity.Name,
+            Name = state.User.Identity?.Name,
             Email = state.User.FindFirst(ClaimTypes.Email)?.Value,
             Roles = state.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray()
         };
