@@ -5,7 +5,7 @@ namespace QuestFlag.Demo.WebApp.Client.Helpers;
 
 public static class PkceHelper
 {
-    private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01233456789-._~";
+    private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
     public static string GenerateCodeVerifier(int length = 128)
     {
