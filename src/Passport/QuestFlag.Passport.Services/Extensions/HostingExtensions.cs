@@ -174,7 +174,10 @@ public static class HostingExtensions
 
             foreach (var p in permissions) descriptor.Permissions.Add(p);
 
-            descriptor.Requirements.Add(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange);
+            if (app.RequirePkce)
+            {
+                descriptor.Requirements.Add(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange);
+            }
 
             await manager.CreateAsync(descriptor);
         }

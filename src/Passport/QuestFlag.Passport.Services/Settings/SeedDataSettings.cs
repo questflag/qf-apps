@@ -60,6 +60,11 @@ public class SeedOidcAppSettings
     /// authorization-code + refresh-token set is used automatically.
     /// </summary>
     public List<string> Permissions { get; set; } = [];
+
+    /// <summary>
+    /// Whether to require PKCE for this application.
+    /// </summary>
+    public bool RequirePkce { get; set; } = true;
 }
 
 public class SeedAgentSettings
