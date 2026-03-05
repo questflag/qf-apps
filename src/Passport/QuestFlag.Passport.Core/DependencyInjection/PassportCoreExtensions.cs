@@ -47,6 +47,11 @@ public static class PassportCoreExtensions
         .AddEntityFrameworkStores<PassportDbContext>()
         .AddDefaultTokenProviders();
 
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "QuestFlag.Identity";
+        });
+
         // 4. OpenIddict Core (Stores)
         services.AddOpenIddict()
             .AddCore(options =>

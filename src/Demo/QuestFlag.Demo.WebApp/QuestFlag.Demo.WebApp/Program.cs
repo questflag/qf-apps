@@ -73,10 +73,9 @@ public class Program
             app.UseHsts();
         }
         app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-        app.UseHttpsRedirection();
+        app.UseQuestFlagApiPipeline();
 
         app.UseAntiforgery();
-        app.UseQuestFlagApiPipeline();
 
         app.MapStaticAssets();
         app.MapRazorComponents<App>()

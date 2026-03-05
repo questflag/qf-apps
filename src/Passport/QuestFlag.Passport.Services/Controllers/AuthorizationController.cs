@@ -36,7 +36,6 @@ public class AuthorizationController : ControllerBase
 
     [HttpGet("~/connect/authorize")]
     [HttpPost("~/connect/authorize")]
-    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Authorize()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??

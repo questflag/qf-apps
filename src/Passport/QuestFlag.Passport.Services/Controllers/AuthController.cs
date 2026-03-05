@@ -31,7 +31,7 @@ public class AuthController : ControllerBase
         _signInManager = signInManager;
     }
 
-    [HttpPost("token"), IgnoreAntiforgeryToken]
+    [HttpPost("token")]
     [Consumes("application/x-www-form-urlencoded")]
     public async Task<IActionResult> Exchange()
     {
@@ -123,7 +123,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("userinfo"), HttpPost("userinfo"), Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> UserInfo()
     {
         var user = await _userRepository.GetByIdAsync(Guid.Parse(User.GetClaim(OpenIddictConstants.Claims.Subject) ?? Guid.Empty.ToString()));
@@ -169,7 +168,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("logout"), HttpPost("logout")]
-    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Logout()
     {
         // 1. Sign out from ASP.NET Core Identity (deletes the application cookie).

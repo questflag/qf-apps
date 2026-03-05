@@ -1,6 +1,7 @@
 @page "/admin/tenants"
+@rendermode InteractiveWebAssembly
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "passport_admin,tenant_admin")]
-@rendermode InteractiveAuto
+
 @using QuestFlag.Passport.AdminClient
 @inject PassportAdminClient AdminClient
 

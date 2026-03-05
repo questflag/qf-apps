@@ -10,7 +10,8 @@
         
         <div class="mt-8 space-y-6">
             @if (NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/login") || 
-                 NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/sso"))
+                 NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/sso") ||
+                 NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').EndsWith("/signin-oidc"))
             {
                 @Body
             }
