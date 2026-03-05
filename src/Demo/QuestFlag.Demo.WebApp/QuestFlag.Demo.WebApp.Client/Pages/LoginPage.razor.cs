@@ -9,9 +9,13 @@ namespace QuestFlag.Demo.WebApp.Client.Pages;
 
 public partial class LoginPage
 {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ErrorMessage { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && string.IsNullOrEmpty(ErrorMessage))
         {
             await RedirectToSso();
         }

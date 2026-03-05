@@ -43,9 +43,10 @@ public partial class SigninOidc
             var codeVerifier = await JS.InvokeAsync<string?>("localStorage.getItem", "code_verifier");
             var tokenResponse = await ExchangeCodeForToken(authority, clientId, code, redirectUri, codeVerifier);
 
-            if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+            if (tokenResponse == null || !string.IsNullOrEmpty(tokenResponse.Error) || string.IsNullOrEmpty(tokenResponse.AccessToken))
             {
-                Nav.NavigateTo("/login?ErrorMessage=Token+exchange+failed");
+                var msg = tokenResponse?.ErrorDescription ?? tokenResponse?.Error ?? "Token exchange failed";
+                Nav.NavigateTo($"/login?ErrorMessage={Uri.EscapeDataString(msg)}");
                 return;
             }
 
@@ -153,10 +154,17 @@ public partial class SigninOidc
 
         using var client = new HttpClient();
         var response = await client.PostAsync(tokenEndpoint, content);
-        if (!response.IsSuccessStatusCode) return null;
-
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TokenResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+        var result = JsonSerializer.Deserialize<TokenResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+        if (!response.IsSuccessStatusCode && result != null)
+        {
+            // If we have a structured OIDC error, ensure it's returned so we can show it
+            if (string.IsNullOrEmpty(result.Error)) result.Error = $"HTTP {(int)response.StatusCode}";
+        }
+        
+        return result;
     }
 
     public class TokenResponse
@@ -166,5 +174,7 @@ public partial class SigninOidc
         public int ExpiresIn { get; set; }
         public string? RefreshToken { get; set; }
         public string? IdToken { get; set; }
+        public string? Error { get; set; }
+        public string? ErrorDescription { get; set; }
     }
 }
