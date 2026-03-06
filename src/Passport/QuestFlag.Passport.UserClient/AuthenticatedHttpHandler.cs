@@ -25,13 +25,23 @@ public class AuthenticatedHttpHandler : DelegatingHandler
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        var response = await base.SendAsync(request, cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+        try
         {
-            await _tokenProvider.HandleUnauthorizedAsync();
-        }
+            var response = await base.SendAsync(request, cancellationToken);
 
-        return response;
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await _tokenProvider.HandleUnauthorizedAsync();
+            }
+
+            return response;
+        }
+        catch (HttpRequestException ex) when (ex.Message.Contains("TypeError: NetworkError"))
+        {
+            // When navigating away (e.g. forced logout due to 401), pending fetch requests
+            // are aborted by the browser, surfacing as a NetworkError rather than a graceful cancellation.
+            // By translating this to a TaskCanceledException, we prevent Blazor from generating Unhandled Errors.
+            throw new TaskCanceledException("Request was aborted due to navigation (NetworkError).", ex);
+        }
     }
 }

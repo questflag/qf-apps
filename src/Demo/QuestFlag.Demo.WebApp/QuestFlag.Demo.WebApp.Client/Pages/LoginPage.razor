@@ -2,11 +2,6 @@
 @page "/sso"
 @page "/account/login"
 
-@inject NavigationManager Nav
-@inject IConfiguration Configuration
-@inject IJSRuntime JS
-@using QuestFlag.Demo.WebApp.Client.Helpers
-
 <PageTitle>Sign In — QuestFlag</PageTitle>
 
 <div class="flex items-center justify-center min-h-screen bg-white">
@@ -26,7 +21,7 @@
             <h2 class="text-xl font-black text-slate-900 tracking-tighter mb-2">Login Failed</h2>
             <p class="text-red-800 text-sm font-medium mb-6">@ErrorMessage</p>
             
-            <button @onclick="RedirectToSso" class="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-premium hover:bg-primary-hover transition-all duration-300">
+            <button @onclick="RedirectToLogin" class="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-premium hover:bg-primary-hover transition-all duration-300">
                 Retry Sign In
             </button>
         </div>
@@ -50,7 +45,7 @@
                     <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
                 </div>
 
-                <button @onclick="RedirectToSso" class="group relative px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                <button @onclick="RedirectToLogin" class="group relative px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300">
                     Click here if not redirected
                 </button>
             </div>

@@ -52,13 +52,21 @@ public partial class GlobalUsersPage
 
     private async Task LoadMetadataAsync()
     {
-        _availableRoles = await AdminClient.GetRolesAsync();
-        _availableAgents = await AdminClient.GetAgentsAsync();
+        try
+        {
+            _availableRoles = await AdminClient.GetRolesAsync();
+            _availableAgents = await AdminClient.GetAgentsAsync();
+        }
+        catch (HttpRequestException) { /* Handle gracefully, likely 401 due to session expiry or logout */ }
     }
 
     private async Task LoadUsersAsync()
     {
-        _users = await AdminClient.GetGlobalUsersAsync(_searchQuery);
+        try
+        {
+            _users = await AdminClient.GetGlobalUsersAsync(_searchQuery);
+        }
+        catch (HttpRequestException) { /* Handle gracefully */ }
     }
     
     private async Task PrepareInvite()

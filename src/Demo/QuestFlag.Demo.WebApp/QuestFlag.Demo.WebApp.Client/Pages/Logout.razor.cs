@@ -20,30 +20,15 @@ public partial class Logout
 
     private async Task PerformLogout()
     {
-        try
-        {
-            // Clear all localStorage keys
-            await JS.InvokeVoidAsync("localStorage.clear");
-
-            // Clear all session storage too
-            await JS.InvokeVoidAsync("sessionStorage.clear");
-
-            // Clear all cookies via JavaScript
-            await JS.InvokeVoidAsync("eval", @"
-                document.cookie.split(';').forEach(function(c) {
-                    document.cookie = c.trim().split('=')[0] + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
-                });
-            ");
-        }
-        catch { /* Ignore JS errors */ }
-
-        // Notify auth state provider (in-memory singleton)
+        // Clear in-memory auth state and localStorage keys (user_info, access_token, code_verifier)
         if (AuthStateProvider is PersistentAuthenticationStateProvider provider)
         {
             await provider.SignOutAsync();
         }
 
-        // Navigate to login — client-side nav, auth state is already cleared
-        Nav.NavigateTo("/login", forceLoad: false);
+        // Navigate to the server-side logout endpoint with forceLoad:true so the server request is made.
+        // The server calls SignOutAsync which expires the HttpOnly auth cookie — JS cannot delete it.
+        // The server endpoint then redirects to / (the demo app landing page).
+        Nav.NavigateTo("/api/auth/logout", forceLoad: true);
     }
 }
