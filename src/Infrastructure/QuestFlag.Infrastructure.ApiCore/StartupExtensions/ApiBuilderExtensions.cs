@@ -71,11 +71,30 @@ public static class ApiBuilderExtensions
 
         // Authentication defaults: use OpenIddict validation scheme so services don't need
         // to repeat these few lines in each Program.cs.
+        // We also register the OpenIddict validation handler here to ensure it's used by all APIs.
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
         });
+
+        builder.Services.AddOpenIddict()
+            .AddValidation(options =>
+            {
+                // Note: The authority must match the Passport Services URL.
+                // We attempt to read it from configuration.
+                var authority = builder.Configuration["QuestFlag:Passport:Authority"] 
+                    ?? builder.Configuration["ServiceUrls:PassportServices"];
+
+                if (!string.IsNullOrEmpty(authority))
+                {
+                    options.SetIssuer(authority);
+                    options.UseSystemNetHttp();
+                }
+
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
 
         // Authorization - allow the caller to add policies specific to the service.
         builder.Services.AddAuthorization(options =>

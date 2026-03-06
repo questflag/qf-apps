@@ -48,6 +48,12 @@ public class Program
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 
-        await builder.Build().RunAsync();
+        var host = builder.Build();
+
+        // Eagerly instantiate TokenProvider so it can consume the AccessToken
+        // from PersistentComponentState before the state is discarded after the initial render.
+        host.Services.GetRequiredService<IAccessTokenProvider>();
+
+        await host.RunAsync();
     }
 }

@@ -35,10 +35,10 @@ public class Program
             configureAuthorization: options =>
             {
                 options.AddPolicy("PassportAdmin", policy =>
-                    policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
+                    policy.RequireRole(UserRole.PassportAdmin));
 
                 options.AddPolicy("TenantAdmin", policy =>
-                    policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
+                    policy.RequireRole(UserRole.TenantAdmin, UserRole.PassportAdmin));
             });
 
         // 3. OpenIddict Server — Full SSO Provider
@@ -81,28 +81,11 @@ public class Program
                        .EnableTokenEndpointPassthrough()
                        .EnableUserInfoEndpointPassthrough()
                        .EnableEndSessionEndpointPassthrough();
-            })
-            .AddValidation(options =>
-            {
-                options.UseLocalServer();
-                options.UseAspNetCore();
             });
 
-        // 4. Authentication & Authorization
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-        });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("PassportAdmin", policy =>
-                policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.PassportAdmin));
+        // 4. Authentication & Authorization are now handled by builder.AddQuestFlagApi() above.
 
-            options.AddPolicy("TenantAdmin", policy =>
-                policy.RequireClaim(OpenIddictConstants.Claims.Role, UserRole.TenantAdmin, UserRole.PassportAdmin));
-        });
 
         // 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json
         var infraWebApp          = builder.Configuration["ServiceUrls:InfraWebApp"]         ?? throw new InvalidOperationException("ServiceUrls:InfraWebApp is required.");
