@@ -19,7 +19,12 @@ public class AuthenticatedHttpHandler : DelegatingHandler
 
         if (!string.IsNullOrEmpty(token))
         {
+            Console.WriteLine($"[AuthenticatedHttpHandler] Attaching token (length: {token.Length}) to {request.Method} {request.RequestUri}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+        else
+        {
+            Console.WriteLine($"[AuthenticatedHttpHandler] NO TOKEN found for {request.Method} {request.RequestUri}");
         }
 
         try

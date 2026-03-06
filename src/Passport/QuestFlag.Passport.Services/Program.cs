@@ -22,8 +22,8 @@ public class Program
         builder.Services.AddPassportApplication();
         builder.Services.AddPassportCore(builder.Configuration);
 
-        // 2. Common API services, authentication defaults and CORS policy registration.
-        builder.AddQuestFlagApi(
+        // 2. Common API services and CORS policy registration.
+        builder.AddQuestFlagApiBase(
             corsPolicyName: "PassportClients",
             corsConfigKeys: new[]
             {
@@ -31,14 +31,6 @@ public class Program
                 "ServiceUrls:InfraWebAppHttp",
                 "ServiceUrls:PassportWebApp",
                 "ServiceUrls:PassportAdminWebApp"
-            },
-            configureAuthorization: options =>
-            {
-                options.AddPolicy("PassportAdmin", policy =>
-                    policy.RequireRole(UserRole.PassportAdmin));
-
-                options.AddPolicy("TenantAdmin", policy =>
-                    policy.RequireRole(UserRole.TenantAdmin, UserRole.PassportAdmin));
             });
 
         // 3. OpenIddict Server — Full SSO Provider
@@ -83,8 +75,17 @@ public class Program
                        .EnableEndSessionEndpointPassthrough();
             });
 
+        // 4. Authentication & Authorization — Registered AFTER AddServer so UseLocalServer works.
+        builder.AddQuestFlagAuthentication(
+            useLocalServer: true,
+            configureAuthorization: options =>
+            {
+                options.AddPolicy("PassportAdmin", policy =>
+                    policy.RequireRole(UserRole.PassportAdmin));
 
-        // 4. Authentication & Authorization are now handled by builder.AddQuestFlagApi() above.
+                options.AddPolicy("TenantAdmin", policy =>
+                    policy.RequireRole(UserRole.TenantAdmin, UserRole.PassportAdmin));
+            });
 
 
         // 5. CORS for all web app origins — configured via ServiceUrls:* in appsettings.json

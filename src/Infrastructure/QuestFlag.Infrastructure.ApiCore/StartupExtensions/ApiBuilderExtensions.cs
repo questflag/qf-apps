@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenIddict.Validation;
 using OpenIddict.Validation.AspNetCore;
 
 namespace QuestFlag.Infrastructure.ApiCore.StartupExtensions;
@@ -56,54 +57,17 @@ public static class ApiBuilderExtensions
     }
 
     /// <summary>
-    /// Registers the common QuestFlag API surface including controllers, Swagger and the
-    /// OpenIddict validation-based authentication defaults. Optionally registers a CORS
-    /// policy by reading origin URLs from configuration keys and allows the caller to
-    /// configure authorization policies.
+    /// Registers the common QuestFlag API surface including controllers and Swagger.
+    /// Does NOT register authentication or authorization.
     /// </summary>
-    public static WebApplicationBuilder AddQuestFlagApi(this WebApplicationBuilder builder,
+    public static WebApplicationBuilder AddQuestFlagApiBase(this WebApplicationBuilder builder,
         string corsPolicyName = "DefaultClients",
-        string[]? corsConfigKeys = null,
-        Action<AuthorizationOptions>? configureAuthorization = null)
+        string[]? corsConfigKeys = null)
     {
         // Controllers + Swagger + API explorer
         builder.Services.AddQuestFlagApiServices();
 
-        // Authentication defaults: use OpenIddict validation scheme so services don't need
-        // to repeat these few lines in each Program.cs.
-        // We also register the OpenIddict validation handler here to ensure it's used by all APIs.
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-        });
-
-        builder.Services.AddOpenIddict()
-            .AddValidation(options =>
-            {
-                // Note: The authority must match the Passport Services URL.
-                // We attempt to read it from configuration.
-                var authority = builder.Configuration["QuestFlag:Passport:Authority"] 
-                    ?? builder.Configuration["ServiceUrls:PassportServices"];
-
-                if (!string.IsNullOrEmpty(authority))
-                {
-                    options.SetIssuer(authority);
-                    options.UseSystemNetHttp();
-                }
-
-                options.UseLocalServer();
-                options.UseAspNetCore();
-            });
-
-        // Authorization - allow the caller to add policies specific to the service.
-        builder.Services.AddAuthorization(options =>
-        {
-            configureAuthorization?.Invoke(options);
-        });
-
-        // Optional CORS registration - read origins from provided configuration keys
-        // (e.g. "ServiceUrls:InfraWebApp"). If no keys provided, skip CORS registration.
+        // Optional CORS registration
         if (corsConfigKeys != null && corsConfigKeys.Length > 0)
         {
             var origins = new List<string>();
@@ -125,6 +89,63 @@ public static class ApiBuilderExtensions
                 });
             }
         }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers OpenIddict validation-based authentication and authorization policies.
+    /// </summary>
+    public static WebApplicationBuilder AddQuestFlagAuthentication(this WebApplicationBuilder builder,
+        bool useLocalServer = false,
+        Action<AuthorizationOptions>? configureAuthorization = null)
+    {
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+        });
+
+        builder.Services.AddOpenIddict()
+            .AddValidation(options =>
+            {
+                var authority = builder.Configuration["QuestFlag:Passport:Authority"] 
+                    ?? builder.Configuration["ServiceUrls:PassportServices"]
+                    ?? builder.Configuration["Oidc:Authority"];
+
+                if (!string.IsNullOrEmpty(authority))
+                {
+                    options.SetIssuer(authority);
+                    options.UseSystemNetHttp();
+                }
+
+                if (useLocalServer)
+                {
+                    options.UseLocalServer();
+                }
+
+                options.UseAspNetCore();
+            });
+
+        builder.Services.AddAuthorization(options =>
+        {
+            configureAuthorization?.Invoke(options);
+        });
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers everything: controllers, Swagger, CORS, Authentication and Authorization.
+    /// </summary>
+    public static WebApplicationBuilder AddQuestFlagApi(this WebApplicationBuilder builder,
+        string corsPolicyName = "DefaultClients",
+        string[]? corsConfigKeys = null,
+        bool useLocalServer = false,
+        Action<AuthorizationOptions>? configureAuthorization = null)
+    {
+        builder.AddQuestFlagApiBase(corsPolicyName, corsConfigKeys);
+        builder.AddQuestFlagAuthentication(useLocalServer, configureAuthorization);
 
         return builder;
     }
