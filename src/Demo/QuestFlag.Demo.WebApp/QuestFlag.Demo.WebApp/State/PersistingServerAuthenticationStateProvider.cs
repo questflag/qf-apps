@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Components.Web;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using QuestFlag.Demo.WebApp.Client.State;
 
@@ -25,6 +26,11 @@ internal sealed class PersistingServerAuthenticationStateProvider : ServerAuthen
         this.httpContextAccessor = httpContextAccessor;
         AuthenticationStateChanged += OnAuthenticationStateChanged;
         subscription = state.RegisterOnPersisting(OnPersistingAsync, RenderMode.InteractiveWebAssembly);
+
+        if (httpContextAccessor.HttpContext?.User is { Identity.IsAuthenticated: true } user)
+        {
+            SetAuthenticationState(Task.FromResult(new AuthenticationState(user)));
+        }
     }
 
     private void OnAuthenticationStateChanged(Task<AuthenticationState> task)
@@ -44,12 +50,16 @@ internal sealed class PersistingServerAuthenticationStateProvider : ServerAuthen
 
         if (principal.Identity?.IsAuthenticated == true)
         {
-            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? principal.FindFirst("sub")?.Value;
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                ?? principal.FindFirst("sub")?.Value
+                ?? principal.FindFirst("oid")?.Value;
+
             var name = principal.Identity.Name ?? principal.FindFirst("name")?.Value ?? userId;
             var email = principal.FindFirst(ClaimTypes.Email)?.Value;
 
             if (userId != null)
             {
+                Console.WriteLine($"[ServerAuth] Persisting UserInfo for {name} ({userId})");
                 state.PersistAsJson(nameof(UserInfo), new UserInfo
                 {
                     UserId = userId,
@@ -66,12 +76,22 @@ internal sealed class PersistingServerAuthenticationStateProvider : ServerAuthen
                 var context = httpContextAccessor.HttpContext;
                 if (context != null)
                 {
-                    var token = await context.GetTokenAsync("access_token");
+                    // Explicitly pull from the cookie scheme where OIDC stores it after SaveTokens = true
+                    var token = await context.GetTokenAsync(CookieAuthenticationDefaults.AuthenticationScheme, "access_token");
                     if (!string.IsNullOrEmpty(token))
                     {
+                        Console.WriteLine($"[ServerAuth] Persisting AccessToken (length: {token.Length})");
                         state.PersistAsJson("AccessToken", token);
                     }
+                    else
+                    {
+                        Console.WriteLine("[ServerAuth] WARNING: AccessToken NOT FOUND in HttpContext tokens.");
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("[ServerAuth] WARNING: Authenticated user has no Subject/NameIdentifier claim.");
             }
         }
     }

@@ -25,8 +25,13 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         // Try server-persisted state first (prerender)
         if (_state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) && userInfo is not null)
         {
+            Console.WriteLine($"[AuthState] Recovered UserInfo from server: {userInfo.Name} ({userInfo.UserId})");
             _authenticationStateTask = Task.FromResult(CreateState(userInfo));
             _initialized = true;
+        }
+        else
+        {
+            Console.WriteLine("[AuthState] NO UserInfo found in PersistentComponentState.");
         }
     }
 

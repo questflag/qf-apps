@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
@@ -21,7 +22,8 @@ public class ServerTokenProvider : IAccessTokenProvider
         var context = _httpContextAccessor.HttpContext;
         if (context == null) return null;
 
-        return await context.GetTokenAsync("access_token");
+        // Explicitly pull from the cookie scheme where OIDC stores it
+        return await context.GetTokenAsync(CookieAuthenticationDefaults.AuthenticationScheme, "access_token");
     }
 
     public Task HandleUnauthorizedAsync()

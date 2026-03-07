@@ -39,15 +39,28 @@ public class TokenProvider : IAccessTokenProvider
             {
                 // Try load from storage
                 _accessToken = await _js.InvokeAsync<string?>("localStorage.getItem", cancellationToken, "access_token");
+                if (!string.IsNullOrEmpty(_accessToken))
+                {
+                    Console.WriteLine($"[TokenProvider] Access token recovered from localStorage (length: {_accessToken.Length})");
+                }
+                else
+                {
+                    Console.WriteLine("[TokenProvider] NO access token found in localStorage.");
+                }
             }
             else
             {
                 // Save what we got from server
+                Console.WriteLine($"[TokenProvider] Saving server-provided access token to localStorage (length: {_accessToken.Length})");
                 await _js.InvokeVoidAsync("localStorage.setItem", cancellationToken, "access_token", _accessToken);
             }
             _initialized = true;
         }
-        catch { /* Prerendering or JS error */ }
+        catch (Exception ex)
+        { 
+            /* Prerendering or JS error */ 
+            Console.WriteLine($"[TokenProvider] JS interop error or prerendering: {ex.Message}");
+        }
 
         return _accessToken;
     }
