@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using QuestFlag.Passport.AdminClient;
@@ -12,19 +13,44 @@ public partial class RolesPage
     private string _newName = "";
     private bool _creating;
     private string? _createError;
+    private string? _loadError;
 
     private RoleDto? _editingRole;
     private string _editName = "";
     private bool _updating;
     private string? _editError;
 
-    private IEnumerable<RoleDto>? FilteredRoles => 
-        string.IsNullOrWhiteSpace(_searchQuery) 
-            ? _roles 
+    private IEnumerable<RoleDto>? FilteredRoles =>
+        string.IsNullOrWhiteSpace(_searchQuery)
+            ? _roles
             : _roles?.Where(r => r.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync()
-        => _roles = await AdminClient.GetRolesAsync();
+    {
+        if (!OperatingSystem.IsBrowser())
+        {
+            // Skip protected API calls during server prerender.
+            return;
+        }
+
+        await LoadRolesAsync();
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        _loadError = null;
+        try
+        {
+            _roles = await AdminClient.GetRolesAsync();
+        }
+        catch (HttpRequestException ex)
+        {
+            _loadError = ex.StatusCode == HttpStatusCode.Forbidden
+                ? "Access denied for role management. Your session is active, but your account does not have permission for this action."
+                : "Unable to load roles right now.";
+            Console.WriteLine($"[RolesPage] Failed to load roles. Status: {ex.StatusCode}; Message: {ex.Message}");
+        }
+    }
 
     private async Task CreateRole()
     {
@@ -33,7 +59,7 @@ public partial class RolesPage
         try
         {
             await AdminClient.CreateRoleAsync(_newName);
-            _roles = await AdminClient.GetRolesAsync();
+            await LoadRolesAsync();
             _showCreate = false;
             _newName = "";
         }
@@ -56,7 +82,7 @@ public partial class RolesPage
         try
         {
             await AdminClient.UpdateRoleAsync(_editingRole.Id, _editName);
-            _roles = await AdminClient.GetRolesAsync();
+            await LoadRolesAsync();
             _editingRole = null;
         }
         catch (Exception ex) { _editError = ex.Message; }
@@ -71,9 +97,12 @@ public partial class RolesPage
         try
         {
             await AdminClient.DeleteRoleAsync(id);
-            _roles = await AdminClient.GetRolesAsync();
+            await LoadRolesAsync();
         }
-        catch (Exception) { /* Log error */ }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[RolesPage] Failed to delete role {id}: {ex.Message}");
+        }
     }
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

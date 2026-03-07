@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QuestFlag.Demo.WebApp.State;
 using QuestFlag.Infrastructure.Client;
 using QuestFlag.Infrastructure.Client.Contracts;
 using QuestFlag.Passport.UserClient;
+using QuestFlag.Passport.AdminClient;
 using QuestFlag.Infrastructure.ApiCore.StartupExtensions;
 using QuestFlag.Communication.Client.Implementations;
 using QuestFlag.Communication.Client.Contracts;
@@ -23,7 +25,6 @@ public class Program
 
         builder.AddServiceDefaults();
 
-        // Add services to the container.
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
@@ -48,6 +49,11 @@ public class Program
         }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
 
         builder.Services.AddHttpClient<PassportUserClient>(client =>
+        {
+            client.BaseAddress = new Uri(passportServicesUrl);
+        }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
+
+        builder.Services.AddHttpClient<PassportAdminClient>(client =>
         {
             client.BaseAddress = new Uri(passportServicesUrl);
         }).AddHttpMessageHandler<QuestFlag.Infrastructure.Client.AuthenticatedHttpHandler>();
@@ -77,18 +83,16 @@ public class Program
             options.Scope.Add("email");
             options.Scope.Add("roles");
             options.Scope.Add("offline_access");
-            
+
             options.TokenValidationParameters.NameClaimType = "name";
             options.TokenValidationParameters.RoleClaimType = "role";
 
-            // After successful server-side OIDC, redirect to the home page.
             options.Events.OnTicketReceived = ctx =>
             {
                 ctx.ReturnUri = "/";
                 return Task.CompletedTask;
             };
 
-            // Handle failed remote logins gracefully (e.g., user rejected, state mismatch).
             options.Events.OnRemoteFailure = ctx =>
             {
                 var msg = Uri.EscapeDataString(ctx.Failure?.Message ?? "Authentication failed");
@@ -104,7 +108,6 @@ public class Program
 
         app.MapDefaultEndpoints();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
@@ -112,10 +115,17 @@ public class Program
         else
         {
             app.UseExceptionHandler("/Error", createScopeForErrors: true);
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
-        app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
+        app.UseStatusCodePages(async context =>
+        {
+            if (context.HttpContext.Response.StatusCode == StatusCodes.Status404NotFound)
+            {
+                context.HttpContext.Response.Redirect("/not-found");
+            }
+        });
+
         app.UseQuestFlagApiPipeline();
 
         app.UseAntiforgery();
@@ -126,26 +136,20 @@ public class Program
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(QuestFlag.Demo.WebApp.Client._Imports).Assembly);
 
-
-        // Server-side login — triggers ASP.NET Core OIDC challenge.
-        // The middleware handles PKCE via correlation cookies (no localStorage needed).
         app.MapGet("/api/auth/login", async (HttpContext context) =>
         {
             await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme,
                 new AuthenticationProperties { RedirectUri = "/" });
         }).AllowAnonymous();
 
-        // Server-side logout — clears Demo App cookie then clears Passport Services session.
         app.MapGet("/api/auth/logout", async (HttpContext context) =>
         {
             var properties = new AuthenticationProperties { RedirectUri = "/" };
-            
+
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, properties);
         }).AllowAnonymous();
 
-        // Called by OpenIddict after it clears the Passport Services session.
-        // Redirects the user to the demo app landing page.
         app.MapGet("/signout-callback-oidc", () => Results.Redirect("/")).AllowAnonymous();
 
         app.Run();

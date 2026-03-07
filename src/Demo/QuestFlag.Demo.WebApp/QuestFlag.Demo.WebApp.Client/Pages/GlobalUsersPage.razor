@@ -15,6 +15,11 @@
         </div>
     </div>
 
+
+    @if (!string.IsNullOrEmpty(_loadError))
+    {
+        <div class="bg-amber-50 text-amber-800 p-3 rounded-md text-sm border border-amber-200">@_loadError</div>
+    }
     @if (_showInvite)
     {
         <div class="card p-6 bg-blue-50/30 border-blue-100">
@@ -180,3 +185,4 @@
         </div>
     }
 </div>
+

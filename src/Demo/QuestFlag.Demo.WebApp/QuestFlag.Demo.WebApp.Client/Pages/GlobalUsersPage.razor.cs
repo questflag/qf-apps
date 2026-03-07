@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using QuestFlag.Passport.AdminClient;
@@ -9,7 +10,8 @@ public partial class GlobalUsersPage
     private IReadOnlyList<UserAdminDto>? _users;
     private IReadOnlyList<TenantAdminDto>? _tenants;
     private string _searchQuery = "";
-    
+    private string? _loadError;
+
     private string SearchQuery
     {
         get => _searchQuery;
@@ -28,7 +30,7 @@ public partial class GlobalUsersPage
     private string _invUsername = "", _invEmail = "", _invDisplayName = "";
     private List<string> _invRoles = new();
     private List<string> _invAgentClientIds = new();
-    
+
     private IReadOnlyList<RoleDto>? _availableRoles;
     private IReadOnlyList<AgentDto>? _availableAgents;
     private bool _inviting;
@@ -47,6 +49,12 @@ public partial class GlobalUsersPage
 
     protected override async Task OnInitializedAsync()
     {
+        if (!OperatingSystem.IsBrowser())
+        {
+            // Skip protected API calls during server prerender.
+            return;
+        }
+
         await Task.WhenAll(LoadUsersAsync(), LoadMetadataAsync());
     }
 
@@ -57,7 +65,14 @@ public partial class GlobalUsersPage
             _availableRoles = await AdminClient.GetRolesAsync();
             _availableAgents = await AdminClient.GetAgentsAsync();
         }
-        catch (HttpRequestException) { /* Handle gracefully, likely 401 due to session expiry or logout */ }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"[GlobalUsersPage] Failed to load metadata. Status: {ex.StatusCode}; Message: {ex.Message}");
+            if (ex.StatusCode == HttpStatusCode.Forbidden)
+            {
+                _loadError = "Access denied for user administration. Your session is active, but your account does not have permission for this action.";
+            }
+        }
     }
 
     private async Task LoadUsersAsync()
@@ -65,10 +80,17 @@ public partial class GlobalUsersPage
         try
         {
             _users = await AdminClient.GetGlobalUsersAsync(_searchQuery);
+            _loadError = null;
         }
-        catch (HttpRequestException) { /* Handle gracefully */ }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"[GlobalUsersPage] Failed to load users. Status: {ex.StatusCode}; Message: {ex.Message}");
+            _loadError = ex.StatusCode == HttpStatusCode.Forbidden
+                ? "Access denied for global user directory. Your session is active, but your account does not have permission for this action."
+                : "Unable to load users right now.";
+        }
     }
-    
+
     private async Task PrepareInvite()
     {
         if (_tenants == null)
@@ -147,7 +169,10 @@ public partial class GlobalUsersPage
             await AdminClient.DeleteUserAsync(user.TenantId, user.Id);
             await LoadUsersAsync();
         }
-        catch (Exception) { /* Log error */ }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[GlobalUsersPage] Failed to delete user {user.Id}: {ex.Message}");
+        }
     }
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

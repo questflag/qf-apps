@@ -1,9 +1,9 @@
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Text.Json;
-using System.Linq;
 
 namespace QuestFlag.Demo.WebApp.Client.State;
 
@@ -22,7 +22,7 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         _state = state;
         _js = js;
 
-        // Try server-persisted state first (prerender)
+        // Try server-persisted state first (prerender).
         if (_state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) && userInfo is not null)
         {
             Console.WriteLine($"[AuthState] Recovered UserInfo from server: {userInfo.Name} ({userInfo.UserId})");
@@ -37,7 +37,6 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        // On first client-side call (after WASM init), read from localStorage
         if (!_initialized)
         {
             try
@@ -51,18 +50,29 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
                         _authenticationStateTask = Task.FromResult(CreateState(userInfo));
                     }
                 }
+                else
+                {
+                    // Fallback: rebuild user info from JWT payload when user_info was not yet stored.
+                    var accessToken = await _js.InvokeAsync<string?>("localStorage.getItem", "access_token");
+                    if (!string.IsNullOrWhiteSpace(accessToken) && TryCreateUserInfoFromJwt(accessToken, out var tokenUserInfo))
+                    {
+                        Console.WriteLine($"[AuthState] Reconstructed UserInfo from access token for {tokenUserInfo.Name} ({tokenUserInfo.UserId}).");
+                        _authenticationStateTask = Task.FromResult(CreateState(tokenUserInfo));
+                        await _js.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(tokenUserInfo));
+                    }
+                }
             }
-            catch { /* JS not available during prerendering */ }
+            catch
+            {
+                // JS not available during prerendering.
+            }
+
             _initialized = true;
         }
 
         return await _authenticationStateTask;
     }
 
-    /// <summary>
-    /// Called after successful SSO token exchange. Stores user info and notifies Blazor.
-    /// Does NOT require a page reload.
-    /// </summary>
     public async Task SignInAsync(UserInfo userInfo, string accessToken)
     {
         try
@@ -70,51 +80,136 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
             await _js.InvokeVoidAsync("localStorage.setItem", "user_info", JsonSerializer.Serialize(userInfo));
             await _js.InvokeVoidAsync("localStorage.setItem", "access_token", accessToken);
         }
-        catch { /* Ignore */ }
+        catch
+        {
+            // Ignore storage errors.
+        }
 
         _authenticationStateTask = Task.FromResult(CreateState(userInfo));
         _initialized = true;
         NotifyAuthenticationStateChanged(_authenticationStateTask);
     }
 
-    /// <summary>
-    /// Called on logout. Clears all auth state from memory and localStorage.
-    /// Does NOT require a page reload.
-    /// </summary>
     public async Task SignOutAsync()
     {
         try
         {
-            // Clear all known auth keys
             await _js.InvokeVoidAsync("localStorage.removeItem", "user_info");
             await _js.InvokeVoidAsync("localStorage.removeItem", "access_token");
             await _js.InvokeVoidAsync("localStorage.removeItem", "code_verifier");
         }
-        catch { /* Ignore */ }
+        catch
+        {
+            // Ignore storage errors.
+        }
 
         _authenticationStateTask = defaultUnauthenticatedTask;
         _initialized = true;
         NotifyAuthenticationStateChanged(_authenticationStateTask);
     }
 
-    private AuthenticationState CreateState(UserInfo userInfo)
+    private static AuthenticationState CreateState(UserInfo userInfo)
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId ?? ""),
-            new Claim(ClaimTypes.Name, userInfo.Name ?? ""),
+            new(ClaimTypes.NameIdentifier, userInfo.UserId ?? string.Empty),
+            new(ClaimTypes.Name, userInfo.Name ?? string.Empty)
         };
-        if (!string.IsNullOrEmpty(userInfo.Email))
-            claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
 
-        if (userInfo.Roles != null)
+        if (!string.IsNullOrEmpty(userInfo.Email))
         {
-            foreach (var role in userInfo.Roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
+        }
+
+        foreach (var role in userInfo.Roles ?? Array.Empty<string>())
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Bearer")));
+    }
+
+    private static bool TryCreateUserInfoFromJwt(string token, out UserInfo userInfo)
+    {
+        userInfo = new UserInfo();
+
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2)
+            {
+                return false;
+            }
+
+            var payload = parts[1]
+                .Replace('-', '+')
+                .Replace('_', '/');
+
+            payload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
+            var payloadBytes = Convert.FromBase64String(payload);
+            using var doc = JsonDocument.Parse(Encoding.UTF8.GetString(payloadBytes));
+            var root = doc.RootElement;
+
+            string? GetString(params string[] names)
+            {
+                foreach (var name in names)
+                {
+                    if (root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String)
+                    {
+                        return prop.GetString();
+                    }
+                }
+                return null;
+            }
+
+            var roles = new List<string>();
+            void AddRoles(string claimName)
+            {
+                if (!root.TryGetProperty(claimName, out var prop)) return;
+
+                if (prop.ValueKind == JsonValueKind.String)
+                {
+                    var role = prop.GetString();
+                    if (!string.IsNullOrWhiteSpace(role)) roles.Add(role);
+                }
+                else if (prop.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in prop.EnumerateArray())
+                    {
+                        if (item.ValueKind == JsonValueKind.String)
+                        {
+                            var role = item.GetString();
+                            if (!string.IsNullOrWhiteSpace(role)) roles.Add(role);
+                        }
+                    }
+                }
+            }
+
+            AddRoles("role");
+            AddRoles("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+
+            var userId = GetString("user_id", "sub");
+            var name = GetString("name", "username", "preferred_username", "sub");
+            var email = GetString("email");
+
+            if (string.IsNullOrWhiteSpace(userId) && string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            userInfo = new UserInfo
+            {
+                UserId = userId,
+                Name = name,
+                Email = email,
+                Roles = roles.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+            };
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

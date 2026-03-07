@@ -28,20 +28,13 @@
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">System Management</span>
                 <span class="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
             </div>
-            
+
             <div class="px-3 space-y-1">
                 <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300" href="admin/tenants" ActiveClass="bg-primary/5 text-primary shadow-sm ring-1 ring-primary/10">
                     <div class="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 group-hover:bg-white transition-colors mr-3 shadow-sm">
                         <span class="bi bi-buildings text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
                     </div>
                     <span>Tenants</span>
-                </NavLink>
-
-                <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300" href="admin/users" ActiveClass="bg-primary/5 text-primary shadow-sm ring-1 ring-primary/10">
-                    <div class="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 group-hover:bg-white transition-colors mr-3 shadow-sm">
-                        <span class="bi bi-people text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
-                    </div>
-                    <span>User Directory</span>
                 </NavLink>
 
                 <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300" href="admin/roles" ActiveClass="bg-primary/5 text-primary shadow-sm ring-1 ring-primary/10">
@@ -58,6 +51,17 @@
                     <span>Service Agents</span>
                 </NavLink>
             </div>
+        </div>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="passport_admin">
+        <div class="px-3 space-y-1">
+            <NavLink class="group flex items-center px-4 py-3 text-sm font-semibold rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300" href="admin/users" ActiveClass="bg-primary/5 text-primary shadow-sm ring-1 ring-primary/10">
+                <div class="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 group-hover:bg-white transition-colors mr-3 shadow-sm">
+                    <span class="bi bi-people text-lg opacity-70 group-hover:opacity-100" aria-hidden="true"></span>
+                </div>
+                <span>User Directory</span>
+            </NavLink>
         </div>
     </AuthorizeView>
 
