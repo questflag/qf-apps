@@ -53,6 +53,10 @@ public class Program
         // Eagerly instantiate TokenProvider so it can consume the AccessToken
         // from PersistentComponentState before the state is discarded after the initial render.
         host.Services.GetRequiredService<IAccessTokenProvider>();
+        
+        // Eagerly instantiate AuthenticationStateProvider for the exact same reason:
+        // PersistentComponentState discards its state if not consumed during early initialization.
+        host.Services.GetRequiredService<AuthenticationStateProvider>();
 
         await host.RunAsync();
     }

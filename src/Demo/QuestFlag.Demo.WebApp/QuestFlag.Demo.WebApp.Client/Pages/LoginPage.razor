@@ -1,56 +1,30 @@
-@page "/login"
-@page "/sso"
-@page "/account/login"
+﻿@page "/login"
+@rendermode InteractiveWebAssembly
+<PageTitle>System Login</PageTitle>
 
-<PageTitle>Sign In — QuestFlag</PageTitle>
-
-<div class="flex items-center justify-center min-h-screen bg-white">
-    <!-- Animated background element -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse"></div>
-        <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
-    </div>
-
-<div class="relative w-full max-w-md p-10 text-center">
-    @if (!string.IsNullOrEmpty(ErrorMessage))
-    {
-        <div class="mb-10 p-6 bg-red-50 border border-red-100 rounded-3xl animate-in fade-in slide-in-from-top-4 duration-700">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-red-100 text-red-600 text-xl font-black mb-4">
-                <span class="bi bi-exclamation-triangle"></span>
-            </div>
-            <h2 class="text-xl font-black text-slate-900 tracking-tighter mb-2">Login Failed</h2>
-            <p class="text-red-800 text-sm font-medium mb-6">@ErrorMessage</p>
-            
-            <button @onclick="RedirectToLogin" class="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-premium hover:bg-primary-hover transition-all duration-300">
-                Retry Sign In
-            </button>
-        </div>
-    }
-    else
-    {
-        <!-- Brand Logo -->
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary text-white text-3xl font-black shadow-premium mb-10 transform hover:scale-105 transition-transform duration-500">
-            QF
-        </div>
-
-        <!-- Content -->
-        <div class="space-y-4">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Authenticating</h1>
-            <p class="text-slate-400 font-semibold uppercase tracking-[0.2em] text-[10px]">Preparing your secure session</p>
-            
-            <div class="pt-10 flex flex-col items-center">
-                <div class="flex space-x-2 mb-10">
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></div>
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger mb-4">
+                    <h4 class="alert-heading">Login Error</h4>
+                    <p>@ErrorMessage</p>
                 </div>
-
-                <button @onclick="RedirectToLogin" class="group relative px-8 py-4 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300">
-                    Click here if not redirected
-                </button>
-            </div>
+                <button class="btn btn-primary" @onclick="RedirectToLogin">Retry Sign In</button>
+            }
+            else
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Authenticating...</h4>
+                        <p class="text-muted">You are being redirected to our secure identity provider.</p>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
-</div>
-

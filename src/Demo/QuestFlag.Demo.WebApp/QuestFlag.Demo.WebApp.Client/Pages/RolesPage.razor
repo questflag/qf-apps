@@ -1,35 +1,35 @@
-@page "/admin/roles"
+﻿@page "/admin/roles"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "passport_admin,tenant_admin")]
 
 @using QuestFlag.Passport.AdminClient
 @inject PassportAdminClient AdminClient
 
-<PageTitle>Roles — Passport Admin</PageTitle>
+<PageTitle>Roles â€” Passport Admin</PageTitle>
 
 <div class="max-w-7xl mx-auto p-4 space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-        <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 mb-4 sm:mb-0">Roles</h1>
+        <h1 class="text-2xl font-extrabold mb-4 sm:mb-0">Roles</h1>
         <div class="flex space-x-2">
-            <input @bind="_searchQuery" @bind:event="oninput" placeholder="Search roles..." class="input-field w-64" />
+            <input @bind="_searchQuery" @bind:event="oninput" placeholder="Search roles..." class="form-control w-auto" />
             <button class="btn btn-primary" @onclick="() => _showCreate = true">+ New Role</button>
         </div>
     </div>
 
     @if (!string.IsNullOrEmpty(_loadError))
     {
-        <div class="bg-amber-50 text-amber-800 p-3 rounded-md text-sm border border-amber-200">@_loadError</div>
+        <div class="p-3 text-sm border">@_loadError</div>
     }
 
     @if (_showCreate)
     {
-        <div class="card p-6 bg-blue-50/30 border-blue-100">
+        <div class="card p-6">
             <h2 class="text-lg font-semibold mb-4">Create Role</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input @bind="_newName" placeholder="member" class="input-field" /></div>
+                <div><label class="block text-sm font-medium mb-1">Name</label><input @bind="_newName" placeholder="member" class="form-control" /></div>
             </div>
-            @if (_createError != null) { <div class="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200 mt-4">@_createError</div> }
+            @if (_createError != null) { <div class="p-3 text-sm border mt-4">@_createError</div> }
             <div class="mt-4 flex space-x-2">
-                <button class="btn btn-primary" @onclick="CreateRole" disabled="@_creating">@(_creating ? "Creating…" : "Create")</button>
+                <button class="btn btn-primary" @onclick="CreateRole" disabled="@_creating">@(_creating ? "Creatingâ€¦" : "Create")</button>
                 <button class="btn btn-secondary" @onclick="() => _showCreate = false">Cancel</button>
             </div>
         </div>
@@ -37,14 +37,14 @@
 
     @if (_editingRole != null)
     {
-        <div class="card p-6 bg-amber-50/30 border-amber-100">
-            <h2 class="text-lg font-semibold mb-4">Edit Role: <span class="text-amber-700">@_editingRole.Name</span></h2>
+        <div class="card p-6">
+            <h2 class="text-lg font-semibold mb-4">Edit Role: <span >@_editingRole.Name</span></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input @bind="_editName" class="input-field" /></div>
+                <div><label class="block text-sm font-medium mb-1">Name</label><input @bind="_editName" class="form-control" /></div>
             </div>
-            @if (_editError != null) { <div class="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200 mt-4">@_editError</div> }
+            @if (_editError != null) { <div class="p-3 text-sm border mt-4">@_editError</div> }
             <div class="mt-4 flex space-x-2">
-                <button class="btn btn-primary" @onclick="UpdateRole" disabled="@_updating">@(_updating ? "Saving…" : "Save Changes")</button>
+                <button class="btn btn-primary" @onclick="UpdateRole" disabled="@_updating">@(_updating ? "Savingâ€¦" : "Save Changes")</button>
                 <button class="btn btn-secondary" @onclick="() => _editingRole = null">Cancel</button>
             </div>
         </div>
@@ -52,23 +52,23 @@
 
     @if (_roles == null)
     {
-        <p class="text-sm font-medium text-gray-500">Loading roles…</p>
+        <p class="text-sm font-medium">Loading rolesâ€¦</p>
     }
     else
     {
         <div class="card overflow-x-auto">
             <table class="w-full text-left">
                 <thead class="table-header"><tr><th class="px-4 py-3">Name</th><th class="px-4 py-3">ID</th><th class="px-4 py-3">Actions</th></tr></thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody >
                 @foreach (var r in FilteredRoles ?? Array.Empty<RoleDto>())
                 {
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover: transition-colors">
                         <td class="table-cell font-medium">@r.Name</td>
-                        <td class="table-cell font-mono text-xs text-gray-400">@r.Id</td>
+                        <td class="table-cell text-xs">@r.Id</td>
                         <td class="table-cell">
-                            <div class="flex items-center space-x-3">
-                                <button class="text-sm font-medium text-amber-600 hover:text-amber-700" @onclick="() => StartEdit(r)">Edit</button>
-                                <button class="text-sm font-medium text-red-600 hover:text-red-700" @onclick="() => DeleteRole(r.Id)">Delete</button>
+                            <div class="flex items-center gap-2">
+                                <button class="text-sm font-medium hover:" @onclick="() => StartEdit(r)">Edit</button>
+                                <button class="text-sm font-medium hover:" @onclick="() => DeleteRole(r.Id)">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -78,3 +78,4 @@
         </div>
     }
 </div>
+

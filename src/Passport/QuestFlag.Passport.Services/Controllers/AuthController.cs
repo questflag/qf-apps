@@ -122,7 +122,7 @@ public class AuthController : ControllerBase
         return BadRequest(new { error = "The specified grant type is not supported." });
     }
 
-    [HttpGet("userinfo"), HttpPost("userinfo"), Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [HttpGet("userinfo"), HttpPost("userinfo"), Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UserInfo()
     {
         var user = await _userRepository.GetByIdAsync(Guid.Parse(User.GetClaim(OpenIddictConstants.Claims.Subject) ?? Guid.Empty.ToString()));
